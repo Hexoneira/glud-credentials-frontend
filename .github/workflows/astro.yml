@@ -45,12 +45,15 @@ jobs:
             echo "runner=yarn" >> $GITHUB_OUTPUT
             echo "lockfile=yarn.lock" >> $GITHUB_OUTPUT
             exit 0
-          elif [ -f "${{ github.workspace }}/package.json" ]; then
+          elif [ -f "${{ github.workspace }}/package-lock.json" ]; then
             echo "manager=npm" >> $GITHUB_OUTPUT
             echo "command=ci" >> $GITHUB_OUTPUT
             echo "runner=npx --no-install" >> $GITHUB_OUTPUT
             echo "lockfile=package-lock.json" >> $GITHUB_OUTPUT
             exit 0
+          elif [ -f "${{ github.workspace }}/package.json" ]; then
+            echo "package.json found but package-lock.json is missing; this workflow requires a lockfile for npm ci and caching." >&2
+            exit 1
           else
             echo "Unable to determine package manager"
             exit 1
