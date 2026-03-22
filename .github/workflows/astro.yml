@@ -77,9 +77,15 @@ jobs:
         working-directory: ${{ env.BUILD_PATH }}
       - name: Build with Astro
         run: |
-          ${{ steps.detect-package-manager.outputs.runner }} astro build \
-            --site "${{ steps.pages.outputs.origin || 'https://localhost' }}" \
-            --base "${{ steps.pages.outputs.base_path || '/' }}"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # For pull request validation, run a plain Astro build without Pages-specific flags
+            ${{ steps.detect-package-manager.outputs.runner }} astro build
+          else
+            # For deployments, use the site and base path configured by actions/configure-pages
+            ${{ steps.detect-package-manager.outputs.runner }} astro build \
+              --site "${{ steps.pages.outputs.origin }}" \
+              --base "${{ steps.pages.outputs.base_path }}"
+          fi
         working-directory: ${{ env.BUILD_PATH }}
       - name: Upload artifact
         if: github.event_name != 'pull_request'
