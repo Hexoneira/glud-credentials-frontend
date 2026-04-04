@@ -3,124 +3,136 @@
 </p>
 
 <p align="center">
-	<a href="https://astro.build/" target="_blank"><img alt="Astro" src="https://img.shields.io/badge/Astro-5.x-0b132b?style=for-the-badge&logo=astro&logoColor=white"></a>
-	<a href="https://react.dev/" target="_blank"><img alt="React" src="https://img.shields.io/badge/React-19.x-1c2541?style=for-the-badge&logo=react&logoColor=61dafb"></a>
-	<a href="https://tailwindcss.com/" target="_blank"><img alt="Tailwind CSS" src="https://img.shields.io/badge/TailwindCSS-4.x-3a506b?style=for-the-badge&logo=tailwindcss&logoColor=38bdf8"></a>
-	<a href="https://www.typescriptlang.org/" target="_blank"><img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.x-5bc0be?style=for-the-badge&logo=typescript&logoColor=0b132b"></a>
+	<strong>Frontend oficial del carnet digital GLUD</strong><br />
+	Experiencia mobile-first para visualizacion, validacion y control de membresia.
 </p>
 
 <p align="center">
-	<img alt="UX" src="https://img.shields.io/badge/Focus-Mobile%20First-0b132b?style=flat-square">
-	<img alt="Identity" src="https://img.shields.io/badge/Visual%20Direction-GLUD%20Aesthetic-1c2541?style=flat-square">
-	<img alt="Architecture" src="https://img.shields.io/badge/Architecture-Frontend%20Web%20App-3a506b?style=flat-square">
-	<img alt="Integration" src="https://img.shields.io/badge/Integration-GLUD%20Credentials%20API-5bc0be?style=flat-square&logoColor=0b132b">
+	<a href="https://astro.build/"><img alt="Astro" src="https://img.shields.io/badge/Astro-5.x-0b132b?style=for-the-badge&logo=astro&logoColor=white"></a>
+	<a href="https://react.dev/"><img alt="React" src="https://img.shields.io/badge/React-19.x-1c2541?style=for-the-badge&logo=react&logoColor=61dafb"></a>
+	<a href="https://tailwindcss.com/"><img alt="Tailwind CSS" src="https://img.shields.io/badge/TailwindCSS-4.x-3a506b?style=for-the-badge&logo=tailwindcss&logoColor=38bdf8"></a>
+	<a href="https://www.typescriptlang.org/"><img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.x-5bc0be?style=for-the-badge&logo=typescript&logoColor=0b132b"></a>
 </p>
 
-## GLUD Credentials Frontend
+<p align="center">
+	<img alt="Focus" src="https://img.shields.io/badge/Focus-Mobile%20First-0b132b?style=flat-square">
+	<img alt="Visual Direction" src="https://img.shields.io/badge/Visual%20Direction-GLUD%20Aesthetic-1c2541?style=flat-square">
+	<img alt="Architecture" src="https://img.shields.io/badge/Architecture-Frontend%20Web%20App-3a506b?style=flat-square">
+	<img alt="Integration" src="https://img.shields.io/badge/Integration-GLUD%20Credentials%20API-5bc0be?style=flat-square&logoColor=0b132b">
+	<img alt="Node" src="https://img.shields.io/badge/Node.js-22%2B-0f2b3f?style=flat-square&logo=node.js&logoColor=7dd3fc">
+</p>
 
-Frontend oficial para la visualizacion del carnet digital de miembros GLUD y sus datos asociados, optimizado para dispositivos moviles.
+## Resumen Ejecutivo
 
-Este proyecto esta disenado para ofrecer una experiencia rapida, clara y segura, manteniendo la linea visual de [glud.org](https://glud.org): contraste oscuro, acentos neon, tipografia contundente y componentes orientados a comunidad tecnologica.
+GLUD Credentials Frontend es la interfaz oficial para gestionar la experiencia digital de credenciales de miembros GLUD.
+El proyecto esta orientado a rendimiento, legibilidad y claridad operativa en dispositivos moviles, con una linea visual corporativa de alto contraste y acentos neon.
 
-## Objetivo
+## Propuesta de Valor
 
-Construir una web app enfocada en moviles donde cada miembro pueda:
+- Centraliza el carnet digital en una vista clara y verificable.
+- Reduce friccion en validaciones mediante QR y codigo dinamico.
+- Asegura consistencia visual con la identidad GLUD.
+- Prioriza lectura rapida en pantallas pequenas y escenarios de uso real.
 
-- Consultar su carnet digital activo.
-- Ver estado de membresia y vigencia.
-- Acceder a informacion esencial de perfil.
-- Validar y compartir su credencial de forma simple (por QR o identificador).
+## Alcance Funcional
 
-## Alcance funcional
+- Autenticacion del miembro contra API.
+- Visualizacion del carnet digital activo.
+- Datos clave de perfil y estado de membresia.
+- Validacion por QR y codigo temporal.
+- Manejo de estados de carga, error, sin credencial y vigencia.
+- Diseno responsive con enfoque mobile-first.
 
-- Autenticacion del miembro (flujo seguro contra API).
-- Vista principal del carnet digital.
-- Pantalla de detalles de membresia.
-- Visualizacion de QR/identificador para validacion.
-- Manejo de estados: cargando, sin credencial, expirada, error de red.
-- Diseno responsive con prioridad absoluta a pantallas pequenas.
+## Arquitectura Frontend
 
-## Stack oficial
+| Capa | Tecnologia | Responsabilidad |
+| --- | --- | --- |
+| App shell | Astro | Enrutamiento, SSR y optimizacion de carga inicial |
+| Interactividad | React | Componentes dinamicos del carnet y QR |
+| UI System | Tailwind CSS | Estilos utilitarios, escala responsive y consistencia visual |
+| Tipado | TypeScript | Seguridad de tipos y mantenibilidad |
 
-- Astro (estructura, routing y rendimiento web)
-- React (componentes interactivos)
-- Tailwind CSS (sistema de estilos utilitario)
-- TypeScript (tipado estricto)
-
-## Direccion de diseño
-
-Basado en la estetica de GLUD:
+## Direccion de Diseno
 
 | Aspecto | Definicion |
 | --- | --- |
-| Fondo | Oscuro profundo con gradientes sutiles. |
-| Acentos | Cian/azul electrico para acciones primarias. |
-| Tipografia | Fuerte para titulares y lectura clara en movil. |
-| Recursos visuales | Elementos geometricos ligeros como apoyo visual. |
-| Jerarquia | Simple, con foco en el carnet como pieza central. |
+| Fondo | Oscuro profundo con gradientes sutiles |
+| Acentos | Cian/azul electrico para estados y foco visual |
+| Tipografia | Jerarquia fuerte, legible y orientada a movil |
+| Estilo | Sobrio, tecnico y corporativo |
+| Composicion | Carnet como elemento principal y contexto minimo |
 
-Principios UX del proyecto:
+Principios UX aplicados:
 
-| Principio | Aplicacion |
-| --- | --- |
-| Mobile first real | Se disena primero para smartphone. |
-| Interaccion corta | Maximo valor en pocos toques. |
-| Claridad de estado | Siempre mostrar que ocurre. |
-| Legibilidad | Alta en exteriores y pantallas pequenas. |
+- Mobile-first real.
+- Interaccion corta y directa.
+- Claridad de estado en todo momento.
+- Legibilidad alta en diferentes condiciones de luz.
 
-## Integracion con backend
+## Integracion con Backend
 
-Este frontend consume la API del proyecto GLUD Credentials API para autenticacion, consulta de miembro y lectura de credencial digital.
+Este frontend consume la API GLUD Credentials para autenticacion, consulta de miembro y estado de credencial.
 
-Repositorio backend relacionado:
-- [GLUD Credentials API (Spring Boot)](https://github.com/hexoneira/glud-credentials-api)
+- Backend relacionado: [GLUD Credentials API (Spring Boot)](https://github.com/hexoneira/glud-credentials-api)
 
-## Inicio rapido
+## Inicio Rapido
 
 ### Requisitos
 
 - Node.js 20 o superior (recomendado 22 LTS)
 - npm 10 o superior
 
-### 1) Instalar dependencias
+### Instalacion y ejecucion
 
 ```bash
 npm install
-```
-
-### 2) Ejecutar en desarrollo
-
-```bash
 npm run dev
 ```
 
-### 3) Build de produccion
+### Build y preview
 
 ```bash
 npm run build
-```
-
-### 4) Preview local
-
-```bash
 npm run preview
 ```
 
-## Flujo funcional principal
+### Variable de entorno esperada
 
-1. El miembro inicia sesion.
-2. El sistema consulta su estado de membresia.
-3. Se renderiza el carnet digital con datos vigentes.
-4. El usuario puede mostrar QR/identificador para validacion.
-5. Se gestionan estados alternos (sin carnet, expirado o error).
+```bash
+PUBLIC_API_BASE_URL=http://localhost:8080
+```
 
-## Criterios de calidad del frontend
+## Scripts Disponibles
 
-- Lighthouse mobile con foco en Performance y Accessibility.
-- Tiempo de carga inicial bajo en red movil.
+| Script | Descripcion |
+| --- | --- |
+| `npm run dev` | Levanta entorno de desarrollo |
+| `npm run build` | Genera build de produccion |
+| `npm run preview` | Sirve build localmente |
+| `npm run astro` | Ejecuta comandos Astro CLI |
+
+## Estructura del Proyecto
+
+```text
+src/
+	components/
+		CarnetPanel.astro
+		TOTPQRBlock.tsx
+		QRGenerator.tsx
+	pages/
+		index.astro
+		carnet.astro
+	styles/
+		global.css
+	config.ts
+```
+
+## Criterios de Calidad
+
+- Performance y accesibilidad orientadas a Lighthouse mobile.
 - Componentes reutilizables y tipados.
-- Estilos consistentes mediante tokens y utilidades Tailwind.
 - Manejo centralizado de errores de API.
+- Escalado visual consistente entre breakpoints.
 
 ## Organizacion
 
@@ -128,4 +140,4 @@ Proyecto desarrollado por Hexoneira para GLUD (Grupo GNU/Linux Universidad Distr
 
 ## Licencia
 
-Este repositorio se distribuye bajo la licencia definida en `LICENSE`.
+Distribuido bajo la licencia definida en `LICENSE`.
