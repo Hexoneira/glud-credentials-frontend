@@ -72,6 +72,7 @@ export default function OrbsBackground() {
           // @ts-ignore
           const modAny: any = mod;
           anime = modAny && (modAny.default || modAny.anime || modAny);
+          console.warn('[OrbsBackground] animejs failed to load from main entry, loaded from fallback', err);
         } catch (e) {
           // If anime fails to load, log and abort animations
           // eslint-disable-next-line no-console
