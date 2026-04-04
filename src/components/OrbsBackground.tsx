@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 
-type OrbConfig = {
-  id: string;
-  color: string;
+type OrbEntry = {
+  wrapper: HTMLDivElement;
+  orb: HTMLDivElement;
   delay: number;
 };
 
@@ -15,7 +15,8 @@ function randomBetween(min: number, max: number): number {
 
 export default function OrbsBackground() {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const orbsRef = useRef<Map<string, HTMLDivElement>>(new Map());
+  // Store wrapper (parallax target) and inner orb (anime animation target) separately
+  const orbEntriesRef = useRef<OrbEntry[]>([]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -24,34 +25,44 @@ export default function OrbsBackground() {
     const isDesktop = window.innerWidth > MOBILE_WIDTH;
     const orbCount = isDesktop ? 4 : 3;
 
-    // Crear elementos de orbes
-    const orbConfigs: OrbConfig[] = [];
+    // Create wrapper + inner orb pairs so parallax and float animations use separate elements
     for (let i = 0; i < orbCount; i++) {
-      const orb = document.createElement('div');
-      orb.className = 'gradient-orb';
-      orb.id = `orb-${i}`;
-
       const color = COLORS[i % COLORS.length];
       const size = isDesktop ? randomBetween(280, 420) : randomBetween(200, 300);
 
-      orb.style.cssText = `
+      // Wrapper: handles parallax offset via its own transform (not touched by anime)
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = `
         position: absolute;
         width: ${size}px;
         height: ${size}px;
+        left: ${randomBetween(10, 80)}%;
+        top: ${randomBetween(10, 80)}%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 0;
+        will-change: transform;
+      `;
+
+      // Inner orb: animated by anime (translateX/Y, scale, opacity) independently
+      const orb = document.createElement('div');
+      orb.className = 'gradient-orb';
+      orb.style.cssText = `
+        position: absolute;
+        inset: 0;
         border-radius: 50%;
         opacity: 0.35;
         filter: blur(80px);
-        pointer-events: none;
-        z-index: 0;
         background: radial-gradient(circle, ${color}, transparent);
+        will-change: transform, opacity;
       `;
 
-      container.appendChild(orb);
-      orbsRef.current.set(`orb-${i}`, orb);
+      wrapper.appendChild(orb);
+      container.appendChild(wrapper);
 
-      orbConfigs.push({
-        id: `orb-${i}`,
-        color,
+      orbEntriesRef.current.push({
+        wrapper,
+        orb,
         delay: randomBetween(0, 1500),
       });
     }
@@ -91,12 +102,9 @@ export default function OrbsBackground() {
         }
       }
 
-      // Animar cada orbe
-      orbConfigs.forEach((config) => {
-        const orb = orbsRef.current.get(config.id);
-        if (!orb) return;
-
-        // Animación de movimiento suave y continuo
+      // Animate each inner orb (float + scale + opacity) — wrapper is untouched by anime
+      orbEntriesRef.current.forEach(({ orb, delay }) => {
+        // Smooth continuous float animation
         anime({
           targets: orb,
           translateX: [
@@ -110,33 +118,33 @@ export default function OrbsBackground() {
             randomBetween(-120, 120),
           ],
           duration: randomBetween(8000, 15000),
-          delay: config.delay,
+          delay,
           easing: 'easeInOutSine',
           loop: true,
         });
 
-        // Animación de pulsación/opacidad
+        // Pulse / opacity animation
         anime({
           targets: orb,
           opacity: [0.25, 0.45, 0.25],
           duration: randomBetween(3000, 5000),
-          delay: config.delay + randomBetween(0, 500),
+          delay: delay + randomBetween(0, 500),
           easing: 'easeInOutQuad',
           loop: true,
         });
 
-        // Animación de escala suave
+        // Gentle scale animation
         anime({
           targets: orb,
           scale: [0.95, 1.1, 0.95],
           duration: randomBetween(4000, 7000),
-          delay: config.delay + randomBetween(200, 800),
+          delay: delay + randomBetween(200, 800),
           easing: 'easeInOutSine',
           loop: true,
         });
       });
 
-      // Efecto parallax con mouse (solo desktop)
+      // Parallax effect on mouse (desktop only) — applied to wrapper, not the animated inner orb
       let mouseHandler: ((e: MouseEvent) => void) | null = null;
       if (isDesktop) {
         mouseHandler = (e: MouseEvent) => {
@@ -146,18 +154,11 @@ export default function OrbsBackground() {
           const xPercent = (clientX / innerWidth - 0.5) * 2;
           const yPercent = (clientY / innerHeight - 0.5) * 2;
 
-          Array.from(orbsRef.current.values()).forEach((orb, index) => {
+          orbEntriesRef.current.forEach(({ wrapper }, index) => {
             const speed = (index + 1) * 15;
             try {
-              // Use anime.set if available, otherwise set transform directly
-              if (anime && typeof anime.set === 'function') {
-                anime.set(orb, {
-                  translateX: xPercent * speed,
-                  translateY: yPercent * speed,
-                });
-              } else {
-                orb.style.transform = `translate(${xPercent * speed}px, ${yPercent * speed}px)`;
-              }
+              // Translate the wrapper for parallax; the inner orb's anime transform is unaffected
+              wrapper.style.transform = `translate(calc(-50% + ${xPercent * speed}px), calc(-50% + ${yPercent * speed}px))`;
             } catch (err) {
               // swallow transform errors to avoid HMR crashes
             }
@@ -167,7 +168,7 @@ export default function OrbsBackground() {
         document.addEventListener('mousemove', mouseHandler);
       }
 
-      // attach mouseHandler to orbConfigs for cleanup
+      // attach mouseHandler for cleanup
       (setupAnimations as any)._mouseHandler = mouseHandler;
     };
 
@@ -182,17 +183,12 @@ export default function OrbsBackground() {
         // ignore
       }
 
-      orbsRef.current.forEach((orb) => {
-        try {
-          orb.style.transform = '';
-        } catch (e) {
-          // ignore
-        }
-        if (orb.parentNode === container) {
-          container.removeChild(orb);
+      orbEntriesRef.current.forEach(({ wrapper }) => {
+        if (wrapper.parentNode === container) {
+          container.removeChild(wrapper);
         }
       });
-      orbsRef.current.clear();
+      orbEntriesRef.current = [];
     };
   }, []);
 
