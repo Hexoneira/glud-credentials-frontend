@@ -65,14 +65,13 @@ const formattedId = member.id.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
         <div class="card-sheen" aria-hidden="true"></div>
         <div class="absolute inset-x-0 top-0 h-px w-full bg-linear-to-r from-transparent via-cyan-400/50 to-transparent"></div>
 
-        <div id="inner-panel" class="relative z-10 col-start-2 row-start-2 w-full border border-cyan-200/18 bg-[#0b1120]/95 shadow-inner grid grid-rows-[0.4rem_auto_1fr_auto_0.4rem] sm:grid-rows-[0.7rem_auto_1fr_auto_0.7rem]">
+        <div id="inner-panel" class="relative z-10 col-start-2 row-start-2 w-full grid grid-rows-[0.4rem_auto_1fr_auto_0.4rem] sm:grid-rows-[0.7rem_auto_1fr_auto_0.7rem]">
             <header class="row-start-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-white/15 p-4 sm:gap-5 sm:p-5 md:p-6 lg:p-8 sm:items-end">
                 <div class="min-w-0 text-left">
                     <h1 class="text-2xl font-black tracking-[0.14em] text-white drop-shadow-[0_0_12px_rgba(34,254,251,0.3)] sm:text-3xl md:text-5xl sm:tracking-[0.15em] md:tracking-[0.17em]">GLUD</h1>
                     <p class="mt-1 text-[0.58rem] font-bold uppercase tracking-[0.27em] text-cyan-400 sm:text-[0.7rem] md:text-[0.75rem] sm:tracking-[0.25em] md:tracking-[0.3em]">Universidad Distrital</p>
                 </div>
                 <div class="self-start whitespace-nowrap pl-2 text-right sm:self-auto sm:pl-0">
-                    <p class="text-[0.5rem] font-bold uppercase tracking-[0.23em] text-slate-500 sm:text-[0.6rem] md:text-[0.65rem] sm:tracking-[0.25em]">Secure Access</p>
                     <p class="mt-1 text-[0.65rem] font-mono tracking-[0.12em] text-slate-300 sm:text-[0.75rem] md:text-[0.85rem] sm:tracking-[0.15em]">
                         ID: <span class="text-white font-semibold">{formattedId}</span>
                     </p>
