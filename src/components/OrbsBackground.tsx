@@ -17,6 +17,10 @@ export default function OrbsBackground() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   // Store wrapper (parallax target) and inner orb (anime animation target) separately
   const orbEntriesRef = useRef<OrbEntry[]>([]);
+  // Dedicated ref for the parallax mouse handler so cleanup is always deterministic
+  const mouseHandlerRef = useRef<((e: MouseEvent) => void) | null>(null);
+  // Refs for animation instances so they can be paused on unmount
+  const animationInstancesRef = useRef<Array<{ pause: () => void }>>([]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -67,6 +71,9 @@ export default function OrbsBackground() {
       });
     }
 
+    // Cancellation flag: set to true in cleanup so the async setup aborts if it resolves late
+    let cancelled = false;
+
     const setupAnimations = async () => {
       // Try importing animejs robustly and fall back safely
       let anime: any = null;
@@ -92,6 +99,9 @@ export default function OrbsBackground() {
         }
       }
 
+      // Abort if the component unmounted while we were awaiting the import
+      if (cancelled) return;
+
       if (!anime || typeof anime !== 'function') {
         // If the resolved export isn't callable, try to use .default function
         if (anime && typeof anime.default === 'function') anime = anime.default;
@@ -105,7 +115,7 @@ export default function OrbsBackground() {
       // Animate each inner orb (float + scale + opacity) — wrapper is untouched by anime
       orbEntriesRef.current.forEach(({ orb, delay }) => {
         // Smooth continuous float animation
-        anime({
+        const floatAnim = anime({
           targets: orb,
           translateX: [
             randomBetween(-150, 150),
@@ -124,7 +134,7 @@ export default function OrbsBackground() {
         });
 
         // Pulse / opacity animation
-        anime({
+        const opacityAnim = anime({
           targets: orb,
           opacity: [0.25, 0.45, 0.25],
           duration: randomBetween(3000, 5000),
@@ -134,7 +144,7 @@ export default function OrbsBackground() {
         });
 
         // Gentle scale animation
-        anime({
+        const scaleAnim = anime({
           targets: orb,
           scale: [0.95, 1.1, 0.95],
           duration: randomBetween(4000, 7000),
@@ -142,12 +152,13 @@ export default function OrbsBackground() {
           easing: 'easeInOutSine',
           loop: true,
         });
+
+        animationInstancesRef.current.push(floatAnim, opacityAnim, scaleAnim);
       });
 
       // Parallax effect on mouse (desktop only) — applied to wrapper, not the animated inner orb
-      let mouseHandler: ((e: MouseEvent) => void) | null = null;
-      if (isDesktop) {
-        mouseHandler = (e: MouseEvent) => {
+      if (isDesktop && !cancelled) {
+        const handler = (e: MouseEvent) => {
           const { clientX, clientY } = e;
           const { innerWidth, innerHeight } = window;
 
@@ -165,22 +176,26 @@ export default function OrbsBackground() {
           });
         };
 
-        document.addEventListener('mousemove', mouseHandler);
+        mouseHandlerRef.current = handler;
+        document.addEventListener('mousemove', handler);
       }
-
-      // attach mouseHandler for cleanup
-      (setupAnimations as any)._mouseHandler = mouseHandler;
     };
 
     void setupAnimations();
 
     return () => {
-      // remove mouse handler if attached
-      try {
-        const mh = (setupAnimations as any)._mouseHandler;
-        if (mh) document.removeEventListener('mousemove', mh);
-      } catch (e) {
-        // ignore
+      cancelled = true;
+
+      // Pause all running anime instances to stop their internal RAF loops
+      animationInstancesRef.current.forEach(inst => {
+        try { inst.pause(); } catch (e) { /* ignore */ }
+      });
+      animationInstancesRef.current = [];
+
+      // Remove the parallax mouse handler using the dedicated ref
+      if (mouseHandlerRef.current) {
+        document.removeEventListener('mousemove', mouseHandlerRef.current);
+        mouseHandlerRef.current = null;
       }
 
       orbEntriesRef.current.forEach(({ wrapper }) => {
