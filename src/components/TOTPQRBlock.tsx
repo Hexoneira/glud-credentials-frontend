@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { generateSync } from 'otplib';
 import QRGenerator from './QRGenerator';
 
@@ -40,8 +40,11 @@ export default function TOTPQRBlock({
 
   const secret = useMemo(() => deriveBase32SecretFromId(studentId), [studentId]);
 
+  // Track which 30s window the last code was generated for so we skip redundant crypto work
+  const lastPeriodRef = useRef<number>(-1);
+
   useEffect(() => {
-    const refresh = () => {
+    const generateCode = () => {
       try {
         const token = generateSync({
           strategy: 'totp',
@@ -54,13 +57,24 @@ export default function TOTPQRBlock({
         console.error('[TOTPQRBlock] Error generating TOTP', error);
         setCode('000000');
       }
+    };
 
+    const tick = () => {
       const epochSeconds = Math.floor(Date.now() / 1000);
+      const currentPeriod = Math.floor(epochSeconds / 30);
+
+      // Only redo TOTP crypto when the 30s window rolls over
+      if (currentPeriod !== lastPeriodRef.current) {
+        lastPeriodRef.current = currentPeriod;
+        generateCode();
+      }
+
       setRemaining(30 - (epochSeconds % 30));
     };
 
-    refresh();
-    const interval = window.setInterval(refresh, 1000);
+    // Run immediately, then every second for the countdown
+    tick();
+    const interval = window.setInterval(tick, 1000);
     return () => window.clearInterval(interval);
   }, [secret]);
 
