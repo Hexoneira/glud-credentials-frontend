@@ -79,7 +79,7 @@ Este frontend consume la API GLUD Credentials para autenticacion, consulta de mi
 
 ### Requisitos
 
-- Node.js 20 o superior (recomendado 22 LTS)
+- Node.js 22.12.0 o superior
 - npm 10 o superior
 
 ### Instalacion y ejecucion
