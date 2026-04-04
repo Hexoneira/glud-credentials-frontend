@@ -35,31 +35,31 @@
   @font-face {
     font-family: "Exo 2 Variable";
     font-display: auto;
-    src: url(/fonts/exo2-variable.woff2) format("woff2");
+    src: local("Exo 2 Variable"), local("Exo 2");
   }
 
   @font-face {
     font-family: "Fira Sans Bold";
     font-display: auto;
-    src: url(/fonts/firasans-bold.woff2) format("woff2");
+    src: local("Fira Sans Bold"), local("Fira Sans");
   }
 
   @font-face {
     font-family: "Fira Sans ExtraLight";
     font-display: auto;
-    src: url(/fonts/firasans-extralight.woff2) format("woff2");
+    src: local("Fira Sans ExtraLight"), local("Fira Sans");
   }
 
   @font-face {
     font-family: "Fira Sans Thin";
     font-display: auto;
-    src: url(/fonts/firasans-thin.woff2) format("woff2");
+    src: local("Fira Sans Thin"), local("Fira Sans");
   }
 
   @font-face {
     font-family: "Fira Sans Regular";
     font-display: auto;
-    src: url(/fonts/firasans-regular.woff2) format("woff2");
+    src: local("Fira Sans Regular"), local("Fira Sans");
   }
 
   /* Estilos base */
