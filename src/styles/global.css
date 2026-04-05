@@ -1,1 +1,131 @@
 @import "tailwindcss";
+
+/* ==========================================
+   Variables CSS personalizadas GLUD
+   ========================================== */
+@layer base {
+  :root {
+    /* Colores principales */
+    --cyan: hsl(180, 100%, 55%);
+    --primary: #00ffff;
+    --purple: hsl(266deg 100% 55%);
+    --secondary: #800fff;
+    --orange: hsl(34deg 99.13% 55%);
+    --white: hsl(0deg 0% 93%);
+    --pink: hsl(344deg 100% 66%);
+
+    /* Backgrounds */
+    --bg-black: #1c1e1e;
+    --bg-black-gunmetal: #1c2128;
+    --bg-eerie: #181818;
+    --bg-white: #f5f5f5;
+    --black: hsl(0deg 0% 13%);
+
+    /* Colores de soporte */
+    --support-beer: #fe9920;
+    --support-eerie: #111827;
+    --support-grey: #8e95a1;
+    --support-gunmetal: #282e38;
+    --support-lila: #ff467d;
+    --support-morado: #8b51cb;
+    --support-yankees: #1c173d;
+  }
+
+  /* Fuentes personalizadas */
+  @font-face {
+    font-family: "Exo 2 Variable";
+    font-display: auto;
+    src: local("Exo 2 Variable"), local("Exo 2");
+  }
+
+  @font-face {
+    font-family: "Fira Sans Bold";
+    font-display: auto;
+    src: local("Fira Sans Bold"), local("Fira Sans");
+  }
+
+  @font-face {
+    font-family: "Fira Sans ExtraLight";
+    font-display: auto;
+    src: local("Fira Sans ExtraLight"), local("Fira Sans");
+  }
+
+  @font-face {
+    font-family: "Fira Sans Thin";
+    font-display: auto;
+    src: local("Fira Sans Thin"), local("Fira Sans");
+  }
+
+  @font-face {
+    font-family: "Fira Sans Regular";
+    font-display: auto;
+    src: local("Fira Sans Regular"), local("Fira Sans");
+  }
+
+  /* Estilos base */
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--black);
+    font-family: 'Exo 2 Variable', sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0;
+  }
+
+  /* Asegurar espacio para el header fijo en secciones */
+  section {
+    scroll-margin-top: 180px;
+  }
+
+  @media (max-width: 768px) {
+    section {
+      scroll-margin-top: 120px;
+    }
+  }
+}
+
+/* Componentes reutilizables */
+@layer components {
+  .main-container {
+    background: var(--black);
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  .primary-button {
+    padding: 1rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-transform: capitalize;
+    background: var(--cyan);
+    color: var(--purple);
+    font-family: 'Exo 2 Variable', sans-serif;
+    letter-spacing: 0.09rem;
+    transition: all 0.3s ease;
+  }
+
+  .primary-button:hover {
+    opacity: 0.9;
+  }
+}
+
+/* Utilidades personalizadas */
+@layer utilities {
+  .text-shadow-cyan {
+    text-shadow: var(--cyan) 0 0 10px;
+  }
+
+  .text-shadow-purple {
+    text-shadow: var(--purple) 1px -1px;
+  }
+}
