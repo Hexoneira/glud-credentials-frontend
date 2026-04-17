@@ -7,8 +7,6 @@ name: Deploy Astro site to Pages
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main", "develop"] # Valida el build antes de aceptar el PR
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -17,15 +15,13 @@ on:
 permissions:
   contents: read
 
-# Allow only one concurrent deployment per event/ref, skipping runs queued between the run in-progress and latest queued.
-# For pull_request validations, cancel in-progress runs so that only the latest commit is built; for production deployments, allow them to complete.
+# Allow only one concurrent deployment per ref, canceling older in-progress runs in favor of the latest queued run.
 concurrency:
-  group: pages-${{ github.event_name }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-  BUILD_PATH: "." # default value when not using subfolders
-  # BUILD_PATH: subfolder
+  BUILD_PATH: "."
 
 jobs:
   build:
@@ -40,52 +36,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Detect package manager
-        id: detect-package-manager
-        run: |
-          if [ -f "${{ github.workspace }}/yarn.lock" ]; then
-            echo "manager=yarn" >> $GITHUB_OUTPUT
-            echo "command=install" >> $GITHUB_OUTPUT
-            echo "runner=yarn" >> $GITHUB_OUTPUT
-            echo "lockfile=yarn.lock" >> $GITHUB_OUTPUT
-            exit 0
-          elif [ -f "${{ github.workspace }}/package-lock.json" ]; then
-            echo "manager=npm" >> $GITHUB_OUTPUT
-            echo "command=ci" >> $GITHUB_OUTPUT
-            echo "runner=npx --no-install" >> $GITHUB_OUTPUT
-            echo "lockfile=package-lock.json" >> $GITHUB_OUTPUT
-            exit 0
-          elif [ -f "${{ github.workspace }}/package.json" ]; then
-            echo "package.json found but package-lock.json is missing; this workflow requires a lockfile for npm ci and caching." >&2
-            exit 1
-          else
-            echo "Unable to determine package manager"
-            exit 1
-          fi
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "22.12.0"
-          cache: ${{ steps.detect-package-manager.outputs.manager }}
-          cache-dependency-path: ${{ env.BUILD_PATH }}/${{ steps.detect-package-manager.outputs.lockfile }}
+          cache: "npm"
+          cache-dependency-path: ${{ env.BUILD_PATH }}/package-lock.json
       - name: Setup Pages
         id: pages
-        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
       - name: Install dependencies
-        run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
+        run: npm ci
         working-directory: ${{ env.BUILD_PATH }}
       - name: Build with Astro
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            # For pull request validation, run a plain Astro build without Pages-specific flags
-            ${{ steps.detect-package-manager.outputs.runner }} astro build
-          else
-            # For deployments, use the site and base path configured by actions/configure-pages
-            ${{ steps.detect-package-manager.outputs.runner }} astro build \
-              --site "${{ steps.pages.outputs.origin }}" \
-              --base "${{ steps.pages.outputs.base_path }}"
-          fi
+          # Use the same Pages-derived site and base path for validation and deployment builds
+          npx astro build \
+            --site "${{ steps.pages.outputs.origin }}" \
+            --base "${{ steps.pages.outputs.base_path }}"
         working-directory: ${{ env.BUILD_PATH }}
       - name: Upload artifact
         if: github.event_name != 'pull_request'
