@@ -70,22 +70,16 @@ jobs:
           cache-dependency-path: ${{ env.BUILD_PATH }}/${{ steps.detect-package-manager.outputs.lockfile }}
       - name: Setup Pages
         id: pages
-        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
         working-directory: ${{ env.BUILD_PATH }}
       - name: Build with Astro
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            # For pull request validation, run a plain Astro build without Pages-specific flags
-            ${{ steps.detect-package-manager.outputs.runner }} astro build
-          else
-            # For deployments, use the site and base path configured by actions/configure-pages
-            ${{ steps.detect-package-manager.outputs.runner }} astro build \
-              --site "${{ steps.pages.outputs.origin }}" \
-              --base "${{ steps.pages.outputs.base_path }}"
-          fi
+          # Use the same Pages-derived site and base path for validation and deployment builds
+          ${{ steps.detect-package-manager.outputs.runner }} astro build \
+            --site "${{ steps.pages.outputs.origin }}" \
+            --base "${{ steps.pages.outputs.base_path }}"
         working-directory: ${{ env.BUILD_PATH }}
       - name: Upload artifact
         if: github.event_name != 'pull_request'
