@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Admin | Hexoneira</title>
+</head>
+<body>
+  <div class="main-container flex h-screen overflow-hidden text-[var(--white)]">
+    
+    <aside class="w-64 bg-[var(--bg-black-gunmetal)] flex flex-col justify-between p-6 border-r border-[var(--support-gunmetal)] flex-shrink-0">
+      
+      <div>
+        <div class="mb-12 flex items-center gap-3">
+          <div class="w-8 h-8 rounded bg-[var(--support-gunmetal)] flex items-center justify-center">
+            <span class="text-[var(--support-beer)] font-bold">H</span>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold tracking-widest uppercase">Hexoneira</h1>
+            <p class="text-[var(--cyan)] text-[10px] tracking-widest uppercase">Super Admin</p>
+          </div>
+        </div>
+
+        <nav class="flex flex-col gap-4 text-sm font-semibold">
+          <a href="/super-admin" class="flex items-center gap-3 text-[var(--cyan)] border-l-2 border-[var(--cyan)] pl-3">
+            <span>Tenants</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 text-[var(--support-grey)] hover:text-[var(--white)] pl-3 transition-colors">
+            <span>Infrastructure</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 text-[var(--support-grey)] hover:text-[var(--white)] pl-3 transition-colors">
+            <span>Global Logs</span>
+          </a>
+          <a href="#" class="flex items-center gap-3 text-[var(--support-grey)] hover:text-[var(--white)] pl-3 transition-colors">
+            <span>Settings</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        <button class="primary-button w-full rounded-full text-xs shadow-[0_0_15px_rgba(0,255,255,0.2)]">
+          Create New Group
+        </button>
+
+        <div class="flex flex-col gap-2 text-xs text-[var(--support-grey)]">
+          <a href="#" class="hover:text-[var(--white)] transition-colors">? Support</a>
+          <a href="#" class="hover:text-[var(--white)] transition-colors">icon Documentation</a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col bg-[var(--bg-eerie)] overflow-y-auto">
+      
+      <header class="flex items-center justify-between px-10 py-5 border-b border-[var(--support-gunmetal)]">
+        
+        <div class="flex items-center gap-6 w-1/2">
+          <input 
+            type="text" 
+            placeholder="Search system resources..." 
+            class="bg-[var(--bg-black)] border border-[var(--support-gunmetal)] rounded-full px-5 py-2 w-2/3 text-xs focus:outline-none focus:border-[var(--cyan)] text-[var(--white)]"
+          >
+          <div class="flex items-center gap-2 text-[var(--cyan)] text-[10px] tracking-widest uppercase font-bold">
+            <span class="w-2 h-2 rounded-full bg-[var(--cyan)] shadow-[0_0_8px_var(--cyan)]"></span>
+            System Status: Optimal
+          </div>
+        </div>
+
+        <div class="flex items-center gap-5 text-[var(--support-grey)]">
+          <span>icon</span>
+          <span>icon</span>
+          <div class="w-8 h-8 rounded-full bg-[var(--support-gunmetal)]"></div> </div>
+      </header>
+
+      <div class="p-10">
+        <slot />
+      </div>
+
+    </main>
+  </div>
+</body>
+</html>

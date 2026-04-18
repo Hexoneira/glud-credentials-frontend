@@ -1,5 +1,6 @@
 ---
 import SuperAdminLayout from '../layouts/SuperAdminLayout.astro';
+import WorkgroupsTable from '../components/WorkgroupsTable.tsx';
 ---
 
 <SuperAdminLayout>
@@ -18,9 +19,7 @@ import SuperAdminLayout from '../layouts/SuperAdminLayout.astro';
   </div>
 
   <div class="mb-10">
-    <div class="bg-[var(--bg-black-gunmetal)] rounded-3xl p-8 border border-[var(--support-gunmetal)] min-h-[300px] flex items-center justify-center border-dashed">
-      <p class="text-[var(--support-grey)] italic">La tabla de grupos se renderizará aquí...</p>
-    </div>
+    <WorkgroupsTable client:load />
   </div>
 
   <div class="grid grid-cols-3 gap-6">
