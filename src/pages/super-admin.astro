@@ -19,12 +19,23 @@ import CreateGroupForm from '../components/CreateGroupForm.tsx';
     </div>
   </div>
 
+  <!-- 
+  ======================================
+  TABLA DE GRUPOS DE TRABAJO (WORKGROUPS)
+  ====================================== 
+  -->
   <div class="mb-10">
     <WorkgroupsTable client:load />
   </div>
-
-  <div class="mb-10">
-    <CreateGroupForm client:load />
-  </div>
     
+  <!-- 
+  ======================================
+  MODAL DE CREACIÓN DE GRUPO
+  Al ser un modal flotante (fixed), es 
+  buena práctica colocarlo fuera de los 
+  contenedores de flujo principales.
+  ====================================== 
+  -->
+  <CreateGroupForm client:load />
+  
 </SuperAdminLayout>
