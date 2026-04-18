@@ -1,0 +1,52 @@
+---
+import SuperAdminLayout from '../layouts/SuperAdminLayout.astro';
+---
+
+<SuperAdminLayout>
+  <div class="flex justify-between items-start mb-10">
+    <div>
+      <h1 class="text-5xl font-bold tracking-tighter mb-2">MAIN TENANTS</h1>
+      <p class="text-[var(--support-grey)] max-w-md text-sm leading-relaxed">
+        Orchestrate and monitor workgroup lifecycle across the Hexoneira infrastructure.
+      </p>
+    </div>
+    
+    <div class="bg-[var(--bg-black-gunmetal)] p-5 rounded-2xl border border-[var(--support-gunmetal)] flex flex-col items-center">
+      <span class="text-[10px] uppercase tracking-widest text-[var(--support-grey)] mb-1">Total Active</span>
+      <span class="text-3xl font-bold text-[var(--cyan)]">128 Units</span>
+    </div>
+  </div>
+
+  <div class="mb-10">
+    <div class="bg-[var(--bg-black-gunmetal)] rounded-3xl p-8 border border-[var(--support-gunmetal)] min-h-[300px] flex items-center justify-center border-dashed">
+      <p class="text-[var(--support-grey)] italic">La tabla de grupos se renderizará aquí...</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-6">
+    <div class="bg-[var(--bg-black-gunmetal)] p-6 rounded-2xl border border-[var(--support-gunmetal)] relative overflow-hidden">
+      <span class="text-[10px] uppercase tracking-widest text-[var(--support-grey)]">Network Load</span>
+      <div class="text-2xl font-bold mt-2">42.8 GB/s</div>
+      <div class="w-full h-1 bg-[var(--support-gunmetal)] mt-4 rounded-full overflow-hidden">
+        <div class="w-[70%] h-full bg-[var(--cyan)] shadow-[0_0_10px_var(--cyan)]"></div>
+      </div>
+    </div>
+
+    <div class="bg-[var(--bg-black-gunmetal)] p-6 rounded-2xl border border-[var(--support-gunmetal)]">
+      <span class="text-[10px] uppercase tracking-widest text-[var(--support-grey)]">Global Compliance</span>
+      <div class="text-2xl font-bold mt-2">98.2%</div>
+      <div class="flex gap-1 mt-4">
+        <div class="h-1 flex-1 bg-[var(--cyan)]"></div>
+        <div class="h-1 flex-1 bg-[var(--cyan)]"></div>
+        <div class="h-1 flex-1 bg-[var(--cyan)]"></div>
+        <div class="h-1 flex-1 bg-[var(--support-gunmetal)]"></div>
+      </div>
+    </div>
+
+    <div class="bg-[var(--support-yankees)] p-6 rounded-2xl border border-[var(--support-morado)]">
+      <span class="text-[10px] uppercase tracking-widest text-[var(--support-morado)]">Next Protocol Audit</span>
+      <div class="text-2xl font-bold mt-2 text-[var(--white)]">14:02:11</div>
+      <p class="text-[10px] text-[var(--support-morado)] mt-2 font-mono uppercase">Standard Automated Sweep</p>
+    </div>
+  </div>
+</SuperAdminLayout>
