@@ -5,6 +5,7 @@ const tenantsData = [
     id: 'NODE-01-GL',
     name: 'GLUD',
     subtitle: 'LINUX USER GROUP',
+    director: 'Linus Torvalds',
     population: '34',
     status: 'ACTIVE',
     iconColor: 'var(--cyan)'
@@ -13,97 +14,126 @@ const tenantsData = [
     id: 'NODE-02-IN',
     name: 'ACM',
     subtitle: 'ACM GROUP',
+    director: 'Alan Turing',
     population: '45',
     status: 'ACTIVE',
-    iconColor: 'var(--purple)'
+    iconColor: 'var(--support-beer)' // Un color distinto para contrastar
   },
   {
     id: 'NODE-03-CS',
-    name: 'CyberSec',
-    subtitle: 'SID SOCIEDAD DE INOVACIÓN Y DESARROLLO',
-    population: '218',
+    name: 'SID',
+    subtitle: 'SOCIEDAD DE INNOVACIÓN Y DESARROLLO',
+    director: 'Ada Lovelace',
+    population: '40',
     status: 'SUSPENDED',
-    // Usamos el rosa/rojo que tienes en tu CSS para alertas
-    iconColor: 'var(--support-lila)' 
+    iconColor: 'var(--support-lila)'
   }
 ];
 
 export default function WorkgroupsTable() {
+  // Estadísticas globales derivadas de los datos
+  const totalGroups = tenantsData.length;
+  const activeGroups = tenantsData.filter(t => t.status === 'ACTIVE').length;
+  const totalMembers = tenantsData.reduce((acc, t) => acc + (parseInt(t.population) || 0), 0);
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-8">
       
-      {/* ENCABEZADOS DE LA TABLA */}
-      <div className="grid grid-cols-5 px-6 text-[10px] uppercase tracking-widest text-[var(--support-grey)] font-bold mb-2">
-        <div className="col-span-1">Tenant Identity</div>
-        <div className="col-span-1">Node Code</div>
-        <div className="col-span-1">Population</div>
-        <div className="col-span-1">Status Vector</div>
-        <div className="col-span-1 text-right">Protocol</div>
+      {/* ESTADÍSTICAS GLOBALES DE LA TABLA (Parte Superior) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          { label: 'Total Workgroups', value: totalGroups, color: 'text-[var(--white)]', border: 'border-[var(--support-gunmetal)]', glow: 'shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:border-[var(--white)]/20' },
+          { label: 'Active Workgroups', value: activeGroups, color: 'text-[var(--cyan)]', border: 'border-[var(--cyan)]/30', glow: 'shadow-[0_0_15px_rgba(0,255,255,0.1)] hover:shadow-[0_0_25px_rgba(0,255,255,0.2)] hover:border-[var(--cyan)]/50' },
+          { label: 'Global Population', value: totalMembers, color: 'text-[var(--support-beer)]', border: 'border-[var(--support-beer)]/30', glow: 'shadow-[0_0_15px_rgba(242,169,0,0.1)] hover:shadow-[0_0_25px_rgba(242,169,0,0.2)] hover:border-[var(--support-beer)]/50' },
+        ].map((stat, i) => (
+          <div key={i} className={`bg-[var(--bg-black-gunmetal)] p-6 rounded-2xl border ${stat.border} ${stat.glow} transition-all duration-300 flex flex-col justify-center`}>
+            <span className="text-[10px] uppercase tracking-widest text-[var(--support-grey)] mb-2">{stat.label}</span>
+            <span className={`text-4xl font-bold font-display ${stat.color}`}>{stat.value}</span>
+          </div>
+        ))}
       </div>
 
-      {/* FILAS DE LA TABLA (Mapeo de los datos) */}
-      <div className="flex flex-col gap-4">
+      {/* REJILLA DE TARJETAS DE TRABAJO (Reemplaza a la tabla tradicional) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {tenantsData.map((tenant) => {
           const isActive = tenant.status === 'ACTIVE';
 
           return (
             <div 
               key={tenant.id} 
-              className="grid grid-cols-5 items-center bg-[var(--bg-black-gunmetal)] p-5 rounded-2xl border border-[var(--support-gunmetal)] hover:border-[var(--support-grey)] transition-colors"
+              className={`bg-[var(--bg-black-gunmetal)] rounded-3xl border border-[var(--support-gunmetal)] flex flex-col overflow-hidden group transition-all duration-300`}
+              style={{
+                boxShadow: `0 0 15px rgba(0,0,0,0.5)`,
+                borderColor: 'var(--support-gunmetal)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = tenant.iconColor;
+                e.currentTarget.style.boxShadow = `0 0 25px ${tenant.iconColor}40`; // Añade opacidad al final si está en formato nativo, o podemos forzar un glow suave
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--support-gunmetal)';
+                e.currentTarget.style.boxShadow = `0 0 15px rgba(0,0,0,0.5)`;
+              }}
             >
-              
-              {/* Columna 1: Identidad e Ícono */}
-              <div className="flex items-center gap-4">
-                <div 
-                  className="w-10 h-10 rounded-lg flex items-center justify-center bg-[var(--bg-black)] border border-[var(--support-gunmetal)]"
-                >
-                  {/* Simulamos un ícono con un recuadro de color */}
-                  <div className="w-4 h-4 rounded-sm" style={{ backgroundColor: tenant.iconColor }}></div>
+              {/* CABECERA DE LA TARJETA */}
+              <div className="p-6 border-b border-[var(--support-gunmetal)] flex justify-between items-start">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-[var(--bg-black)] border border-[var(--support-gunmetal)] shadow-inner">
+                    <div className="w-5 h-5 rounded-md shadow-[0_0_10px_currentColor]" style={{ backgroundColor: tenant.iconColor, color: tenant.iconColor }}></div>
+                  </div>
+                  <div className="flex flex-col">
+                    <h3 className="font-bold text-xl text-[var(--white)] tracking-tight">{tenant.name}</h3>
+                    <span className="text-[9px] uppercase tracking-widest text-[var(--support-grey)] mt-1">{tenant.subtitle}</span>
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-bold text-base text-[var(--white)]">{tenant.name}</span>
-                  <span className="text-[9px] uppercase tracking-widest text-[var(--support-grey)]">{tenant.subtitle}</span>
-                </div>
-              </div>
-
-              {/* Columna 2: Código de Nodo (Badge) */}
-              <div>
-                <span className="bg-[var(--bg-black)] border border-[var(--support-gunmetal)] rounded-full px-3 py-1 text-[10px] font-bold text-[var(--cyan)] tracking-widest">
-                  {tenant.id}
-                </span>
-              </div>
-
-              {/* Columna 3: Población */}
-              <div className="flex items-baseline gap-1">
-                <span className="font-bold text-lg text-[var(--white)]">{tenant.population}</span>
-                <span className="text-[9px] uppercase tracking-widest text-[var(--support-grey)]">MEMBERS</span>
-              </div>
-
-              {/* Columna 4: Estado */}
-              <div className="flex items-center gap-2">
-                <span 
-                  className={`w-2 h-2 rounded-full ${isActive ? 'bg-[var(--cyan)] shadow-[0_0_8px_var(--cyan)]' : 'bg-[var(--support-lila)] shadow-[0_0_8px_var(--support-lila)]'}`}
-                ></span>
-                <span 
-                  className={`text-[10px] font-bold tracking-widest ${isActive ? 'text-[var(--cyan)]' : 'text-[var(--support-lila)]'}`}
-                >
+                {/* Badge de Estado */}
+                <div className={`px-3 py-1.5 rounded-full text-[9px] font-bold tracking-widest flex items-center gap-2 border ${isActive ? 'bg-[var(--cyan)]/10 text-[var(--cyan)] border-[var(--cyan)]/30' : 'bg-[var(--support-lila)]/10 text-[var(--support-lila)] border-[var(--support-lila)]/30'}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[var(--cyan)] shadow-[0_0_5px_var(--cyan)]' : 'bg-[var(--support-lila)] shadow-[0_0_5px_var(--support-lila)]'}`}></span>
                   {tenant.status}
-                </span>
+                </div>
               </div>
 
-              {/* Columna 5: Acciones (Protocolo) */}
-              <div className="flex items-center justify-end gap-6">
-                {/* Ícono de editar (Lápiz genérico) */}
-                <button className="text-[var(--support-grey)] hover:text-[var(--white)] transition-colors">
-                </button>
+              {/* CUERPO DE LA TARJETA (Estadísticas Específicas) */}
+              <div className="p-6 flex-1 flex flex-col gap-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] uppercase tracking-widest text-[var(--support-grey)]">Node Code</span>
+                  <span className="text-xs font-mono font-bold text-[var(--white)] bg-[var(--bg-black)] px-2 py-1 rounded border border-[var(--support-gunmetal)]">
+                    {tenant.id}
+                  </span>
+                </div>
                 
-                {/* Botón de acción dinámica según el estado */}
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] uppercase tracking-widest text-[var(--support-grey)]">Population</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="font-bold text-lg text-[var(--white)]">{tenant.population}</span>
+                    <span className="text-[9px] uppercase tracking-widest text-[var(--support-grey)]">Members</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] uppercase tracking-widest text-[var(--support-grey)]">Director</span>
+                  <span className="text-sm font-bold text-[var(--white)]">{tenant.director}</span>
+                </div>
+              </div>
+
+              {/* PIE DE LA TARJETA (Acciones al fondo) */}
+              <div className="p-4 bg-[var(--bg-black)] border-t border-[var(--support-gunmetal)] flex items-center justify-between gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                
+                <div className="flex gap-4 px-2">
+                  <button className="text-[10px] font-bold uppercase tracking-widest text-[var(--support-grey)] hover:text-[var(--cyan)] transition-colors">
+                    Edit
+                  </button>
+                  <button className="text-[10px] font-bold uppercase tracking-widest text-[var(--support-grey)] hover:text-[var(--support-lila)] transition-colors">
+                    Delete
+                  </button>
+                </div>
+                
                 {isActive ? (
-                  <button className="border border-[var(--support-gunmetal)] text-[var(--support-grey)] rounded-full px-6 py-2 text-[10px] font-bold uppercase tracking-widest hover:border-[var(--support-grey)] transition-all">
+                  <button className="border border-[var(--support-gunmetal)] text-[var(--support-grey)] rounded-full px-5 py-2 text-[10px] font-bold uppercase tracking-widest hover:border-[var(--support-lila)] hover:text-[var(--support-lila)] transition-all">
                     Suspend
                   </button>
                 ) : (
-                  <button className="bg-[var(--cyan)] text-[var(--bg-black)] rounded-full px-6 py-2 text-[10px] font-bold uppercase tracking-widest hover:shadow-[0_0_15px_rgba(0,255,255,0.4)] transition-all">
+                  <button className="bg-[var(--cyan)]/20 border border-[var(--cyan)] text-[var(--cyan)] rounded-full px-5 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-[var(--cyan)] hover:text-[var(--bg-black)] hover:shadow-[0_0_15px_rgba(0,255,255,0.4)] transition-all">
                     Reactivate
                   </button>
                 )}
