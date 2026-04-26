@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { generateSync } from 'otplib';
 import QRGenerator from './QRGenerator';
+import { useAuthStore } from '../store/authStore';
 
 type TOTPQRBlockProps = {
   studentId: string;
@@ -30,15 +31,22 @@ function deriveBase32SecretFromId(studentId: string): string {
 }
 
 export default function TOTPQRBlock({
-  studentId,
+  studentId: initialStudentId,
   qrSize = 220,
   primaryColor = '#22fefb',
   qrLightColor = '#071026',
-}: TOTPQRBlockProps) {
+}: Readonly<TOTPQRBlockProps>) {
   const [code, setCode] = useState('000000');
   const [remaining, setRemaining] = useState(30);
 
-  const secret = useMemo(() => deriveBase32SecretFromId(studentId), [studentId]);
+  const authUser = useAuthStore((state) => state.user);
+  const studentId = authUser ? String(authUser.codigo || authUser.id) : initialStudentId;
+
+  // Priorizar el secreto real del backend si existe, sino usar la derivación determinista
+  const secret = useMemo(() => {
+    if (authUser?.totpSecret) return authUser.totpSecret;
+    return deriveBase32SecretFromId(studentId);
+  }, [studentId, authUser?.totpSecret]);
 
   // Track which 30s window the last code was generated for so we skip redundant crypto work
   const lastPeriodRef = useRef<number>(-1);
