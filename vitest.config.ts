@@ -8,7 +8,22 @@ export default getViteConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
-      exclude: ['node_modules/', 'dist/', 'src/layouts/*', 'src/config.ts', '.astro/', 'astro.config.mjs', 'tailwind.config.*']
-    }
-  }
+      reportsDirectory: './coverage',
+      exclude: [
+        'node_modules/**',
+        'dist/**',
+        '.astro/**',
+        'src/layouts/**',
+        'src/pages/**',
+        'src/assets/**',
+        'src/styles/**',
+        'src/config.ts',
+        'src/**/*.d.ts',
+        'astro.config.mjs',
+        'vitest.config.ts',
+        'vitest.setup.ts',
+        'tailwind.config.*',
+      ],
+    },
+  },
 });
