@@ -51,6 +51,16 @@ describe('Auth Store', () => {
     expect(state.user?.tenantId).toBe('glud-tenant'); // Adds new
   });
 
+  it('should return null if updateUser is called without a logged-in user', () => {
+    // Asegurarse de que no hay usuario
+    useAuthStore.getState().logout();
+    
+    useAuthStore.getState().updateUser({ nombre: 'Intento' });
+    
+    const state = useAuthStore.getState();
+    expect(state.user).toBeNull();
+  });
+
   it('should clear state on logout', () => {
     useAuthStore.getState().setAuth('mock-token', { id: '1', role: 'admin' });
     
