@@ -9,3 +9,4 @@ if (!publicApiBaseUrl) {
 }
 
 export const API_BASE_URL = publicApiBaseUrl || 'http://localhost:8080/api';
+export const API_TIMEOUT = 5000; // 5 segundos de gracia para peticiones de red
