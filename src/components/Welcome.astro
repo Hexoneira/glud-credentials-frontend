@@ -135,8 +135,18 @@ const API_TIMEOUT = 1200;
     form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        const studentId = studentIdInput?.value || '';
-        const password = passwordInput?.value || '';
+        // Sanitización: Solo números para el ID de estudiante
+        const rawId = studentIdInput?.value.trim() || '';
+        const studentId = rawId.replace(/\D/g, ''); 
+        const password = passwordInput?.value.trim() || '';
+
+        if (!studentId || !password) {
+            if (errorMessage) {
+                errorMessage.textContent = !studentId ? 'El código debe ser numérico' : 'Ingresa tu contraseña';
+                errorMessage.classList.remove('hidden');
+            }
+            return;
+        }
 
         // Reset state
         errorMessage?.classList.add('hidden');

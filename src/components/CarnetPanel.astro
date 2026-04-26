@@ -154,7 +154,19 @@ const gludTheme = {
                 }
 
                 if (data.icon && avatarFrame) {
-                    avatarFrame.innerHTML = `<img src="${data.icon}" alt="Avatar" class="object-cover w-full h-full" />`;
+                    // Validación de URL segura (solo http, https o rutas relativas)
+                    const isSafeUrl = /^https?:\/\//i.test(data.icon) || data.icon.startsWith('/');
+                    
+                    if (isSafeUrl) {
+                        const img = document.createElement('img');
+                        img.src = data.icon;
+                        img.alt = 'Avatar';
+                        img.className = 'object-cover w-full h-full';
+                        img.onerror = () => { img.style.display = 'none'; };
+                        
+                        avatarFrame.innerHTML = '';
+                        avatarFrame.appendChild(img);
+                    }
                 }
 
                 if (statusEl) {
