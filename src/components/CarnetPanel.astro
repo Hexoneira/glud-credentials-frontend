@@ -101,17 +101,29 @@ const gludTheme = {
     const avatarFrame = document.getElementById('avatar-frame');
     const statusEl = document.getElementById('ui-status');
 
+    function isRecord(value: unknown): value is Record<string, unknown> {
+        return typeof value === 'object' && value !== null;
+    }
+
+    function readString(value: unknown): string | undefined {
+        return typeof value === 'string' && value.trim() ? value : undefined;
+    }
+
     async function fetchMemberData() {
         const { token, user } = useAuthStore.getState();
         if (!token || !user) return;
 
+        const currentUser = isRecord(user) ? user : {};
+
         // 1. Mostrar información base casi instantáneamente desde Zustand
-        // @ts-ignore
-        const baseName = user.nombre || user.name || 'Sin nombre';
+        const baseName =
+            readString(currentUser.nombre) ||
+            readString(currentUser.name) ||
+            'Sin nombre';
         if (nameEl) nameEl.textContent = baseName;
-        if (roleEl) roleEl.textContent = user.role || 'Sin rol';
+        if (roleEl) roleEl.textContent = readString(currentUser.role) || 'Sin rol';
         
-        const rawId = String(user.codigo || user.id || '00000000');
+        const rawId = String(currentUser.codigo || currentUser.id || '00000000');
         if (idEl) idEl.textContent = rawId.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
         
         if (initialEl) initialEl.textContent = baseName.charAt(0).toUpperCase();

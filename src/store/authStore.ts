@@ -5,6 +5,10 @@ export interface User {
   id: string | number;
   codigo?: string;
   nombre?: string;
+  name?: string;
+  email?: string;
+  groups?: string[];
+  icon?: string;
   role: string;
   tenantId?: string;
   totpSecret?: string; // Nuevo campo para el secreto real del backend
