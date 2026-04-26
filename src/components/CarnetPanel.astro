@@ -1,61 +1,17 @@
 ---
 import OrbsBackground from './OrbsBackground';
 import TOTPQRBlock from './TOTPQRBlock';
-
-type Member = {
-    name: string;
-    email: string;
-    role: string;
-    groups: string[];
-    id: string;
-    icon?: string;
-};
-
 import { API_BASE_URL } from '../config';
 
 const API_MEMBER_ENDPOINT = `${API_BASE_URL}/member/current`;
-const API_TIMEOUT = 1200;
-
-const fallbackMember: Member = {
-  name: 'Sin datos',
-  email: 'sin-datos@example.invalid',
-  role: 'Sin rol',
-  groups: ['Sin grupo'],
-  id: '00000000000',
-    icon: '',
-};
 
 const gludTheme = {
     primary: '#22fefb',
     qrSurface: '#070b14',
 };
-
-let member: Member = fallbackMember;
-
-try {
-    const response = await fetch(API_MEMBER_ENDPOINT, {
-        signal: AbortSignal.timeout(API_TIMEOUT),
-    });
-
-    if (response.ok) {
-        const data = await response.json();
-        member = {
-            name: data.name ?? fallbackMember.name,
-            email: data.email ?? fallbackMember.email,
-            icon: data.icon ?? fallbackMember.icon,
-            role: data.role ?? fallbackMember.role,
-            groups: Array.isArray(data.groups) && data.groups.length ? data.groups : fallbackMember.groups,
-            id: String(data.id ?? fallbackMember.id),
-        };
-    }
-} catch {
-    member = fallbackMember;
-}
-
-const formattedId = member.id.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
 ---
 
-<section id="panel" class="relative isolate grid min-h-screen grid-cols-[1.25rem_minmax(0,1fr)_1.25rem] grid-rows-[1fr_auto_1fr] overflow-hidden bg-[#050916] py-6 font-sans selection:bg-cyan-500/30 sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:py-0 md:grid-cols-[1.25rem_minmax(0,67rem)_1.25rem] lg:grid-cols-[2fr_minmax(0,75rem)_2fr]">
+<section id="panel" data-endpoint={API_MEMBER_ENDPOINT} class="relative isolate grid min-h-screen grid-cols-[1.25rem_minmax(0,1fr)_1.25rem] grid-rows-[1fr_auto_1fr] overflow-hidden bg-[#050916] py-6 font-sans selection:bg-cyan-500/30 sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:py-0 md:grid-cols-[1.25rem_minmax(0,67rem)_1.25rem] lg:grid-cols-[2fr_minmax(0,75rem)_2fr]">
     <div class="absolute inset-0 z-0">
         <OrbsBackground client:load />
     </div>
@@ -73,7 +29,7 @@ const formattedId = member.id.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
                 </div>
                 <div class="self-start whitespace-nowrap pl-2 text-right sm:self-auto sm:pl-0">
                     <p class="mt-1 text-[0.65rem] font-mono tracking-[0.12em] text-slate-300 sm:text-[0.75rem] md:text-[0.85rem] sm:tracking-[0.15em]">
-                        ID: <span class="text-white font-semibold">{formattedId}</span>
+                        ID: <span id="ui-member-id" class="text-white font-semibold">...</span>
                     </p>
                 </div>
             </header>
@@ -81,33 +37,25 @@ const formattedId = member.id.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
             <div class="row-start-3 grid divide-y divide-white/15 md:grid-cols-[1.4fr_1fr] md:divide-x md:divide-y-0">
                 <section class="grid content-center gap-7 sm:gap-8 md:gap-10 p-4 sm:p-5 md:p-6 lg:p-8">
                     <div class="mt-5 sm:mt-6 md:mt-12 lg:mt-20 grid grid-cols-[auto_minmax(0,1fr)] items-start gap-4 sm:gap-4 md:gap-5 sm:items-center">
-                        <div class="avatar-frame flex w-18 sm:w-20 md:w-24 lg:w-28 aspect-square shrink-0 items-center justify-center rounded-md overflow-hidden bg-linear-to-br from-[#4f46e5] to-[#0ea5e9] shadow-[0_0_30px_rgba(79,70,229,0.3)]">
-                            {member.icon ? (
-                                <img src={member.icon} alt={member.name} class="object-cover w-full h-full" />
-                            ) : (
-                                <span class="text-3xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white">{member.name.charAt(0).toUpperCase()}</span>
-                            )}
+                        <div id="avatar-frame" class="avatar-frame flex w-18 sm:w-20 md:w-24 lg:w-28 aspect-square shrink-0 items-center justify-center rounded-md overflow-hidden bg-linear-to-br from-[#4f46e5] to-[#0ea5e9] shadow-[0_0_30px_rgba(79,70,229,0.3)]">
+                            <span id="ui-member-initial" class="text-3xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white"></span>
                         </div>
                         <div class="min-w-0">
                             <p class="text-[0.6rem] font-bold uppercase tracking-[0.25em] text-cyan-400 sm:text-[0.62rem] md:text-[0.65rem]">Miembro Titular</p>
-                            <h2 class="mt-2 text-[1.7rem] sm:text-xl md:text-2xl lg:text-3xl font-bold leading-tight tracking-wide text-white">{member.name}</h2>
-                            <p class="mt-1 break-all text-[0.8rem] sm:text-[0.85rem] md:text-[0.9rem] font-medium tracking-wide text-slate-400">{member.email}</p>
+                            <h2 id="ui-member-name" class="mt-2 text-[1.7rem] sm:text-xl md:text-2xl lg:text-3xl font-bold leading-tight tracking-wide text-white">Cargando...</h2>
+                            <p id="ui-member-email" class="mt-1 break-all text-[0.8rem] sm:text-[0.85rem] md:text-[0.9rem] font-medium tracking-wide text-slate-400">...</p>
                         </div>
                     </div>
 
                     <div class="grid gap-4 sm:gap-5 md:gap-6 sm:grid-cols-2 lg:grid-cols-2">
                         <div>
                             <span class="block text-[0.6rem] font-bold uppercase tracking-[0.2em] text-slate-500">Cargo / Rol</span>
-                            <p class="mt-2 text-[0.85rem] sm:text-sm md:text-base font-bold uppercase tracking-[0.15em] text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]">{member.role}</p>
+                            <p id="ui-member-role" class="mt-2 text-[0.85rem] sm:text-sm md:text-base font-bold uppercase tracking-[0.15em] text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]">...</p>
                         </div>
                         <div>
                             <span class="block text-[0.6rem] font-bold uppercase tracking-[0.2em] text-slate-500">Departamentos</span>
-                            <div class="mt-2 flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-2">
-                                {member.groups.map((group) => (
-                                    <p class="text-[0.85rem] sm:text-sm md:text-base font-bold uppercase tracking-[0.15em] text-slate-200">
-                                        {group}
-                                    </p>
-                                ))}
+                            <div id="ui-member-groups" class="mt-2 flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-2">
+                                <!-- Groups will be injected here -->
                             </div>
                         </div>
                     </div>
@@ -115,9 +63,10 @@ const formattedId = member.id.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
 
                 <section class="grid place-items-center bg-black/30 p-4 sm:p-5 md:p-6 lg:p-8">
                     <div class="w-full max-w-96 sm:max-w-xs md:max-w-md lg:max-w-lg origin-center transform scale-90 sm:scale-95 md:scale-100">
+                        <!-- TOTPQRBlock leerá de Zustand internamente -->
                         <TOTPQRBlock
                             client:load
-                            studentId={member.id}
+                            studentId="00000000000"
                             qrSize={220}
                             primaryColor={gludTheme.primary}
                             qrLightColor={gludTheme.qrSurface}
@@ -130,9 +79,95 @@ const formattedId = member.id.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
                 <p class="text-center md:text-left">Credencial digital oficial e intransferible.</p>
                 <div class="flex items-center justify-center gap-3 text-cyan-400 md:justify-end">
                     <span class="status-dot shrink-0"></span>
-                    <span>Estado: Vigente</span>
+                    <span id="ui-status">Estado: Verificando...</span>
                 </div>
             </footer>
         </div>
     </article>
 </section>
+
+<script>
+    import { useAuthStore } from '../store/authStore';
+    
+    const panel = document.getElementById('panel');
+    const endpoint = panel?.dataset.endpoint || '';
+    
+    const nameEl = document.getElementById('ui-member-name');
+    const emailEl = document.getElementById('ui-member-email');
+    const roleEl = document.getElementById('ui-member-role');
+    const groupsEl = document.getElementById('ui-member-groups');
+    const idEl = document.getElementById('ui-member-id');
+    const initialEl = document.getElementById('ui-member-initial');
+    const avatarFrame = document.getElementById('avatar-frame');
+    const statusEl = document.getElementById('ui-status');
+
+    async function fetchMemberData() {
+        const { token, user } = useAuthStore.getState();
+        if (!token || !user) return;
+
+        // 1. Mostrar información base casi instantáneamente desde Zustand
+        // @ts-ignore
+        const baseName = user.nombre || user.name || 'Sin nombre';
+        if (nameEl) nameEl.textContent = baseName;
+        if (roleEl) roleEl.textContent = user.role || 'Sin rol';
+        
+        const rawId = String(user.codigo || user.id || '00000000');
+        if (idEl) idEl.textContent = rawId.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
+        
+        if (initialEl) initialEl.textContent = baseName.charAt(0).toUpperCase();
+
+        if (!endpoint) return;
+
+        // 2. Traer información completa del endpoint GET /member/current
+        try {
+            const response = await fetch(endpoint, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                
+                // Sincronizar con el store global para que otros componentes (como el QR) se actualicen
+                useAuthStore.getState().updateUser(data);
+
+                if (nameEl && data.name) nameEl.textContent = data.name;
+                if (emailEl && data.email) emailEl.textContent = data.email;
+                if (roleEl && data.role) roleEl.textContent = data.role;
+                
+                if (groupsEl && Array.isArray(data.groups)) {
+                    groupsEl.innerHTML = '';
+                    data.groups.forEach((group: string) => {
+                        const p = document.createElement('p');
+                        p.className = 'text-[0.85rem] sm:text-sm md:text-base font-bold uppercase tracking-[0.15em] text-slate-200';
+                        p.textContent = group;
+                        groupsEl.appendChild(p);
+                    });
+                } else if (groupsEl) {
+                    groupsEl.innerHTML = '<p class="text-[0.85rem] sm:text-sm md:text-base font-bold uppercase tracking-[0.15em] text-slate-500">Sin grupo</p>';
+                }
+                
+                if (idEl && data.id) {
+                     const realId = String(data.id);
+                     idEl.textContent = realId.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
+                }
+
+                if (data.icon && avatarFrame) {
+                    avatarFrame.innerHTML = `<img src="${data.icon}" alt="Avatar" class="object-cover w-full h-full" />`;
+                }
+
+                if (statusEl) {
+                    statusEl.textContent = "Estado: Vigente";
+                }
+            } else {
+                if (statusEl) statusEl.textContent = "Estado: Error de Conexión";
+            }
+        } catch (e) {
+            console.error("No se pudo cargar la data completa del miembro");
+            if (statusEl) statusEl.textContent = "Estado: Modo Offline";
+        }
+    }
+
+    fetchMemberData();
+</script>

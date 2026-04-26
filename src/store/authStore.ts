@@ -7,12 +7,14 @@ export interface User {
   nombre?: string;
   role: string;
   tenantId?: string;
+  totpSecret?: string; // Nuevo campo para el secreto real del backend
 }
 
 interface AuthState {
   token: string | null;
   user: User | null;
   setAuth: (token: string, user: User) => void;
+  updateUser: (userData: Partial<User>) => void;
   logout: () => void;
 }
 
@@ -22,10 +24,13 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       user: null,
       setAuth: (token, user) => set({ token, user }),
+      updateUser: (userData) => set((state) => ({
+        user: state.user ? { ...state.user, ...userData } : null
+      })),
       logout: () => set({ token: null, user: null }),
     }),
     {
-      name: 'auth-storage', // Esto se guardará en el localStorage
+      name: 'auth-storage',
     }
   )
 );
