@@ -1,6 +1,6 @@
 import React from 'react';
 
-const tenantsData = [
+export const tenantsData = [
   {
     id: 'NODE-01-GL',
     name: 'GLUD',
@@ -8,7 +8,8 @@ const tenantsData = [
     director: 'Linus Torvalds',
     population: '34',
     status: 'ACTIVE',
-    iconColor: 'var(--cyan)'
+    iconColor: 'var(--cyan)',
+    shadowColor: 'rgba(0, 255, 255, 0.25)'
   },
   {
     id: 'NODE-02-IN',
@@ -17,7 +18,8 @@ const tenantsData = [
     director: 'Alan Turing',
     population: '45',
     status: 'ACTIVE',
-    iconColor: 'var(--support-beer)' // Un color distinto para contrastar
+    iconColor: 'var(--support-beer)',
+    shadowColor: 'rgba(242, 169, 0, 0.25)'
   },
   {
     id: 'NODE-03-CS',
@@ -26,7 +28,8 @@ const tenantsData = [
     director: 'Ada Lovelace',
     population: '40',
     status: 'SUSPENDED',
-    iconColor: 'var(--support-lila)'
+    iconColor: 'var(--support-lila)',
+    shadowColor: 'rgba(255, 102, 178, 0.25)'
   }
 ];
 
@@ -68,7 +71,7 @@ export default function WorkgroupsTable() {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = tenant.iconColor;
-                e.currentTarget.style.boxShadow = `0 0 25px ${tenant.iconColor}40`; // Añade opacidad al final si está en formato nativo, o podemos forzar un glow suave
+                e.currentTarget.style.boxShadow = `0 0 25px ${tenant.shadowColor}`;
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = 'var(--support-gunmetal)';

@@ -2,6 +2,9 @@
 import SuperAdminLayout from '../layouts/SuperAdminLayout.astro';
 import WorkgroupsTable from '../components/WorkgroupsTable.tsx';
 import CreateGroupForm from '../components/CreateGroupForm.tsx';
+import { tenantsData } from '../components/WorkgroupsTable.tsx';
+
+const totalActive = tenantsData.filter(t => t.status === 'ACTIVE').length;
 ---
 
 <SuperAdminLayout>
@@ -15,7 +18,7 @@ import CreateGroupForm from '../components/CreateGroupForm.tsx';
     
     <div class="bg-[var(--bg-black-gunmetal)] p-5 rounded-2xl border border-[var(--support-gunmetal)] flex flex-col items-center">
       <span class="text-[10px] uppercase tracking-widest text-[var(--support-grey)] mb-1">Total Active</span>
-      <span class="text-3xl font-bold text-[var(--cyan)]">128 Units</span>
+      <span class="text-3xl font-bold text-[var(--cyan)]">{totalActive} Units</span>
     </div>
   </div>
 

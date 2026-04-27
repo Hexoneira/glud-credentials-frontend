@@ -63,6 +63,7 @@ export default function CreateGroupForm({ onClose = () => {} }: CreateGroupFormP
 
   // Estado para errores individuales
   const [errors, setErrors] = useState({ name: false, director: false });
+  const [successMessage, setSuccessMessage] = useState('');
 
   // 2. Función al enviar el formulario
   const handleSubmit = (e: React.FormEvent) => {
@@ -81,9 +82,11 @@ export default function CreateGroupForm({ onClose = () => {} }: CreateGroupFormP
       return;
     }
     
-    console.log("Datos del CRUD listos para enviar:", formData);
-    alert("¡Grupo creado con éxito!");
-    handleClose();
+    setSuccessMessage(`¡Grupo "${formData.name}" registrado con éxito!`);
+    setTimeout(() => {
+      setSuccessMessage('');
+      handleClose();
+    }, 1500);
   };
 
   // Si no está abierto, no renderiza nada
@@ -162,6 +165,13 @@ export default function CreateGroupForm({ onClose = () => {} }: CreateGroupFormP
               />
               <span className="text-[9px] uppercase text-[var(--cyan)] font-bold tracking-widest mt-1 opacity-70">Autogenerado por el sistema</span>
             </div>
+
+            {/* Mensaje de éxito */}
+            {successMessage && (
+              <div className="bg-[var(--cyan)]/10 border border-[var(--cyan)]/40 rounded-xl px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[var(--cyan)] shadow-[0_0_10px_rgba(0,255,255,0.15)]">
+                {successMessage}
+              </div>
+            )}
 
             {/* Botones de acción */}
             <div className="flex justify-between items-center mt-6 pt-6 border-t border-[var(--support-gunmetal)]">
