@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 type CreateGroupFormProps = {
   onClose?: () => void;
@@ -7,17 +7,48 @@ type CreateGroupFormProps = {
 export default function CreateGroupForm({ onClose = () => {} }: CreateGroupFormProps) {
   // Estado para controlar la visibilidad del modal
   const [isOpen, setIsOpen] = useState(false);
+  const previousFocusRef = useRef<Element | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  // Escuchar el evento personalizado para abrir el modal
+  // Escuchar el evento personalizado para abrir el modal y guardar el foco previo
   useEffect(() => {
-    const handleOpen = () => setIsOpen(true);
+    const handleOpen = () => {
+      previousFocusRef.current = document.activeElement;
+      setIsOpen(true);
+    };
     window.addEventListener('openCreateGroupModal', handleOpen);
     return () => window.removeEventListener('openCreateGroupModal', handleOpen);
   }, []);
 
+  // Mover el foco al modal cuando se abre
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      modalRef.current.focus();
+    }
+  }, [isOpen]);
+
+  // Cerrar el modal con la tecla Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+        onClose();
+        if (previousFocusRef.current instanceof HTMLElement) {
+          previousFocusRef.current.focus();
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const handleClose = () => {
     setIsOpen(false);
     onClose();
+    if (previousFocusRef.current instanceof HTMLElement) {
+      previousFocusRef.current.focus();
+    }
   };
 
   // 1. Estado simplificado: Solo Nombre, Director y Tenant Code
@@ -59,16 +90,25 @@ export default function CreateGroupForm({ onClose = () => {} }: CreateGroupFormP
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[var(--bg-black)]/80 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-      
-      <div className="bg-[var(--bg-black-gunmetal)] border border-[var(--cyan)]/30 rounded-3xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-[0_0_40px_rgba(0,255,255,0.15)] transition-all duration-500">
+    <div
+      className="fixed inset-0 bg-[var(--bg-black)]/80 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
+    >
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-group-title"
+        tabIndex={-1}
+        className="bg-[var(--bg-black-gunmetal)] border border-[var(--cyan)]/30 rounded-3xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-[0_0_40px_rgba(0,255,255,0.15)] transition-all duration-500 focus:outline-none"
+      >
         
         {/* PANEL IZQUIERDO (Simplificado) */}
         <div className="w-full md:w-1/3 bg-[var(--bg-eerie)] p-10 border-b md:border-b-0 md:border-r border-[var(--support-gunmetal)] flex flex-col justify-between relative overflow-hidden">
           <div className="absolute -top-20 -left-20 w-40 h-40 bg-[var(--cyan)] rounded-full blur-[100px] opacity-20"></div>
           <div className="relative z-10">
             <span className="text-[10px] text-[var(--cyan)] uppercase tracking-widest font-bold">CRUD_Module</span>
-            <h2 className="text-4xl font-display font-bold text-[var(--white)] mt-2 leading-tight uppercase tracking-tighter">
+            <h2 id="create-group-title" className="text-4xl font-display font-bold text-[var(--white)] mt-2 leading-tight uppercase tracking-tighter">
               Create<br/>Work<br/>Group
             </h2>
             <p className="text-[var(--support-grey)] text-xs mt-6 leading-relaxed">
