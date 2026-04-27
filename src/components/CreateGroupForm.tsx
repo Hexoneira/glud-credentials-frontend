@@ -1,30 +1,69 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-export default function CreateGroupForm({ onClose = () => {} }) {
+type CreateGroupFormProps = {
+  onClose?: () => void;
+};
+
+export default function CreateGroupForm({ onClose = () => {} }: CreateGroupFormProps) {
   // Estado para controlar la visibilidad del modal
   const [isOpen, setIsOpen] = useState(false);
+  const previousFocusRef = useRef<Element | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  // Escuchar el evento personalizado para abrir el modal
+  // Escuchar el evento personalizado para abrir el modal y guardar el foco previo
   useEffect(() => {
-    const handleOpen = () => setIsOpen(true);
+    const handleOpen = () => {
+      previousFocusRef.current = document.activeElement;
+      setIsOpen(true);
+    };
     window.addEventListener('openCreateGroupModal', handleOpen);
     return () => window.removeEventListener('openCreateGroupModal', handleOpen);
   }, []);
 
+  // Mover el foco al modal cuando se abre
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      modalRef.current.focus();
+    }
+  }, [isOpen]);
+
+  // Cerrar el modal con la tecla Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+        onClose();
+        if (previousFocusRef.current instanceof HTMLElement) {
+          previousFocusRef.current.focus();
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const handleClose = () => {
     setIsOpen(false);
     onClose();
+    if (previousFocusRef.current instanceof HTMLElement) {
+      previousFocusRef.current.focus();
+    }
   };
 
   // 1. Estado simplificado: Solo Nombre, Director y Tenant Code
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     name: '',
     director: '',
-    code: 'HX_UUID_772' // Código autogenerado / por defecto
-  });
+    code:
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? `HX_${crypto.randomUUID()}`
+        : `HX_${Date.now()}_${Math.random().toString(36).slice(2, 10)}` // Código autogenerado
+  }));
 
   // Estado para errores individuales
   const [errors, setErrors] = useState({ name: false, director: false });
+  const [successMessage, setSuccessMessage] = useState('');
 
   // 2. Función al enviar el formulario
   const handleSubmit = (e: React.FormEvent) => {
@@ -43,25 +82,36 @@ export default function CreateGroupForm({ onClose = () => {} }) {
       return;
     }
     
-    console.log("Datos del CRUD listos para enviar:", formData);
-    alert("¡Grupo creado con éxito!");
-    handleClose();
+    setSuccessMessage(`¡Grupo "${formData.name}" registrado con éxito!`);
+    setTimeout(() => {
+      setSuccessMessage('');
+      handleClose();
+    }, 1500);
   };
 
   // Si no está abierto, no renderiza nada
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-[var(--bg-black)]/80 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-      
-      <div className="bg-[var(--bg-black-gunmetal)] border border-[var(--cyan)]/30 rounded-3xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-[0_0_40px_rgba(0,255,255,0.15)] transition-all duration-500">
+    <div
+      className="fixed inset-0 bg-[var(--bg-black)]/80 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
+    >
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-group-title"
+        tabIndex={-1}
+        className="bg-[var(--bg-black-gunmetal)] border border-[var(--cyan)]/30 rounded-3xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-[0_0_40px_rgba(0,255,255,0.15)] transition-all duration-500 focus:outline-none"
+      >
         
         {/* PANEL IZQUIERDO (Simplificado) */}
         <div className="w-full md:w-1/3 bg-[var(--bg-eerie)] p-10 border-b md:border-b-0 md:border-r border-[var(--support-gunmetal)] flex flex-col justify-between relative overflow-hidden">
           <div className="absolute -top-20 -left-20 w-40 h-40 bg-[var(--cyan)] rounded-full blur-[100px] opacity-20"></div>
           <div className="relative z-10">
             <span className="text-[10px] text-[var(--cyan)] uppercase tracking-widest font-bold">CRUD_Module</span>
-            <h2 className="text-4xl font-display font-bold text-[var(--white)] mt-2 leading-tight uppercase tracking-tighter">
+            <h2 id="create-group-title" className="text-4xl font-display font-bold text-[var(--white)] mt-2 leading-tight uppercase tracking-tighter">
               Create<br/>Work<br/>Group
             </h2>
             <p className="text-[var(--support-grey)] text-xs mt-6 leading-relaxed">
@@ -115,6 +165,13 @@ export default function CreateGroupForm({ onClose = () => {} }) {
               />
               <span className="text-[9px] uppercase text-[var(--cyan)] font-bold tracking-widest mt-1 opacity-70">Autogenerado por el sistema</span>
             </div>
+
+            {/* Mensaje de éxito */}
+            {successMessage && (
+              <div className="bg-[var(--cyan)]/10 border border-[var(--cyan)]/40 rounded-xl px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[var(--cyan)] shadow-[0_0_10px_rgba(0,255,255,0.15)]">
+                {successMessage}
+              </div>
+            )}
 
             {/* Botones de acción */}
             <div className="flex justify-between items-center mt-6 pt-6 border-t border-[var(--support-gunmetal)]">
