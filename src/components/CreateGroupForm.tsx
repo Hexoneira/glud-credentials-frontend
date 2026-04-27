@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
-export default function CreateGroupForm({ onClose = () => {} }) {
+type CreateGroupFormProps = {
+  onClose?: () => void;
+};
+
+export default function CreateGroupForm({ onClose = () => {} }: CreateGroupFormProps) {
   // Estado para controlar la visibilidad del modal
   const [isOpen, setIsOpen] = useState(false);
 
