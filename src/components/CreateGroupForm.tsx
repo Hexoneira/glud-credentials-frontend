@@ -17,11 +17,14 @@ export default function CreateGroupForm({ onClose = () => {} }) {
   };
 
   // 1. Estado simplificado: Solo Nombre, Director y Tenant Code
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     name: '',
     director: '',
-    code: 'HX_UUID_772' // Código autogenerado / por defecto
-  });
+    code:
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? `HX_${crypto.randomUUID()}`
+        : `HX_${Date.now()}_${Math.random().toString(36).slice(2, 10)}` // Código autogenerado
+  }));
 
   // Estado para errores individuales
   const [errors, setErrors] = useState({ name: false, director: false });
