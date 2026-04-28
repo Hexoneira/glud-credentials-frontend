@@ -1,13 +1,29 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+/// <reference types="vitest" />
+import { getViteConfig } from 'astro/config';
 
-export default defineConfig({
-  plugins: [react()],
+export default getViteConfig({
   test: {
-    globals: true,
-    environment: 'happy-dom',
-    setupFiles: ['./src/test/setup.ts'],
-    css: true,
-    include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}']
-  }
+    environment: 'jsdom',
+    setupFiles: ['./vitest.setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov'],
+      reportsDirectory: './coverage',
+      exclude: [
+        'node_modules/**',
+        'dist/**',
+        '.astro/**',
+        'src/layouts/**',
+        'src/pages/**',
+        'src/assets/**',
+        'src/styles/**',
+        'src/config.ts',
+        'src/**/*.d.ts',
+        'astro.config.mjs',
+        'vitest.config.ts',
+        'vitest.setup.ts',
+        'tailwind.config.*',
+      ],
+    },
+  },
 });
