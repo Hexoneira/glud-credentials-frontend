@@ -6,6 +6,16 @@ type OrbEntry = {
   delay: number;
 };
 
+type AnimeInstance = {
+  pause: () => void;
+};
+
+type AnimeFactory = (config: Record<string, unknown>) => AnimeInstance;
+type AnimeModule = {
+  default?: unknown;
+  anime?: unknown;
+};
+
 const MOBILE_WIDTH = 768;
 const COLORS = ['#00ffff', '#ff006e', '#8b5cf6', '#00ff9f', '#ff4d94'];
 
@@ -15,19 +25,20 @@ function randomBetween(min: number, max: number): number {
 }
 
 // Try to import animejs with a safe fallback and return the callable anime function or null
-async function loadAnime(): Promise<any | null> {
-  let anime: any = null;
+export async function loadAnime(
+  importMain: () => Promise<AnimeModule> = () => import('animejs') as Promise<AnimeModule>,
+  importFallback: () => Promise<AnimeModule> = () => import('animejs/lib/anime.es.js') as Promise<AnimeModule>,
+): Promise<AnimeFactory | null> {
+  let anime: AnimeFactory | null = null;
   try {
-    const mod = await import('animejs');
-    const modAny: any = mod;
-    anime = (modAny && (modAny.default || modAny.anime || modAny));
+    const mod = await importMain();
+    const modAny = mod as AnimeModule;
+    anime = (modAny && (modAny.default || modAny.anime || modAny)) as AnimeFactory | null;
   } catch (err) {
     try {
-      // @ts-ignore
-      const mod = await import('animejs/lib/anime.es.js');
-      // @ts-ignore
-      const modAny: any = mod;
-      anime = modAny && (modAny.default || modAny.anime || modAny);
+      const mod = await importFallback();
+      const modAny = mod as AnimeModule;
+      anime = modAny && (modAny.default || modAny.anime || modAny) as AnimeFactory | null;
       // eslint-disable-next-line no-console
       console.warn('[OrbsBackground] animejs failed to load from main entry, loaded from fallback', err);
     } catch (e) {
@@ -38,7 +49,6 @@ async function loadAnime(): Promise<any | null> {
   }
 
   if (!anime || typeof anime !== 'function') {
-    if (anime && typeof anime.default === 'function') return anime.default;
     // eslint-disable-next-line no-console
     console.warn('[OrbsBackground] animejs export is not a function, aborting animations');
     return null;
@@ -57,11 +67,7 @@ function createMouseHandler(orbEntriesRef: { current: OrbEntry[] }, container: H
 
     orbEntriesRef.current.forEach(({ wrapper }, index) => {
       const speed = (index + 1) * 15;
-      try {
-        wrapper.style.transform = `translate(calc(-50% + ${xPercent * speed}px), calc(-50% + ${yPercent * speed}px))`;
-      } catch (err) {
-        // swallow transform errors to avoid HMR crashes
-      }
+      wrapper.style.transform = `translate(calc(-50% + ${xPercent * speed}px), calc(-50% + ${yPercent * speed}px))`;
     });
   };
 }
@@ -202,7 +208,7 @@ export default function OrbsBackground() {
 
       // Pause all running anime instances to stop their internal RAF loops
       animationInstancesRef.current.forEach(inst => {
-        try { inst.pause(); } catch (e) { /* ignore */ }
+        inst.pause();
       });
       animationInstancesRef.current = [];
 

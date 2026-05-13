@@ -18,7 +18,7 @@ import '../styles/global.css'
             <header class="row-start-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-white/15 p-4 sm:gap-5 sm:p-5 md:p-6 lg:p-8 sm:items-end">
                            <div class="min-w-0 text-left">
                     <h1 class="text-2xl font-black tracking-widest text-white drop-shadow-[0_0_12px_rgba(34,254,251,0.3)] sm:text-3xl md:text-5xl sm:tracking-widest md:tracking-widest">COWORKING</h1>
-                    <p class="mt-1 text-[0.58rem] font-bold uppercase tracking-[0.27em] text-cyan-400 sm:text-[0.7rem] md:text-[0.75rem] sm:tracking-[0.25em] md:tracking-[0.3em]">Universidad Distrital</p>
+                    <p class="mt-1 text-[0.58rem] font-bold uppercase tracking-wide text-cyan-400 sm:text-[0.7rem] md:text-[0.75rem]">Universidad Distrital</p>
                 </div>
                 <h1 class="text-white font-black tracking-wider md:text-5xl">LOGIN</h1>
             </header>
@@ -29,7 +29,7 @@ import '../styles/global.css'
             <form id="login-form" class="grid gap-5">
                 <!-- Campo Usuario/Codigo -->
                 <div class="grid gap-2"> 
-                    <label for="studentId" class="text-[0.6rem] font-bold uppercase tracking-[0.2em] text-slate-400">
+                    <label for="studentId" class="text-[0.6rem] font-bold uppercase tracking-wide text-slate-400">
                         Código de Acceso (11 dígitos)
                     </label>
                     <input 
@@ -50,7 +50,7 @@ import '../styles/global.css'
                 <!-- Campo Contraseña -->
                 <div class="grid gap-2">
                     <div class="flex items-center justify-between">
-                        <label for="password" class="text-[0.6rem] font-bold uppercase tracking-[0.2em] text-slate-400">
+                        <label for="password" class="text-[0.6rem] font-bold uppercase tracking-wide text-slate-400">
                             Contraseña
                         </label>
                         <a href="#" class="text-[0.6rem] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
@@ -78,20 +78,20 @@ import '../styles/global.css'
                 </div>
 
                 <!-- Mensaje de error -->
-                <div id="error-message" class="hidden rounded-md border border-red-500/30 bg-red-500/10 px-4 py-2 text-center text-[0.7rem] font-bold uppercase tracking-[0.1em] text-red-400">
+                <div id="error-message" class="hidden rounded-md border border-red-500/30 bg-red-500/10 px-4 py-2 text-center text-[0.7rem] font-bold uppercase tracking-widest text-red-400">
                 </div>
 
                 <!-- Botón de Ingreso -->
                 <button
                     type="submit"
                     id="submit-btn"
-                    class="mt-4 w-full rounded-md bg-cyan-500 hover:bg-cyan-400 text-[#050916] font-bold uppercase tracking-[0.15em] py-3 transition-all duration-300 shadow-[0_0_15px_rgba(34,254,251,0.3)] hover:shadow-[0_0_25px_rgba(34,254,251,0.5)] focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#0b1120]">
+                    class="mt-4 w-full rounded-md bg-cyan-500 hover:bg-cyan-400 text-[#050916] font-bold uppercase tracking-wide py-3 transition-all duration-300 shadow-[0_0_15px_rgba(34,254,251,0.3)] hover:shadow-[0_0_25px_rgba(34,254,251,0.5)] focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#0b1120]">
                     Ingresar
                 </button>
             </form>
         </section>
         
-        <footer class="row-start-5 grid gap-3 border-t border-white/15 bg-black/50 p-4 sm:p-5 md:p-6 text-[0.55rem] font-semibold uppercase tracking-[0.2em] text-slate-400 text-center">
+        <footer class="row-start-5 grid gap-3 border-t border-white/15 bg-black/50 p-4 sm:p-5 md:p-6 text-[0.55rem] font-semibold uppercase tracking-wide text-slate-400 text-center">
             <p>Acceso exclusivo para miembros activos.</p>
         </footer>
         
@@ -102,6 +102,7 @@ import '../styles/global.css'
 <script>
     import { useAuthStore } from '../store/authStore';
     import { login } from '../services/api';
+    import { getAuthErrorMessage } from '../utils/authError';
 
     const form = document.getElementById('login-form') as HTMLFormElement;
     const errorMessage = document.getElementById('error-message');
@@ -116,24 +117,7 @@ import '../styles/global.css'
         // Log the raw error to help debugging (network/CORS/timeout etc.)
         // eslint-disable-next-line no-console
         console.error('[Welcome] login error:', error);
-
-        // Handle DOM aborts (AbortSignal.timeout produces an AbortError)
-        if (typeof error === 'object' && error !== null) {
-            const anyErr: any = error;
-            if (anyErr.name === 'AbortError' || anyErr.name === 'TimeoutError') {
-                return 'La conexión tardó demasiado. Reintenta.';
-            }
-        }
-
-        if (error instanceof Error) {
-            // Typical network failures (CORS or offline) appear as TypeError in browsers
-            if (error instanceof TypeError) {
-                return error.message || 'Error de conexión. Revisa tu internet.';
-            }
-            return error.message || 'Error de conexión. Revisa tu internet.';
-        }
-
-        return 'Error de conexión. Revisa tu internet.';
+        return getAuthErrorMessage(error);
     }
 
     togglePasswordBtn?.addEventListener('click', () => {
