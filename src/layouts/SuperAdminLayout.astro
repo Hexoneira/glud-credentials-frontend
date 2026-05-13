@@ -3,17 +3,18 @@ import "../styles/global.css";
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Panel de administración de grupos de trabajo - Hexoneira Credentials">
   <title>Super Admin | Hexoneira</title>
 </head>
 <body>
   <div class="main-container flex h-screen overflow-hidden text-[var(--white)]">
     
+    <!-- Sidebar -->
     <aside class="w-64 bg-[var(--bg-black-gunmetal)] flex flex-col justify-between p-6 border-r border-[var(--support-gunmetal)] flex-shrink-0">
-      
       <div>
         <div class="mb-12 flex items-center gap-3">
           <div class="w-8 h-8 rounded bg-[var(--support-gunmetal)] flex items-center justify-center">
@@ -25,42 +26,70 @@ import "../styles/global.css";
           </div>
         </div>
 
-<nav class="flex flex-col gap-4 text-sm font-semibold">
+        <nav class="flex flex-col gap-4 text-sm font-semibold">
           <a href="/super-admin" class="flex items-center gap-3 text-[var(--cyan)] border-l-2 border-[var(--cyan)] pl-3">
-            <span>Tenants</span>
+            <span>Grupos de Trabajo</span>
           </a>
         </nav>
       </div>
 
       <div class="flex flex-col gap-6">
         <button id="btn-create-group" class="primary-button w-full rounded-full text-xs text-[var(--bg-black-gunmetal)] shadow-[0_0_15px_rgba(0,255,255,0.2)] hover:shadow-[0_0_25px_rgba(0,255,255,0.4)] transition-all">
-          Create New Group
+          Crear Nuevo Grupo
         </button>
 
-        <div class="flex flex-col gap-2 text-xs text-[var(--support-grey)]">
-          <a href="#" class="hover:text-[var(--white)] transition-colors">Support</a>
-          <a href="#" class="hover:text-[var(--white)] transition-colors">Documentation</a>
-        </div>
+        <button id="btn-logout" class="text-xs text-[var(--support-grey)] hover:text-[var(--support-lila)] transition-colors text-left">
+          Cerrar sesión
+        </button>
       </div>
     </aside>
 
+    <!-- Main content -->
     <main class="flex-1 flex flex-col bg-[var(--bg-eerie)] overflow-y-auto">
-      <header class="flex items-center justify-between px-10 py-8 border-b border-[var(--support-gunmetal)]">
-         </header>
+      <header class="flex items-center justify-between px-10 py-6 border-b border-[var(--support-gunmetal)]">
+        <div class="flex items-center gap-3">
+          <div class="w-2 h-2 rounded-full bg-[var(--cyan)] shadow-[0_0_6px_var(--cyan)]"></div>
+          <span class="text-[10px] uppercase tracking-widest text-[var(--support-grey)]">Panel de Administración</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <span id="header-user-info" class="text-[10px] uppercase tracking-widest text-[var(--support-grey)]"></span>
+          <button id="btn-header-logout" class="text-[10px] uppercase tracking-widest text-[var(--support-grey)] hover:text-[var(--support-lila)] transition-colors font-bold">
+            Salir
+          </button>
+        </div>
+      </header>
 
       <div class="p-10">
         <slot />
       </div>
-
     </main>
   </div>
 
   <script>
-    const btn = document.getElementById('btn-create-group');
-    if (btn) {
-      btn.addEventListener('click', () => {
+    import { useAuthStore } from '../store/authStore';
+
+    // Botón crear grupo (sidebar)
+    const btnCreate = document.getElementById('btn-create-group');
+    if (btnCreate) {
+      btnCreate.addEventListener('click', () => {
         window.dispatchEvent(new CustomEvent('openCreateGroupModal'));
       });
+    }
+
+    // Logout
+    const handleLogout = () => {
+      useAuthStore.getState().logout();
+      window.location.href = '/';
+    };
+
+    document.getElementById('btn-logout')?.addEventListener('click', handleLogout);
+    document.getElementById('btn-header-logout')?.addEventListener('click', handleLogout);
+
+    // Mostrar info del usuario en el header
+    const user = useAuthStore.getState().user;
+    const headerInfo = document.getElementById('header-user-info');
+    if (headerInfo && user) {
+      headerInfo.textContent = `Super Admin · ${user.nombre || user.name || user.id || 'Sesión activa'}`;
     }
   </script>
 </body>

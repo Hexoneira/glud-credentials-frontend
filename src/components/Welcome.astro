@@ -1,10 +1,6 @@
 ---
 import OrbsBackground from "./OrbsBackground";
 import '../styles/global.css'
-
-import { API_BASE_URL } from '../config';
-
-const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
 ---
 <!--Tarjeta central y orbes del fondo-->
 
@@ -30,16 +26,18 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
         <div class="row-start-3 h-px w-full bg-linear-to-r from-transparent via-cyan-400/30 to-transparent"></div>
         
         <section class="row-start-4 grid content-center gap-6 p-4 sm:p-5 md:p-6 lg:p-8"> 
-            <form id="login-form" class="grid gap-5" data-endpoint={API_AUTHLOGIN_ENDPOINT}>
+            <form id="login-form" class="grid gap-5">
                 <!-- Campo Usuario/Codigo -->
                 <div class="grid gap-2"> 
                     <label for="studentId" class="text-[0.6rem] font-bold uppercase tracking-[0.2em] text-slate-400">
-                        Código Estudiantil
+                        Código de Acceso (11 dígitos)
                     </label>
                     <input 
                         type="text"
                         inputmode="numeric"
-                        pattern="[0-9]*"
+                        pattern="[0-9]{11}"
+                        minlength="11"
+                        maxlength="11"
                         id="studentId"
                         name="studentId"
                         placeholder="202xxxxxxx"
@@ -103,7 +101,7 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
 
 <script>
     import { useAuthStore } from '../store/authStore';
-    import { API_TIMEOUT } from '../config';
+    import { login } from '../services/api';
 
     const form = document.getElementById('login-form') as HTMLFormElement;
     const errorMessage = document.getElementById('error-message');
@@ -114,7 +112,29 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
     const eyeSlashIcon = document.getElementById('eye-slash-icon');
     const studentIdInput = document.getElementById('studentId') as HTMLInputElement;
 
-    const API_AUTHLOGIN_ENDPOINT = form?.dataset.endpoint || '';
+    function getErrorMessage(error: unknown): string {
+        // Log the raw error to help debugging (network/CORS/timeout etc.)
+        // eslint-disable-next-line no-console
+        console.error('[Welcome] login error:', error);
+
+        // Handle DOM aborts (AbortSignal.timeout produces an AbortError)
+        if (typeof error === 'object' && error !== null) {
+            const anyErr: any = error;
+            if (anyErr.name === 'AbortError' || anyErr.name === 'TimeoutError') {
+                return 'La conexión tardó demasiado. Reintenta.';
+            }
+        }
+
+        if (error instanceof Error) {
+            // Typical network failures (CORS or offline) appear as TypeError in browsers
+            if (error instanceof TypeError) {
+                return error.message || 'Error de conexión. Revisa tu internet.';
+            }
+            return error.message || 'Error de conexión. Revisa tu internet.';
+        }
+
+        return 'Error de conexión. Revisa tu internet.';
+    }
 
     togglePasswordBtn?.addEventListener('click', () => {
         if (passwordInput && passwordInput.type === 'password') {
@@ -144,6 +164,14 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
             return;
         }
 
+        if (studentId.length !== 11) {
+            if (errorMessage) {
+                errorMessage.textContent = 'El código debe tener exactamente 11 dígitos';
+                errorMessage.classList.remove('hidden');
+            }
+            return;
+        }
+
         // Reset state
         errorMessage?.classList.add('hidden');
         if(submitBtn) {
@@ -153,48 +181,19 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
         }
 
         try {
-            const response = await fetch(API_AUTHLOGIN_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                signal: AbortSignal.timeout(API_TIMEOUT),
-                body: JSON.stringify({ id: studentId, password: password })
-            });
+            const { token, user } = await login({ id: studentId, password });
+            useAuthStore.getState().setAuth(token, user);
 
-            if (response.ok) {
-                const data = await response.json();
-                const token = data.token || 'jwt-token-simulado';
-                const user = data.user || data;
-                
-                useAuthStore.getState().setAuth(token, user);
-
-                const role = user.role;
-                if (role === 'super_admin') {
-                    window.location.href = '/super-admin';
-                } else if (role === 'admin') {
-                    window.location.href = '/admin';
-                } else {
-                    window.location.href = '/carnet';
-                }
+            if (user.role === 'super_admin') {
+                window.location.href = '/super-admin';
+            } else if (user.role === 'admin') {
+                window.location.href = '/admin';
             } else {
-                let errorMsg = 'Error en el servidor (500)';
-                if (response.status === 401 || response.status === 400 || response.status === 404) {
-                    errorMsg = 'Credenciales inválidas';
-                }
-                const data = await response.json().catch(() => ({}));
-                if (errorMessage) {
-                    errorMessage.textContent = data.message || errorMsg;
-                    errorMessage.classList.remove('hidden');
-                }
+                window.location.href = '/carnet';
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             if (errorMessage) {
-                if (error.name === 'TimeoutError') {
-                    errorMessage.textContent = 'La conexión tardó demasiado. Reintenta.';
-                } else {
-                    errorMessage.textContent = 'Error de conexión. Revisa tu internet.';
-                }
+                errorMessage.textContent = getErrorMessage(error);
                 errorMessage.classList.remove('hidden');
             }
         } finally {

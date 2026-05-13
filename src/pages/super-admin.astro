@@ -1,41 +1,11 @@
 ---
+import ProtectedRoute from '../layouts/ProtectedRoute.astro';
 import SuperAdminLayout from '../layouts/SuperAdminLayout.astro';
-import WorkgroupsTable from '../components/WorkgroupsTable.tsx';
-import CreateGroupForm from '../components/CreateGroupForm.tsx';
-import { tenantsData } from '../components/WorkgroupsTable.tsx';
-
-const totalActive = tenantsData.filter(t => t.status === 'ACTIVE').length;
+import SuperAdminDashboard from '../components/SuperAdminDashboard.tsx';
 ---
 
-<SuperAdminLayout>
-  <div class="flex justify-between items-start mb-10">
-    <div>
-      <h1 class="text-5xl font-bold tracking-tighter mb-2">MAIN TENANTS</h1>
-      <p class="text-[var(--support-grey)] max-w-md text-sm leading-relaxed">
-        Orchestrate and monitor workgroup lifecycle across the Hexoneira infrastructure.
-      </p>
-    </div>
-    
-    <div class="bg-[var(--bg-black-gunmetal)] p-5 rounded-2xl border border-[var(--support-gunmetal)] flex flex-col items-center">
-      <span class="text-[10px] uppercase tracking-widest text-[var(--support-grey)] mb-1">Total Active</span>
-      <span class="text-3xl font-bold text-[var(--cyan)]">{totalActive} Units</span>
-    </div>
-  </div>
-
-  <!-- 
-  ======================================
-  TABLA DE GRUPOS DE TRABAJO
-  ====================================== 
-  -->
-  <div class="mb-10">
-    <WorkgroupsTable client:load />
-  </div>
-    
-  <!-- 
-  ======================================
-  CREACIÓN DE GRUPO
-  ====================================== 
-  -->
-  <CreateGroupForm client:load />
-  
-</SuperAdminLayout>
+<ProtectedRoute allowedRoles={["super_admin"]}>
+  <SuperAdminLayout>
+    <SuperAdminDashboard client:load />
+  </SuperAdminLayout>
+</ProtectedRoute>
