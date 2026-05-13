@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const authState = vi.hoisted(() => ({
-  token: null as string | null,
-}));
+const authState = vi.hoisted(() => {
+  const state: { token: string | null } = { token: null };
+  return state;
+});
 
 vi.mock('../config', () => ({
   API_BASE_URL: 'http://test.local/api',
@@ -18,6 +19,7 @@ import {
   suspendTenant,
   updateTenant,
 } from './api';
+import { API_BASE_URL } from '../config';
 
 vi.mock('../store/authStore', () => ({
   useAuthStore: {
@@ -49,7 +51,7 @@ describe('api service', () => {
     const result = await login({ id: '00000000000', password: 'secret' });
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      'http://test.local/api/auth/login',
+      `${API_BASE_URL}/auth/login`,
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ id: '00000000000', password: 'secret' }),
@@ -66,7 +68,7 @@ describe('api service', () => {
     await fetchTenants();
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      'http://test.local/api/tenants',
+      `${API_BASE_URL}/tenants`,
       expect.objectContaining({
         method: 'GET',
         headers: expect.objectContaining({
@@ -128,22 +130,22 @@ describe('api service', () => {
 
     expect(fetchSpy).toHaveBeenNthCalledWith(
       1,
-      'http://test.local/api/tenants',
+      `${API_BASE_URL}/tenants`,
       expect.objectContaining({ method: 'POST', headers: expect.objectContaining({ Authorization: 'Bearer jwt-auth' }) })
     );
     expect(fetchSpy).toHaveBeenNthCalledWith(
       2,
-      'http://test.local/api/tenants/t-1',
+      `${API_BASE_URL}/tenants/t-1`,
       expect.objectContaining({ method: 'PUT', headers: expect.objectContaining({ Authorization: 'Bearer jwt-auth' }) })
     );
     expect(fetchSpy).toHaveBeenNthCalledWith(
       3,
-      'http://test.local/api/tenants/t-1/suspend',
+      `${API_BASE_URL}/tenants/t-1/suspend`,
       expect.objectContaining({ method: 'PATCH', headers: expect.objectContaining({ Authorization: 'Bearer jwt-auth' }) })
     );
     expect(fetchSpy).toHaveBeenNthCalledWith(
       4,
-      'http://test.local/api/tenants/t-1/reactivate',
+      `${API_BASE_URL}/tenants/t-1/reactivate`,
       expect.objectContaining({ method: 'PATCH', headers: expect.objectContaining({ Authorization: 'Bearer jwt-auth' }) })
     );
   });

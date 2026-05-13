@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Tenant } from '../services/api';
 import { deleteTenant, fetchTenants, reactivateTenant, suspendTenant } from '../services/api';
 
@@ -149,6 +149,11 @@ export default function WorkgroupsTable({ onEdit }: Readonly<WorkgroupsTableProp
                     ? 'bg-[var(--cyan)]/10 text-[var(--cyan)] border-[var(--cyan)]/30'
                     : 'bg-[var(--support-lila)]/10 text-[var(--support-lila)] border-[var(--support-lila)]/30';
 
+                let toggleActionLabel = tenant.status === 'ACTIVE' ? 'Suspender' : 'Reactivar';
+                if (isActionLoading) {
+                  toggleActionLabel = 'Procesando...';
+                }
+
                 return (
                   <tr key={tenant.id} className="border-b border-[var(--support-gunmetal)]/60 hover:bg-[var(--bg-black)]/20">
                     <td className="px-5 py-4 font-semibold text-[var(--white)]">{tenant.name}</td>
@@ -192,7 +197,7 @@ export default function WorkgroupsTable({ onEdit }: Readonly<WorkgroupsTableProp
                           <button
                             onClick={() => setConfirmDelete(tenant.id)}
                             disabled={isActionLoading}
-                            className="text-[10px] font-bold uppercase tracking-widest text-[var(--support-grey)] hover:text-[var(--support-lila)] transition-colors disabled:opacity-50"
+                            className="text-[10px] font-bold uppercase tracking-widest text-(--support-grey) hover:text-(--support-lila) transition-colors disabled:opacity-50"
                           >
                             Eliminar
                           </button>
@@ -203,11 +208,11 @@ export default function WorkgroupsTable({ onEdit }: Readonly<WorkgroupsTableProp
                           disabled={isActionLoading}
                           className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all disabled:opacity-50 ${
                             tenant.status === 'ACTIVE'
-                              ? 'border border-[var(--support-gunmetal)] text-[var(--support-grey)] hover:border-[var(--support-lila)] hover:text-[var(--support-lila)]'
-                              : 'bg-[var(--cyan)]/20 border border-[var(--cyan)] text-[var(--cyan)] hover:bg-[var(--cyan)] hover:text-[var(--bg-black)]'
+                              ? 'border border-(--support-gunmetal) text-(--support-grey) hover:border-(--support-lila) hover:text-(--support-lila)'
+                              : 'bg-(--cyan)/20 border border-(--cyan) text-(--cyan) hover:bg-(--cyan) hover:text-(--bg-black)'
                           }`}
                         >
-                          {isActionLoading ? 'Procesando...' : tenant.status === 'ACTIVE' ? 'Suspender' : 'Reactivar'}
+                          {toggleActionLabel}
                         </button>
                       </div>
                     </td>

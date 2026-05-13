@@ -82,8 +82,6 @@ async function handleResponse<T>(response: Response): Promise<T> {
   try {
     return JSON.parse(text) as T;
   } catch (error) {
-    // Log the raw (possibly-invalid) body to help debugging (CORS/proxy/backend formatting issues)
-    // eslint-disable-next-line no-console
     console.error('[api] Invalid JSON response from', response.url, 'body:', text);
     throw new Error('Respuesta inválida del servidor (JSON parse error)', {
       cause: error instanceof Error ? error : undefined,

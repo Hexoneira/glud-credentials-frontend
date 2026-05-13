@@ -15,7 +15,7 @@ interface FormErrors {
 }
 
 export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormProps>) {
-  const modalRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDialogElement>(null);
   const previousFocusRef = useRef<Element | null>(null);
 
   const [formData, setFormData] = useState({
@@ -143,36 +143,43 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
   const description = isEdit
     ? 'Modifica la información del grupo de trabajo seleccionado.'
     : 'Registra un nuevo grupo de trabajo en el sistema. Define nombre, código de tenant y límite de miembros.';
+  
+  let submitButtonLabel = 'Procesando...';
+  if (submitting) {
+    submitButtonLabel = isEdit ? 'Guardar Cambios' : 'Registrar Grupo';
+  }
 
   return (
-    <div
-      className="fixed inset-0 bg-[var(--bg-black)]/80 backdrop-blur-sm flex justify-center items-center z-50 p-4"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div
-        ref={modalRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="group-form-title"
+    <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
+      <button
+        type="button"
+        className="absolute inset-0 w-full h-full bg-(--bg-black)/80 backdrop-blur-sm border-none cursor-default"
+        onClick={onClose}
+        aria-label="Cerrar modal"
         tabIndex={-1}
-        className="bg-[var(--bg-black-gunmetal)] border border-[var(--cyan)]/30 rounded-3xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-[0_0_40px_rgba(0,255,255,0.15)] focus:outline-none"
+      />
+      <dialog
+        ref={modalRef}
+        open
+        aria-labelledby="group-form-title"
+        className="m-0 p-0 bg-(--bg-black-gunmetal) border border-(--cyan)/30 rounded-3xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-[0_0_40px_rgba(0,255,255,0.15)] focus:outline-none"
       >
         {/* Panel izquierdo */}
-        <div className="w-full md:w-1/3 bg-[var(--bg-eerie)] p-10 border-b md:border-b-0 md:border-r border-[var(--support-gunmetal)] flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute -top-20 -left-20 w-40 h-40 bg-[var(--cyan)] rounded-full blur-[100px] opacity-20"></div>
+        <div className="w-full md:w-1/3 bg-(--bg-eerie) p-10 border-b md:border-b-0 md:border-r border-(--support-gunmetal) flex flex-col justify-between relative overflow-hidden">
+          <div className="absolute -top-20 -left-20 w-40 h-40 bg-(--cyan) rounded-full blur-[100px] opacity-20"></div>
           <div className="relative z-10">
-            <span className="text-[10px] text-[var(--cyan)] uppercase tracking-widest font-bold">
+            <span className="text-[10px] text-(--cyan) uppercase tracking-widest font-bold">
               {isEdit ? 'Edición' : 'Registro'}
             </span>
-            <h2 id="group-form-title" className="text-4xl font-display font-bold text-[var(--white)] mt-2 leading-tight uppercase tracking-tighter">
+            <h2 id="group-form-title" className="text-4xl font-display font-bold text-(--white) mt-2 leading-tight uppercase tracking-tighter">
               {isEdit ? (<>Editar<br/>Grupo</>) : (<>Crear<br/>Grupo</>)}
             </h2>
-            <p className="text-[var(--support-grey)] text-xs mt-6 leading-relaxed">{description}</p>
+            <p className="text-(--support-grey) text-xs mt-6 leading-relaxed">{description}</p>
           </div>
         </div>
 
         {/* Panel derecho - Formulario */}
-        <div className="w-full md:w-2/3 p-10 flex flex-col justify-center bg-[var(--bg-black-gunmetal)]">
+        <div className="w-full md:w-2/3 p-10 flex flex-col justify-center bg-(--bg-black-gunmetal)">
           <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-5" noValidate>
 
             {/* Nombre del grupo */}
@@ -263,12 +270,12 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
                 disabled={submitting}
                 className="flex items-center gap-2 bg-[var(--cyan)]/10 border border-[var(--cyan)] text-[var(--cyan)] px-6 py-2 rounded-full text-[10px] uppercase tracking-widest font-bold shadow-[0_0_15px_rgba(0,255,255,0.2)] hover:bg-[var(--cyan)] hover:text-[var(--bg-black)] hover:shadow-[0_0_25px_rgba(0,255,255,0.5)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {submitting ? 'Procesando...' : (isEdit ? 'Guardar Cambios' : 'Registrar Grupo')}
+                {submitButtonLabel}
               </button>
             </div>
           </form>
         </div>
-      </div>
+      </dialog>
     </div>
   );
 }

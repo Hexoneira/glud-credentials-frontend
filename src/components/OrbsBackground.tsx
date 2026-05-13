@@ -26,19 +26,17 @@ function randomBetween(min: number, max: number): number {
 
 // Try to import animejs with a safe fallback and return the callable anime function or null
 export async function loadAnime(
-  importMain: () => Promise<AnimeModule> = () => import('animejs') as Promise<AnimeModule>,
-  importFallback: () => Promise<AnimeModule> = () => import('animejs/lib/anime.es.js') as Promise<AnimeModule>,
+  importMain: () => Promise<AnimeModule> = () => import('animejs'),
+  importFallback: () => Promise<AnimeModule> = () => import('animejs/lib/anime.es.js'),
 ): Promise<AnimeFactory | null> {
   let anime: AnimeFactory | null = null;
   try {
     const mod = await importMain();
-    const modAny = mod as AnimeModule;
-    anime = (modAny && (modAny.default || modAny.anime || modAny)) as AnimeFactory | null;
+    anime = (mod && (mod.default || mod.anime || mod)) as AnimeFactory | null;
   } catch (err) {
     try {
       const mod = await importFallback();
-      const modAny = mod as AnimeModule;
-      anime = modAny && (modAny.default || modAny.anime || modAny) as AnimeFactory | null;
+      anime = (mod && (mod.default || mod.anime || mod)) as AnimeFactory | null;
       // eslint-disable-next-line no-console
       console.warn('[OrbsBackground] animejs failed to load from main entry, loaded from fallback', err);
     } catch (e) {
@@ -57,7 +55,7 @@ export async function loadAnime(
   return anime;
 }
 
-function createMouseHandler(orbEntriesRef: { current: OrbEntry[] }, container: HTMLDivElement | null) {
+function createMouseHandler(orbEntriesRef: { current: OrbEntry[] }) {
   return (e: MouseEvent) => {
     const { clientX, clientY } = e;
     const { innerWidth, innerHeight } = globalThis as any;
@@ -133,7 +131,7 @@ async function startAnimations({ orbEntriesRef, animationInstancesRef, mouseHand
   });
 
   if (isDesktop && !cancelled.value) {
-    const handler = createMouseHandler(orbEntriesRef, container);
+    const handler = createMouseHandler(orbEntriesRef);
     mouseHandlerRef.current = handler;
     document.addEventListener('mousemove', handler);
   }

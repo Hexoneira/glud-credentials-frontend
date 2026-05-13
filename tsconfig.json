@@ -12,6 +12,8 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": ["astro/client", "react"]
   }
 }

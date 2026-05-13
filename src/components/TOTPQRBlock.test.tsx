@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { render, screen, act, cleanup } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import TOTPQRBlock from './TOTPQRBlock';

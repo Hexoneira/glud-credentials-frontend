@@ -43,7 +43,6 @@ import '../styles/global.css'
                         placeholder="202xxxxxxx"
                         required
                         class="w-full rounded-md border border-white/10 bg-[#0b1220]/90 px-4 py-3 text-white placeholder-slate-500 focus:border-cyan-400/50 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                     />
                 </div>
 
@@ -130,6 +129,11 @@ import '../styles/global.css'
             eyeIcon?.classList.remove('hidden');
             eyeSlashIcon?.classList.add('hidden');
         }
+    });
+
+    studentIdInput?.addEventListener('input', (e) => {
+        const target = e.target as HTMLInputElement;
+        target.value = target.value.replace(/[^0-9]/g, '');
     });
 
     form?.addEventListener('submit', async (e) => {
