@@ -84,8 +84,8 @@ export default function TOTPQRBlock({
 
     // Run immediately, then every second for the countdown
     tick();
-    const interval = window.setInterval(tick, 1000);
-    return () => window.clearInterval(interval);
+    const interval = globalThis.setInterval(tick, 1000);
+    return () => globalThis.clearInterval(interval);
   }, [secret]);
 
   const payload = useMemo(

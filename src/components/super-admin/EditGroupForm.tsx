@@ -1,5 +1,5 @@
-import type { Tenant } from '../services/api';
-import GroupForm from './GroupForm';
+import type { Tenant } from '../../services/api';
+import GroupForm from './GroupForm.tsx';
 
 interface EditGroupFormProps {
   tenant: Tenant | null;

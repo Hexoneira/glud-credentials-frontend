@@ -11,49 +11,49 @@ import "../styles/global.css";
   <title>Super Admin | Hexoneira</title>
 </head>
 <body>
-  <div class="main-container flex h-screen overflow-hidden text-[var(--white)]">
+  <div class="main-container flex h-screen overflow-hidden text-(--white)">
     
     <!-- Sidebar -->
-    <aside class="w-64 bg-[var(--bg-black-gunmetal)] flex flex-col justify-between p-6 border-r border-[var(--support-gunmetal)] flex-shrink-0">
+    <aside class="w-64 bg-(--bg-black-gunmetal) flex flex-col justify-between p-6 border-r border-(--support-gunmetal) shrink-0">
       <div>
         <div class="mb-12 flex items-center gap-3">
-          <div class="w-8 h-8 rounded bg-[var(--support-gunmetal)] flex items-center justify-center">
-            <span class="text-[var(--support-beer)] font-bold">H</span>
+          <div class="w-8 h-8 rounded bg-(--support-gunmetal) flex items-center justify-center">
+            <span class="text-(--support-beer) font-bold">H</span>
           </div>
           <div>
             <h1 class="text-lg font-bold tracking-widest uppercase">Hexoneira</h1>
-            <p class="text-[var(--cyan)] text-[10px] tracking-widest uppercase">Super Admin</p>
+            <p class="text-(--cyan) text-[10px] tracking-widest uppercase">Super Admin</p>
           </div>
         </div>
 
         <nav class="flex flex-col gap-4 text-sm font-semibold">
-          <a href="/super-admin" class="flex items-center gap-3 text-[var(--cyan)] border-l-2 border-[var(--cyan)] pl-3">
+          <a href="/super-admin" class="flex items-center gap-3 text-(--cyan) border-l-2 border-(--cyan) pl-3">
             <span>Grupos de Trabajo</span>
           </a>
         </nav>
       </div>
 
       <div class="flex flex-col gap-6">
-        <button id="btn-create-group" class="primary-button w-full rounded-full text-xs text-[var(--bg-black-gunmetal)] shadow-[0_0_15px_rgba(0,255,255,0.2)] hover:shadow-[0_0_25px_rgba(0,255,255,0.4)] transition-all">
+        <button id="btn-create-group" class="primary-button w-full rounded-full text-xs text-(--bg-black-gunmetal) shadow-[0_0_15px_rgba(0,255,255,0.2)] hover:shadow-[0_0_25px_rgba(0,255,255,0.4)] transition-all">
           Crear Nuevo Grupo
         </button>
 
-        <button id="btn-logout" class="text-xs text-[var(--support-grey)] hover:text-[var(--support-lila)] transition-colors text-left">
+        <button id="btn-logout" class="text-xs text-(--support-grey) hover:text-(--support-lila) transition-colors text-left">
           Cerrar sesión
         </button>
       </div>
     </aside>
 
     <!-- Main content -->
-    <main class="flex-1 flex flex-col bg-[var(--bg-eerie)] overflow-y-auto">
-      <header class="flex items-center justify-between px-10 py-6 border-b border-[var(--support-gunmetal)]">
+    <main class="flex-1 flex flex-col bg-(--bg-eerie) overflow-y-auto">
+      <header class="flex items-center justify-between px-10 py-6 border-b border-(--support-gunmetal)">
         <div class="flex items-center gap-3">
-          <div class="w-2 h-2 rounded-full bg-[var(--cyan)] shadow-[0_0_6px_var(--cyan)]"></div>
-          <span class="text-[10px] uppercase tracking-widest text-[var(--support-grey)]">Panel de Administración</span>
+          <div class="w-2 h-2 rounded-full bg-(--cyan) shadow-[0_0_6px_var(--cyan)]"></div>
+          <span class="text-[10px] uppercase tracking-widest text-(--support-grey)">Panel de Administración</span>
         </div>
         <div class="flex items-center gap-4">
-          <span id="header-user-info" class="text-[10px] uppercase tracking-widest text-[var(--support-grey)]"></span>
-          <button id="btn-header-logout" class="text-[10px] uppercase tracking-widest text-[var(--support-grey)] hover:text-[var(--support-lila)] transition-colors font-bold">
+          <span id="header-user-info" class="text-[10px] uppercase tracking-widest text-(--support-grey)"></span>
+          <button id="btn-header-logout" class="text-[10px] uppercase tracking-widest text-(--support-grey) hover:text-(--support-lila) transition-colors font-bold">
             Salir
           </button>
         </div>
