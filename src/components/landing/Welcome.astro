@@ -1,5 +1,5 @@
 ---
-import OrbsBackground from "./OrbsBackground";
+import OrbsBackground from "../OrbsBackground";
 import '../styles/global.css'
 ---
 <!--Tarjeta central y orbes del fondo-->
@@ -99,9 +99,9 @@ import '../styles/global.css'
 </section>
 
 <script>
-    import { useAuthStore } from '../store/authStore';
-    import { login } from '../services/api';
-    import { getAuthErrorMessage } from '../utils/authError';
+    import { useAuthStore } from '../../store/authStore';
+    import { login } from '../../services/api';
+    import { getAuthErrorMessage } from '../../utils/authError';
 
     const form = document.getElementById('login-form') as HTMLFormElement;
     const errorMessage = document.getElementById('error-message');

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import type { Tenant } from '../services/api';
-import WorkgroupsTable from './WorkgroupsTable';
-import CreateGroupForm from './CreateGroupForm';
-import EditGroupForm from './EditGroupForm';
+import React, { useState } from "react";
+import type { Tenant } from "../../services/api";
+import WorkgroupsTable from "./WorkgroupsTable";
+import CreateGroupForm from "./CreateGroupForm";
+import EditGroupForm from "./EditGroupForm";
 
 export default function SuperAdminDashboard() {
   const [createFormOpen, setCreateFormOpen] = useState(false);
@@ -27,8 +27,9 @@ export default function SuperAdminDashboard() {
   // Escuchar evento del sidebar para abrir el modal de crear
   React.useEffect(() => {
     const handleOpenCreate = () => handleCreate();
-    globalThis.addEventListener('openCreateGroupModal', handleOpenCreate);
-    return () => globalThis.removeEventListener('openCreateGroupModal', handleOpenCreate);
+    globalThis.addEventListener("openCreateGroupModal", handleOpenCreate);
+    return () =>
+      globalThis.removeEventListener("openCreateGroupModal", handleOpenCreate);
   }, []);
 
   return (
@@ -36,9 +37,12 @@ export default function SuperAdminDashboard() {
       {/* Encabezado de la sección */}
       <div className="flex justify-between items-start mb-10">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight mb-2">Grupos de Trabajo</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-2">
+            Grupos de Trabajo
+          </h1>
           <p className="text-[var(--support-grey)] max-w-md text-sm leading-relaxed">
-            Administra la creación, edición, suspensión y reactivación de tenants.
+            Administra la creación, edición, suspensión y reactivación de
+            tenants.
           </p>
         </div>
 
@@ -56,7 +60,10 @@ export default function SuperAdminDashboard() {
       </div>
 
       {/* Modal de formulario */}
-      <CreateGroupForm isOpen={createFormOpen} onClose={handleCloseCreateForm} />
+      <CreateGroupForm
+        isOpen={createFormOpen}
+        onClose={handleCloseCreateForm}
+      />
       <EditGroupForm tenant={editingTenant} onClose={handleCloseEditForm} />
     </>
   );

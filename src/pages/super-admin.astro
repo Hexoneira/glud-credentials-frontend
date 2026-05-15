@@ -1,7 +1,7 @@
 ---
-import ProtectedRoute from '../layouts/ProtectedRoute.astro';
-import SuperAdminLayout from '../layouts/SuperAdminLayout.astro';
-import SuperAdminDashboard from '../components/SuperAdminDashboard.tsx';
+import ProtectedRoute from "../layouts/ProtectedRoute.astro";
+import SuperAdminLayout from "../layouts/SuperAdminLayout.astro";
+import SuperAdminDashboard from "../components/super-admin/SuperAdminDashboard.tsx";
 ---
 
 <ProtectedRoute allowedRoles={["super_admin"]}>

@@ -1,4 +1,4 @@
-import GroupForm from './GroupForm';
+import GroupForm from '../super-admin/GroupForm';
 
 interface CreateGroupFormProps {
   isOpen: boolean;

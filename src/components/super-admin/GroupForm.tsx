@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import type { Tenant } from '../services/api';
-import { createTenant, updateTenant } from '../services/api';
+import type { Tenant } from '../../services/api';
+import { createTenant, updateTenant } from '../../services/api';
 
 interface GroupFormProps {
   mode: 'create' | 'edit';
@@ -144,9 +144,9 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
     ? 'Modifica la información del grupo de trabajo seleccionado.'
     : 'Registra un nuevo grupo de trabajo en el sistema. Define nombre, código de tenant y límite de miembros.';
   
-  let submitButtonLabel = 'Procesando...';
+  let submitButtonLabel = isEdit ? 'Guardar Cambios' : 'Registrar Grupo';
   if (submitting) {
-    submitButtonLabel = isEdit ? 'Guardar Cambios' : 'Registrar Grupo';
+    submitButtonLabel = 'Procesando...';
   }
 
   return (
@@ -185,10 +185,10 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
             {/* Nombre del grupo */}
             <div className="flex flex-col gap-2 group">
               <div className="flex justify-between items-center">
-                <label htmlFor="group-name" className="text-[10px] uppercase tracking-widest text-[var(--cyan)] font-bold">
+                <label htmlFor="group-name" className="text-[10px] uppercase tracking-widest text-(--cyan) font-bold">
                   Nombre del Grupo
                 </label>
-                {errors.name && <span className="text-[9px] uppercase text-[var(--support-lila)] font-bold tracking-widest">{errors.name}</span>}
+                {errors.name && <span className="text-[9px] uppercase text-(--support-lila) font-bold tracking-widest">{errors.name}</span>}
               </div>
               <input
                 id="group-name"
@@ -196,17 +196,17 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
                 placeholder="Ej. GLUD"
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
-                className={`bg-[var(--bg-black)] border ${errors.name ? 'border-[var(--support-lila)]' : 'border-[var(--support-gunmetal)]'} rounded-xl px-4 py-3 text-sm text-[var(--white)] focus:outline-none focus:border-[var(--cyan)] focus:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300`}
+                className={`bg-(--bg-black) border ${errors.name ? 'border-(--support-lila)' : 'border-(--support-gunmetal)'} rounded-xl px-4 py-3 text-sm text-(--white) focus:outline-none focus:border-(--cyan) focus:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300`}
               />
             </div>
 
             {/* Código de Tenant */}
             <div className="flex flex-col gap-2 group">
               <div className="flex justify-between items-center">
-                <label htmlFor="tenant-code" className="text-[10px] uppercase tracking-widest text-[var(--cyan)] font-bold">
+                <label htmlFor="tenant-code" className="text-[10px] uppercase tracking-widest text-(--cyan) font-bold">
                   Código Tenant
                 </label>
-                {errors.tenantCode && <span className="text-[9px] uppercase text-[var(--support-lila)] font-bold tracking-widest">{errors.tenantCode}</span>}
+                {errors.tenantCode && <span className="text-[9px] uppercase text-(--support-lila) font-bold tracking-widest">{errors.tenantCode}</span>}
               </div>
               <input
                 id="tenant-code"
@@ -215,20 +215,20 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
                 value={formData.tenantCode}
                 onChange={(e) => handleChange('tenantCode', e.target.value)}
                 disabled={isEdit}
-                className={`bg-[var(--bg-black)] border ${errors.tenantCode ? 'border-[var(--support-lila)]' : 'border-[var(--support-gunmetal)]'} rounded-xl px-4 py-3 text-sm text-[var(--white)] focus:outline-none focus:border-[var(--cyan)] focus:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300 ${isEdit ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`bg-(--bg-black) border ${errors.tenantCode ? 'border-(--support-lila)' : 'border-(--support-gunmetal)'} rounded-xl px-4 py-3 text-sm text-(--white) focus:outline-none focus:border-(--cyan) focus:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300 ${isEdit ? 'opacity-50 cursor-not-allowed' : ''}`}
               />
               {isEdit && (
-                <span className="text-[9px] uppercase text-[var(--support-grey)] tracking-widest">No editable después de la creación</span>
+                <span className="text-[9px] uppercase text-(--support-grey) tracking-widest">No editable después de la creación</span>
               )}
             </div>
 
             {/* Límite de miembros */}
             <div className="flex flex-col gap-2 group">
               <div className="flex justify-between items-center">
-                <label htmlFor="member-limit" className="text-[10px] uppercase tracking-widest text-[var(--cyan)] font-bold">
+                <label htmlFor="member-limit" className="text-[10px] uppercase tracking-widest text-(--cyan) font-bold">
                   Límite de Miembros
                 </label>
-                {errors.memberLimit && <span className="text-[9px] uppercase text-[var(--support-lila)] font-bold tracking-widest">{errors.memberLimit}</span>}
+                {errors.memberLimit && <span className="text-[9px] uppercase text-(--support-lila) font-bold tracking-widest">{errors.memberLimit}</span>}
               </div>
               <input
                 id="member-limit"
@@ -238,29 +238,29 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
                 placeholder="50"
                 value={formData.memberLimit}
                 onChange={(e) => handleChange('memberLimit', e.target.value)}
-                className={`bg-[var(--bg-black)] border ${errors.memberLimit ? 'border-[var(--support-lila)]' : 'border-[var(--support-gunmetal)]'} rounded-xl px-4 py-3 text-sm text-[var(--white)] focus:outline-none focus:border-[var(--cyan)] focus:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300`}
+                className={`bg-(--bg-black) border ${errors.memberLimit ? 'border-(--support-lila)' : 'border-(--support-gunmetal)'} rounded-xl px-4 py-3 text-sm text-(--white) focus:outline-none focus:border-(--cyan) focus:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300`}
               />
             </div>
 
             {/* Mensajes de estado */}
             {submitError && (
-              <div className="bg-[var(--support-lila)]/10 border border-[var(--support-lila)]/40 rounded-xl px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[var(--support-lila)]">
+              <div className="bg-(--support-lila)/10 border border-(--support-lila)/40 rounded-xl px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-(--support-lila)">
                 {submitError}
               </div>
             )}
             {submitSuccess && (
-              <div className="bg-[var(--cyan)]/10 border border-[var(--cyan)]/40 rounded-xl px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[var(--cyan)] shadow-[0_0_10px_rgba(0,255,255,0.15)]">
+              <div className="bg-(--cyan)/10 border border-(--cyan)/40 rounded-xl px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-(--cyan) shadow-[0_0_10px_rgba(0,255,255,0.15)]">
                 {submitSuccess}
               </div>
             )}
 
             {/* Botones */}
-            <div className="flex justify-between items-center mt-4 pt-4 border-t border-[var(--support-gunmetal)]">
+            <div className="flex justify-between items-center mt-4 pt-4 border-t border-(--support-gunmetal)">
               <button
                 type="button"
                 onClick={onClose}
                 disabled={submitting}
-                className="text-[10px] uppercase tracking-widest text-[var(--support-grey)] hover:text-[var(--support-lila)] font-bold transition-all duration-300 disabled:opacity-50"
+                className="text-[10px] uppercase tracking-widest text-(--support-grey) hover:text-(--support-lila) font-bold transition-all duration-300 disabled:opacity-50"
               >
                 Cancelar
               </button>
@@ -268,7 +268,7 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex items-center gap-2 bg-[var(--cyan)]/10 border border-[var(--cyan)] text-[var(--cyan)] px-6 py-2 rounded-full text-[10px] uppercase tracking-widest font-bold shadow-[0_0_15px_rgba(0,255,255,0.2)] hover:bg-[var(--cyan)] hover:text-[var(--bg-black)] hover:shadow-[0_0_25px_rgba(0,255,255,0.5)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 bg-(--cyan)/10 border border-(--cyan) text-(--cyan) px-6 py-2 rounded-full text-[10px] uppercase tracking-widest font-bold shadow-[0_0_15px_rgba(0,255,255,0.2)] hover:bg-(--cyan) hover:text-(--bg-black) hover:shadow-[0_0_25px_rgba(0,255,255,0.5)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitButtonLabel}
               </button>

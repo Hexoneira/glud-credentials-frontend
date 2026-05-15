@@ -1,7 +1,7 @@
 ---
-import OrbsBackground from './OrbsBackground';
-import TOTPQRBlock from './TOTPQRBlock';
-import { API_BASE_URL } from '../config';
+import OrbsBackground from '../OrbsBackground';
+import TOTPQRBlock from '../carnet/TOTPQRBlock';
+import { API_BASE_URL } from '../../config';
 
 const API_MEMBER_ENDPOINT = `${API_BASE_URL}/member/current`;
 
@@ -87,8 +87,8 @@ const gludTheme = {
 </section>
 
 <script>
-    import { useAuthStore } from '../store/authStore';
-    import { API_TIMEOUT } from '../config';
+    import { useAuthStore } from '../../store/authStore';
+    import { API_TIMEOUT } from '../../config';
     
     const panel = document.getElementById('panel');
     const endpoint = panel?.dataset.endpoint || '';
