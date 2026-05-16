@@ -81,11 +81,14 @@ describe('OrbsBackground', () => {
       expect(container.querySelectorAll('.gradient-orb')).toHaveLength(3);
     });
 
+    const wrappers = Array.from(container.querySelectorAll('div')) as HTMLElement[];
+    const initialTransforms = wrappers.map(w => w.style.transform || '');
+
     // dispatching mousemove should not change wrappers because mobile doesn't attach handler
     globalThis.dispatchEvent(new MouseEvent('mousemove', { clientX: 10, clientY: 10 }));
-    const wrappers = container.querySelectorAll('div');
-    // ensure at least one wrapper exists and none changed transform to non-empty
-    wrappers.forEach(w => expect((w as HTMLElement).style.transform || '').toBe((w as HTMLElement).style.transform || ''));
+
+    expect(wrappers.length).toBeGreaterThan(0);
+    wrappers.forEach((w, index) => expect(w.style.transform || '').toBe(initialTransforms[index]));
 
     unmount();
   });
