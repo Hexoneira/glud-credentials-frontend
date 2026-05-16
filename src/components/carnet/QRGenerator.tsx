@@ -12,7 +12,7 @@ type QRGeneratorProps = {
 };
 
 function normalizeColor(color: string, fallback: string): string {
-  if (!color || !color.trim()) return fallback;
+  if (!color?.trim()) return fallback;
   if (color.trim().toLowerCase() === 'transparent') return '#00000000';
   return color;
 }
@@ -32,11 +32,13 @@ export default function QRGenerator({
   lightColor = '#071026',
   borderColor = '#22fefb',
   shadowColor = 'rgba(34,254,251,0.5)',
-}: QRGeneratorProps) {
+}: Readonly<QRGeneratorProps>) {
   const [src, setSrc] = useState<string>('');
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
+    let cancelled = false;
+
     if (!value.trim()) {
       setSrc('');
       setError('No se encontro contenido para generar el QR.');
@@ -49,19 +51,27 @@ export default function QRGenerator({
     setSrc('');
     setError('');
 
-    QRCode.toDataURL(value, {
-      margin: 0,
-      width: size,
-      color: {
-        dark,
-        light,
-      },
-    })
-      .then((dataUrl: string) => setSrc(dataUrl))
-      .catch((err: unknown) => {
+    async function generateQRCode() {
+      try {
+        const dataUrl: string = await QRCode.toDataURL(value, {
+          margin: 0,
+          width: size,
+          color: { dark, light },
+        });
+        if (cancelled) return;
+        setSrc(dataUrl);
+      } catch (err: unknown) {
         console.error('[QRGenerator] Error generando QR:', err);
+        if (cancelled) return;
         setError('No se pudo generar el QR.');
-      });
+      }
+    }
+
+    generateQRCode();
+
+    return () => {
+      cancelled = true;
+    };
   }, [value, size, darkColor, lightColor]);
 
   if (error) {

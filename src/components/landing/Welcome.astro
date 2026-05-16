@@ -1,10 +1,6 @@
 ---
-import OrbsBackground from "./OrbsBackground";
-import '../styles/global.css'
-
-import { API_BASE_URL } from '../config';
-
-const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
+import OrbsBackground from "../OrbsBackground";
+import '../../styles/global.css'
 ---
 <!--Tarjeta central y orbes del fondo-->
 
@@ -22,7 +18,7 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
             <header class="row-start-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-white/15 p-4 sm:gap-5 sm:p-5 md:p-6 lg:p-8 sm:items-end">
                            <div class="min-w-0 text-left">
                     <h1 class="text-2xl font-black tracking-widest text-white drop-shadow-[0_0_12px_rgba(34,254,251,0.3)] sm:text-3xl md:text-5xl sm:tracking-widest md:tracking-widest">COWORKING</h1>
-                    <p class="mt-1 text-[0.58rem] font-bold uppercase tracking-[0.27em] text-cyan-400 sm:text-[0.7rem] md:text-[0.75rem] sm:tracking-[0.25em] md:tracking-[0.3em]">Universidad Distrital</p>
+                    <p class="mt-1 text-[0.58rem] font-bold uppercase tracking-wide text-cyan-400 sm:text-[0.7rem] md:text-[0.75rem]">Universidad Distrital</p>
                 </div>
                 <h1 class="text-white font-black tracking-wider md:text-5xl">LOGIN</h1>
             </header>
@@ -30,29 +26,30 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
         <div class="row-start-3 h-px w-full bg-linear-to-r from-transparent via-cyan-400/30 to-transparent"></div>
         
         <section class="row-start-4 grid content-center gap-6 p-4 sm:p-5 md:p-6 lg:p-8"> 
-            <form id="login-form" class="grid gap-5" data-endpoint={API_AUTHLOGIN_ENDPOINT}>
+            <form id="login-form" class="grid gap-5">
                 <!-- Campo Usuario/Codigo -->
                 <div class="grid gap-2"> 
-                    <label for="studentId" class="text-[0.6rem] font-bold uppercase tracking-[0.2em] text-slate-400">
-                        Código Estudiantil
+                    <label for="studentId" class="text-[0.6rem] font-bold uppercase tracking-wide text-slate-400">
+                        Código de Acceso (11 dígitos)
                     </label>
                     <input 
                         type="text"
                         inputmode="numeric"
-                        pattern="[0-9]*"
+                        pattern="[0-9]{11}"
+                        minlength="11"
+                        maxlength="11"
                         id="studentId"
                         name="studentId"
                         placeholder="202xxxxxxx"
                         required
                         class="w-full rounded-md border border-white/10 bg-[#0b1220]/90 px-4 py-3 text-white placeholder-slate-500 focus:border-cyan-400/50 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                     />
                 </div>
 
                 <!-- Campo Contraseña -->
                 <div class="grid gap-2">
                     <div class="flex items-center justify-between">
-                        <label for="password" class="text-[0.6rem] font-bold uppercase tracking-[0.2em] text-slate-400">
+                        <label for="password" class="text-[0.6rem] font-bold uppercase tracking-wide text-slate-400">
                             Contraseña
                         </label>
                         <a href="#" class="text-[0.6rem] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
@@ -80,20 +77,20 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
                 </div>
 
                 <!-- Mensaje de error -->
-                <div id="error-message" class="hidden rounded-md border border-red-500/30 bg-red-500/10 px-4 py-2 text-center text-[0.7rem] font-bold uppercase tracking-[0.1em] text-red-400">
+                <div id="error-message" class="hidden rounded-md border border-red-500/30 bg-red-500/10 px-4 py-2 text-center text-[0.7rem] font-bold uppercase tracking-widest text-red-400">
                 </div>
 
                 <!-- Botón de Ingreso -->
                 <button
                     type="submit"
                     id="submit-btn"
-                    class="mt-4 w-full rounded-md bg-cyan-500 hover:bg-cyan-400 text-[#050916] font-bold uppercase tracking-[0.15em] py-3 transition-all duration-300 shadow-[0_0_15px_rgba(34,254,251,0.3)] hover:shadow-[0_0_25px_rgba(34,254,251,0.5)] focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#0b1120]">
+                    class="mt-4 w-full rounded-md bg-cyan-500 hover:bg-cyan-400 text-[#050916] font-bold uppercase tracking-wide py-3 transition-all duration-300 shadow-[0_0_15px_rgba(34,254,251,0.3)] hover:shadow-[0_0_25px_rgba(34,254,251,0.5)] focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#0b1120]">
                     Ingresar
                 </button>
             </form>
         </section>
         
-        <footer class="row-start-5 grid gap-3 border-t border-white/15 bg-black/50 p-4 sm:p-5 md:p-6 text-[0.55rem] font-semibold uppercase tracking-[0.2em] text-slate-400 text-center">
+        <footer class="row-start-5 grid gap-3 border-t border-white/15 bg-black/50 p-4 sm:p-5 md:p-6 text-[0.55rem] font-semibold uppercase tracking-wide text-slate-400 text-center">
             <p>Acceso exclusivo para miembros activos.</p>
         </footer>
         
@@ -102,8 +99,9 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
 </section>
 
 <script>
-    import { useAuthStore } from '../store/authStore';
-    import { API_TIMEOUT } from '../config';
+    import { useAuthStore } from '../../store/authStore';
+    import { login } from '../../services/api';
+    import { getAuthErrorMessage } from '../../utils/authError';
 
     const form = document.getElementById('login-form') as HTMLFormElement;
     const errorMessage = document.getElementById('error-message');
@@ -114,7 +112,12 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
     const eyeSlashIcon = document.getElementById('eye-slash-icon');
     const studentIdInput = document.getElementById('studentId') as HTMLInputElement;
 
-    const API_AUTHLOGIN_ENDPOINT = form?.dataset.endpoint || '';
+    function getErrorMessage(error: unknown): string {
+        // Log the raw error to help debugging (network/CORS/timeout etc.)
+        // eslint-disable-next-line no-console
+        console.error('[Welcome] login error:', error);
+        return getAuthErrorMessage(error);
+    }
 
     togglePasswordBtn?.addEventListener('click', () => {
         if (passwordInput && passwordInput.type === 'password') {
@@ -126,6 +129,11 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
             eyeIcon?.classList.remove('hidden');
             eyeSlashIcon?.classList.add('hidden');
         }
+    });
+
+    studentIdInput?.addEventListener('input', (e) => {
+        const target = e.target as HTMLInputElement;
+        target.value = target.value.replace(/[^0-9]/g, '');
     });
 
     form?.addEventListener('submit', async (e) => {
@@ -144,6 +152,14 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
             return;
         }
 
+        if (studentId.length !== 11) {
+            if (errorMessage) {
+                errorMessage.textContent = 'El código debe tener exactamente 11 dígitos';
+                errorMessage.classList.remove('hidden');
+            }
+            return;
+        }
+
         // Reset state
         errorMessage?.classList.add('hidden');
         if(submitBtn) {
@@ -153,48 +169,19 @@ const API_AUTHLOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;
         }
 
         try {
-            const response = await fetch(API_AUTHLOGIN_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                signal: AbortSignal.timeout(API_TIMEOUT),
-                body: JSON.stringify({ id: studentId, password: password })
-            });
+            const { token, user } = await login({ id: studentId, password });
+            useAuthStore.getState().setAuth(token, user);
 
-            if (response.ok) {
-                const data = await response.json();
-                const token = data.token || 'jwt-token-simulado';
-                const user = data.user || data;
-                
-                useAuthStore.getState().setAuth(token, user);
-
-                const role = user.role;
-                if (role === 'super_admin') {
-                    window.location.href = '/super-admin';
-                } else if (role === 'admin') {
-                    window.location.href = '/admin';
-                } else {
-                    window.location.href = '/carnet';
-                }
+            if (user.role === 'super_admin') {
+                window.location.href = '/super-admin';
+            } else if (user.role === 'admin') {
+                window.location.href = '/admin';
             } else {
-                let errorMsg = 'Error en el servidor (500)';
-                if (response.status === 401 || response.status === 400 || response.status === 404) {
-                    errorMsg = 'Credenciales inválidas';
-                }
-                const data = await response.json().catch(() => ({}));
-                if (errorMessage) {
-                    errorMessage.textContent = data.message || errorMsg;
-                    errorMessage.classList.remove('hidden');
-                }
+                window.location.href = '/carnet';
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             if (errorMessage) {
-                if (error.name === 'TimeoutError') {
-                    errorMessage.textContent = 'La conexión tardó demasiado. Reintenta.';
-                } else {
-                    errorMessage.textContent = 'Error de conexión. Revisa tu internet.';
-                }
+                errorMessage.textContent = getErrorMessage(error);
                 errorMessage.classList.remove('hidden');
             }
         } finally {

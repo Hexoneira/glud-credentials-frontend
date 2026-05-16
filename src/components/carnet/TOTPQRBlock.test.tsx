@@ -1,8 +1,8 @@
-import React from 'react';
+
 import { render, screen, act, cleanup } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import TOTPQRBlock from './TOTPQRBlock';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../../store/authStore';
 import * as otplib from 'otplib';
 
 // Mock otplib to prevent actual crypto errors during simple rendering tests
