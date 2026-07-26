@@ -1,0 +1,207 @@
+---
+import OrbsBackground from '../OrbsBackground';
+import TOTPQRBlock from '../carnet/TOTPQRBlock';
+import { API_BASE_URL } from '../../config';
+
+const API_MEMBER_ENDPOINT = `${API_BASE_URL}/member/current`;
+
+const gludTheme = {
+    primary: '#22fefb',
+    qrSurface: '#070b14',
+};
+---
+
+<section id="panel" data-endpoint={API_MEMBER_ENDPOINT} class="relative isolate grid min-h-screen grid-cols-[1.25rem_minmax(0,1fr)_1.25rem] grid-rows-[1fr_auto_1fr] overflow-hidden bg-[#050916] py-6 font-sans selection:bg-cyan-500/30 sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:py-0 md:grid-cols-[1.25rem_minmax(0,67rem)_1.25rem] lg:grid-cols-[2fr_minmax(0,75rem)_2fr]">
+    <div class="absolute inset-0 z-0">
+        <OrbsBackground client:load />
+    </div>
+    <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_15%_15%,rgba(34,254,251,0.1),transparent_36%),radial-gradient(circle_at_85%_85%,rgba(129,140,248,0.1),transparent_40%),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[auto,auto,28px_28px,28px_28px] opacity-40 pointer-events-none" aria-hidden="true"></div>
+
+    <article class="credential-card relative z-20 col-start-2 row-start-2 w-full justify-self-center overflow-hidden rounded-4xl border border-cyan-400/40 shadow-[0_0_20px_rgba(34,254,251,0.15)] transition-all duration-500 ease-out hover:border-cyan-300/60 hover:shadow-[0_0_30px_rgba(34,254,251,0.3)] bg-[#0b1120]/95 backdrop-blur-2xl grid grid-cols-[0.8rem_minmax(0,1fr)_0.8rem] grid-rows-[0.7rem_minmax(0,1fr)_0.7rem] sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:grid-rows-[0.8rem_minmax(0,1fr)_0.8rem] md:grid-cols-[1.5rem_minmax(0,1fr)_1.5rem] md:grid-rows-[1rem_minmax(0,1fr)_1rem] lg:grid-cols-[2rem_minmax(0,1fr)_2rem] lg:grid-rows-[1.2rem_minmax(0,1fr)_1.2rem]">
+        <div class="card-sheen" aria-hidden="true"></div>
+        <div class="absolute inset-x-0 top-0 h-px w-full bg-linear-to-r from-transparent via-cyan-400/50 to-transparent"></div>
+
+        <div id="inner-panel" class="relative z-10 col-start-2 row-start-2 w-full grid grid-rows-[0.4rem_auto_1fr_auto_0.4rem] sm:grid-rows-[0.7rem_auto_1fr_auto_0.7rem]">
+            <header class="row-start-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-white/15 p-4 sm:gap-5 sm:p-5 md:p-6 lg:p-8 sm:items-end">
+                <div class="min-w-0 text-left">
+                    <h1 class="text-2xl font-black tracking-[0.14em] text-white drop-shadow-[0_0_12px_rgba(34,254,251,0.3)] sm:text-3xl md:text-5xl sm:tracking-[0.15em] md:tracking-[0.17em]">GLUD</h1>
+                    <p class="mt-1 text-[0.58rem] font-bold uppercase tracking-[0.27em] text-cyan-400 sm:text-[0.7rem] md:text-[0.75rem] sm:tracking-[0.25em] md:tracking-[0.3em]">Universidad Distrital</p>
+                </div>
+                <div class="self-start whitespace-nowrap pl-2 text-right sm:self-auto sm:pl-0">
+                    <p class="mt-1 text-[0.65rem] font-mono tracking-[0.12em] text-slate-300 sm:text-[0.75rem] md:text-[0.85rem] sm:tracking-[0.15em]">
+                        ID: <span id="ui-member-id" class="text-white font-semibold">...</span>
+                    </p>
+                </div>
+            </header>
+
+            <div class="row-start-3 grid divide-y divide-white/15 md:grid-cols-[1.4fr_1fr] md:divide-x md:divide-y-0">
+                <section class="grid content-center gap-7 sm:gap-8 md:gap-10 p-4 sm:p-5 md:p-6 lg:p-8">
+                    <div class="mt-5 sm:mt-6 md:mt-12 lg:mt-20 grid grid-cols-[auto_minmax(0,1fr)] items-start gap-4 sm:gap-4 md:gap-5 sm:items-center">
+                        <div id="avatar-frame" class="avatar-frame flex w-18 sm:w-20 md:w-24 lg:w-28 aspect-square shrink-0 items-center justify-center rounded-md overflow-hidden bg-linear-to-br from-[#4f46e5] to-[#0ea5e9] shadow-[0_0_30px_rgba(79,70,229,0.3)]">
+                            <span id="ui-member-initial" class="text-3xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white"></span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-[0.6rem] font-bold uppercase tracking-[0.25em] text-cyan-400 sm:text-[0.62rem] md:text-[0.65rem]">Miembro Titular</p>
+                            <h2 id="ui-member-name" class="mt-2 text-[1.7rem] sm:text-xl md:text-2xl lg:text-3xl font-bold leading-tight tracking-wide text-white">Cargando...</h2>
+                            <p id="ui-member-email" class="mt-1 break-all text-[0.8rem] sm:text-[0.85rem] md:text-[0.9rem] font-medium tracking-wide text-slate-400">...</p>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 sm:gap-5 md:gap-6 sm:grid-cols-2 lg:grid-cols-2">
+                        <div>
+                            <span class="block text-[0.6rem] font-bold uppercase tracking-[0.2em] text-slate-500">Cargo / Rol</span>
+                            <p id="ui-member-role" class="mt-2 text-[0.85rem] sm:text-sm md:text-base font-bold uppercase tracking-[0.15em] text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]">...</p>
+                        </div>
+                        <div>
+                            <span class="block text-[0.6rem] font-bold uppercase tracking-[0.2em] text-slate-500">Departamentos</span>
+                            <div id="ui-member-groups" class="mt-2 flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-2">
+                                <!-- Groups will be injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="grid place-items-center bg-black/30 p-4 sm:p-5 md:p-6 lg:p-8">
+                    <div class="w-full max-w-96 sm:max-w-xs md:max-w-md lg:max-w-lg origin-center transform scale-90 sm:scale-95 md:scale-100">
+                        <!-- TOTPQRBlock leerá de Zustand internamente -->
+                        <TOTPQRBlock
+                            client:load
+                            studentId="00000000000"
+                            qrSize={220}
+                            primaryColor={gludTheme.primary}
+                            qrLightColor={gludTheme.qrSurface}
+                        />
+                    </div>
+                </section>
+            </div>
+
+            <footer class="row-start-4 grid gap-3 sm:gap-3 md:gap-4 border-t border-white/15 bg-black/50 p-4 sm:p-5 md:p-6 text-[0.55rem] sm:text-[0.58rem] md:text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-slate-400 md:grid-cols-[1fr_auto] md:items-center">
+                <p class="text-center md:text-left">Credencial digital oficial e intransferible.</p>
+                <div class="flex items-center justify-center gap-3 text-cyan-400 md:justify-end">
+                    <span class="status-dot shrink-0"></span>
+                    <span id="ui-status">Estado: Verificando...</span>
+                </div>
+            </footer>
+        </div>
+    </article>
+</section>
+
+<script>
+    import { useAuthStore } from '../../store/authStore';
+    import { API_TIMEOUT } from '../../config';
+    
+    const panel = document.getElementById('panel');
+    const endpoint = panel?.dataset.endpoint || '';
+    
+    const nameEl = document.getElementById('ui-member-name');
+    const emailEl = document.getElementById('ui-member-email');
+    const roleEl = document.getElementById('ui-member-role');
+    const groupsEl = document.getElementById('ui-member-groups');
+    const idEl = document.getElementById('ui-member-id');
+    const initialEl = document.getElementById('ui-member-initial');
+    const avatarFrame = document.getElementById('avatar-frame');
+    const statusEl = document.getElementById('ui-status');
+
+    function isRecord(value: unknown): value is Record<string, unknown> {
+        return typeof value === 'object' && value !== null;
+    }
+
+    function readString(value: unknown): string | undefined {
+        return typeof value === 'string' && value.trim() ? value : undefined;
+    }
+
+    async function fetchMemberData() {
+        const { token, user } = useAuthStore.getState();
+        if (!token || !user) return;
+
+        const currentUser = isRecord(user) ? user : {nombre: ' ', name: ' ', email: ' ', role: ' ', groups: ' ', id: ' ', codigo: ' '};
+
+        // 1. Mostrar información base casi instantáneamente desde Zustand
+        const baseName =
+            readString(currentUser.nombre) ||
+            readString(currentUser.name) ||
+            'Sin nombre';
+        if (nameEl) nameEl.textContent = baseName;
+        if (roleEl) roleEl.textContent = readString(currentUser.role) || 'Sin rol';
+        
+        const rawId = String(currentUser.codigo || currentUser.id || '00000000');
+        if (idEl) idEl.textContent = rawId.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
+        
+        if (initialEl) initialEl.textContent = baseName.charAt(0).toUpperCase();
+
+        if (!endpoint) return;
+
+        // 2. Traer información completa del endpoint GET /member/current
+        try {
+            const response = await fetch(endpoint, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                signal: AbortSignal.timeout(API_TIMEOUT)
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                
+                // Sincronizar con el store global para que otros componentes (como el QR) se actualicen
+                useAuthStore.getState().updateUser(data);
+
+                if (nameEl && data.name) nameEl.textContent = data.name;
+                if (emailEl && data.email) emailEl.textContent = data.email;
+                if (roleEl && data.role) roleEl.textContent = data.role;
+                
+                if (groupsEl && Array.isArray(data.groups)) {
+                    groupsEl.innerHTML = '';
+                    data.groups.forEach((group: string) => {
+                        const p = document.createElement('p');
+                        p.className = 'text-[0.85rem] sm:text-sm md:text-base font-bold uppercase tracking-[0.15em] text-slate-200';
+                        p.textContent = group;
+                        groupsEl.appendChild(p);
+                    });
+                } else if (groupsEl) {
+                    groupsEl.innerHTML = '<p class="text-[0.85rem] sm:text-sm md:text-base font-bold uppercase tracking-[0.15em] text-slate-500">Sin grupo</p>';
+                }
+                
+                if (idEl && data.id) {
+                     const realId = String(data.id);
+                     idEl.textContent = realId.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
+                }
+
+                if (data.icon && avatarFrame) {
+                    // Validación de URL segura (solo http, https o rutas relativas)
+                    const isSafeUrl = /^https?:\/\//i.test(data.icon) || data.icon.startsWith('/');
+                    
+                    if (isSafeUrl) {
+                        const img = document.createElement('img');
+                        img.src = data.icon;
+                        img.alt = 'Avatar';
+                        img.className = 'object-cover w-full h-full';
+                        img.onerror = () => { img.style.display = 'none'; };
+                        
+                        avatarFrame.innerHTML = '';
+                        avatarFrame.appendChild(img);
+                    }
+                }
+
+                if (statusEl) {
+                    statusEl.textContent = "● Sincronizado";
+                    statusEl.className = "text-[0.65rem] font-bold uppercase tracking-[0.15em] text-cyan-400";
+                }
+            } else {
+                if (statusEl) {
+                    statusEl.textContent = "● Modo Offline (Error " + response.status + ")";
+                    statusEl.className = "text-[0.65rem] font-bold uppercase tracking-[0.15em] text-amber-500";
+                }
+            }
+        } catch (e: any) {
+            console.error("No se pudo cargar la data completa del miembro", e);
+            if (statusEl) {
+                const isTimeout = e.name === 'TimeoutError';
+                statusEl.textContent = isTimeout ? "● Tiempo Agotado" : "● Modo Offline";
+                statusEl.className = "text-[0.65rem] font-bold uppercase tracking-[0.15em] text-amber-500";
+            }
+        }
+    }
+
+    fetchMemberData();
+</script>

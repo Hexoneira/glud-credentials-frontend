@@ -1,0 +1,13 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProtectedRoute from '../layouts/ProtectedRoute.astro';
+import CarnetPanel from '../components/carnet/CarnetPanel.astro';
+import '../styles/global.css';
+
+// Pagina del carnet del estudiante
+---
+<ProtectedRoute>
+    <Layout>
+        <CarnetPanel />
+    </Layout>
+</ProtectedRoute>

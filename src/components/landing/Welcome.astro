@@ -1,0 +1,195 @@
+---
+import OrbsBackground from "../OrbsBackground";
+import '../../styles/global.css'
+---
+<!--Tarjeta central y orbes del fondo-->
+
+<section id="panel" class="relative isolate grid min-h-screen grid-cols-[1.25rem_minmax(0,1fr)_1.25rem] grid-rows-[1fr_auto_1fr] overflow-hidden bg-[#050916] py-6 font-sans selection:bg-cyan-500/30 sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:py-0 md:grid-cols-[1.25rem_minmax(0,67rem)_1.25rem] lg:grid-cols-[2fr_minmax(0,75rem)_2fr]">
+    <div class="absolute inset-0 z-0">
+      <OrbsBackground client:load />
+    </div>
+    <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_15%_15%,rgba(34,254,251,0.1),transparent_36%),radial-gradient(circle_at_85%_85%,rgba(129,140,248,0.1),transparent_40%),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[auto,auto,28px_28px,28px_28px] opacity-40 pointer-events-none" aria-hidden="true"></div>
+
+    <article class="credential-card relative z-20 col-start-2 row-start-2 w-full justify-self-center overflow-hidden rounded-4xl border border-cyan-400/40 shadow-[0_0_20px_rgba(34,254,251,0.15)] transition-all duration-500 ease-out hover:border-cyan-300/60 hover:shadow-[0_0_30px_rgba(34,254,251,0.3)] bg-[#0b1120]/95 backdrop-blur-2xl grid grid-cols-[0.8rem_minmax(0,1fr)_0.8rem] grid-rows-[0.7rem_minmax(0,1fr)_0.7rem] sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:grid-rows-[0.8rem_minmax(0,1fr)_0.8rem] md:grid-cols-[1.5rem_minmax(0,1fr)_1.5rem] md:grid-rows-[1rem_minmax(0,1fr)_1rem] lg:grid-cols-[2rem_minmax(0,1fr)_2rem] lg:grid-rows-[1.2rem_minmax(0,1fr)_1.2rem]">
+        <div class="card-sheen" aria-hidden="true"></div>
+        <div class="absolute inset-x-0 top-0 h-px w-full bg-linear-to-r from-transparent via-cyan-400/50 to-transparent"></div>
+
+        <div id="inner-panel" class="relative z-10 col-start-2 row-start-2 w-full grid grid-rows-[0.4rem_auto_auto_1fr_auto_0.4rem] sm:grid-rows-[0.7rem_auto_auto_1fr_auto_0.7rem]">
+            <header class="row-start-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-white/15 p-4 sm:gap-5 sm:p-5 md:p-6 lg:p-8 sm:items-end">
+                           <div class="min-w-0 text-left">
+                    <h1 class="text-2xl font-black tracking-widest text-white drop-shadow-[0_0_12px_rgba(34,254,251,0.3)] sm:text-3xl md:text-5xl sm:tracking-widest md:tracking-widest">COWORKING</h1>
+                    <p class="mt-1 text-[0.58rem] font-bold uppercase tracking-wide text-cyan-400 sm:text-[0.7rem] md:text-[0.75rem]">Universidad Distrital</p>
+                </div>
+                <h1 class="text-white font-black tracking-wider md:text-5xl">LOGIN</h1>
+            </header>
+    
+        <div class="row-start-3 h-px w-full bg-linear-to-r from-transparent via-cyan-400/30 to-transparent"></div>
+        
+        <section class="row-start-4 grid content-center gap-6 p-4 sm:p-5 md:p-6 lg:p-8"> 
+            <form id="login-form" class="grid gap-5">
+                <!-- Campo Usuario/Codigo -->
+                <div class="grid gap-2"> 
+                    <label for="studentId" class="text-[0.6rem] font-bold uppercase tracking-wide text-slate-400">
+                        Código de Acceso (11 dígitos)
+                    </label>
+                    <input 
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]{11}"
+                        minlength="11"
+                        maxlength="11"
+                        id="studentId"
+                        name="studentId"
+                        placeholder="202xxxxxxx"
+                        required
+                        class="w-full rounded-md border border-white/10 bg-[#0b1220]/90 px-4 py-3 text-white placeholder-slate-500 focus:border-cyan-400/50 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"
+                    />
+                </div>
+
+                <!-- Campo Contraseña -->
+                <div class="grid gap-2">
+                    <div class="flex items-center justify-between">
+                        <label for="password" class="text-[0.6rem] font-bold uppercase tracking-wide text-slate-400">
+                            Contraseña
+                        </label>
+                        <a href="#" class="text-[0.6rem] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
+                    <div class="relative">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="••••••••"
+                            required
+                            class="w-full rounded-md border border-white/10 bg-[#0b1220]/90 px-4 py-3 pr-12 text-white placeholder-slate-500 focus:border-cyan-400/50 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"/>
+                        <button type="button" id="toggle-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none p-1">
+                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+                            <svg id="eye-slash-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 hidden">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mensaje de error -->
+                <div id="error-message" class="hidden rounded-md border border-red-500/30 bg-red-500/10 px-4 py-2 text-center text-[0.7rem] font-bold uppercase tracking-widest text-red-400">
+                </div>
+
+                <!-- Botón de Ingreso -->
+                <button
+                    type="submit"
+                    id="submit-btn"
+                    class="mt-4 w-full rounded-md bg-cyan-500 hover:bg-cyan-400 text-[#050916] font-bold uppercase tracking-wide py-3 transition-all duration-300 shadow-[0_0_15px_rgba(34,254,251,0.3)] hover:shadow-[0_0_25px_rgba(34,254,251,0.5)] focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#0b1120]">
+                    Ingresar
+                </button>
+            </form>
+        </section>
+        
+        <footer class="row-start-5 grid gap-3 border-t border-white/15 bg-black/50 p-4 sm:p-5 md:p-6 text-[0.55rem] font-semibold uppercase tracking-wide text-slate-400 text-center">
+            <p>Acceso exclusivo para miembros activos.</p>
+        </footer>
+        
+        </div>
+    </article>
+</section>
+
+<script>
+    import { useAuthStore } from '../../store/authStore';
+    import { login } from '../../services/api';
+    import { getAuthErrorMessage } from '../../utils/authError';
+
+    const form = document.getElementById('login-form') as HTMLFormElement;
+    const errorMessage = document.getElementById('error-message');
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const togglePasswordBtn = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password') as HTMLInputElement;
+    const eyeIcon = document.getElementById('eye-icon');
+    const eyeSlashIcon = document.getElementById('eye-slash-icon');
+    const studentIdInput = document.getElementById('studentId') as HTMLInputElement;
+
+    function getErrorMessage(error: unknown): string {
+        // Log the raw error to help debugging (network/CORS/timeout etc.)
+        // eslint-disable-next-line no-console
+        console.error('[Welcome] login error:', error);
+        return getAuthErrorMessage(error);
+    }
+
+    togglePasswordBtn?.addEventListener('click', () => {
+        if (passwordInput && passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon?.classList.add('hidden');
+            eyeSlashIcon?.classList.remove('hidden');
+        } else if (passwordInput) {
+            passwordInput.type = 'password';
+            eyeIcon?.classList.remove('hidden');
+            eyeSlashIcon?.classList.add('hidden');
+        }
+    });
+
+    studentIdInput?.addEventListener('input', (e) => {
+        const target = e.target as HTMLInputElement;
+        target.value = target.value.replace(/[^0-9]/g, '');
+    });
+
+    form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Sanitización: Solo números para el ID de estudiante
+        const rawId = studentIdInput?.value.trim() || '';
+        const studentId = rawId.replace(/\D/g, ''); 
+        const password = passwordInput?.value.trim() || '';
+
+        if (!studentId || !password) {
+            if (errorMessage) {
+                errorMessage.textContent = !studentId ? 'El código debe ser numérico' : 'Ingresa tu contraseña';
+                errorMessage.classList.remove('hidden');
+            }
+            return;
+        }
+
+        if (studentId.length !== 11) {
+            if (errorMessage) {
+                errorMessage.textContent = 'El código debe tener exactamente 11 dígitos';
+                errorMessage.classList.remove('hidden');
+            }
+            return;
+        }
+
+        // Reset state
+        errorMessage?.classList.add('hidden');
+        if(submitBtn) {
+            submitBtn.textContent = 'AUTENTICANDO...';
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+        }
+
+        try {
+            const { token, user } = await login({ id: studentId, password });
+            useAuthStore.getState().setAuth(token, user);
+
+            if (user.role === 'super_admin') {
+                window.location.href = '/super-admin';
+            } else if (user.role === 'admin') {
+                window.location.href = '/admin';
+            } else {
+                window.location.href = '/carnet';
+            }
+        } catch (error: unknown) {
+            if (errorMessage) {
+                errorMessage.textContent = getErrorMessage(error);
+                errorMessage.classList.remove('hidden');
+            }
+        } finally {
+            if(submitBtn) {
+                submitBtn.textContent = 'INGRESAR';
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+            }
+        }
+    });
+</script>

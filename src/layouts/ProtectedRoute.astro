@@ -1,0 +1,35 @@
+---
+// Middleware / HOC para Astro de protección de rutas
+
+interface Props {
+  allowedRoles?: string[];
+}
+const { allowedRoles = [] } = Astro.props;
+---
+<script is:inline define:vars={{ allowedRoles }}>
+  // Este script se ejecuta bloqueando el render para evitar "flashes" de contenido protegido
+  try {
+    const authStorage = localStorage.getItem('auth-storage');
+    if (!authStorage) {
+      window.location.replace('/');
+    } else {
+      const authData = JSON.parse(authStorage).state;
+      if (!authData.token || !authData.user) {
+        window.location.replace('/');
+      } else {
+        const role = authData.user.role;
+        // Validar si la ruta está restringida por roles
+        if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
+          // Redirección según rol base si no tiene acceso
+          if (role === 'super_admin') window.location.replace('/super-admin');
+          else if (role === 'admin') window.location.replace('/admin');
+          else window.location.replace('/carnet');
+        }
+      }
+    }
+  } catch (e) {
+    window.location.replace('/');
+  }
+</script>
+
+<slot />
