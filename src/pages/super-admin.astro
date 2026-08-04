@@ -4,7 +4,7 @@ import SuperAdminLayout from "../layouts/SuperAdminLayout.astro";
 import SuperAdminDashboard from "../components/super-admin/SuperAdminDashboard.tsx";
 ---
 
-<ProtectedRoute allowedRoles={["super_admin"]}>
+<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
   <SuperAdminLayout>
     <SuperAdminDashboard client:load />
   </SuperAdminLayout>

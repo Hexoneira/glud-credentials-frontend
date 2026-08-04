@@ -21,8 +21,8 @@ const { allowedRoles = [] } = Astro.props;
         // Validar si la ruta está restringida por roles
         if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
           // Redirección según rol base si no tiene acceso
-          if (role === 'super_admin') window.location.replace('/super-admin');
-          else if (role === 'admin') window.location.replace('/admin');
+          if (role === 'SUPER_ADMIN') window.location.replace('/super-admin');
+          else if (role === 'TENANT_ADMIN') window.location.replace('/admin');
           else window.location.replace('/carnet');
         }
       }

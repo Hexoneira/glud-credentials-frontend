@@ -42,7 +42,7 @@ describe('TOTPQRBlock Component', () => {
     act(() => {
       useAuthStore.getState().setAuth('token', {
         id: '20232020172',
-        role: 'admin',
+        role: 'TENANT_ADMIN',
         totpSecret: 'REALBACKENDSECRET32CHARSMAXIMO'
       });
     });
