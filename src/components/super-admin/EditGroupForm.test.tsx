@@ -22,6 +22,7 @@ describe('EditGroupForm', () => {
       id: 't1',
       name: 'Tenant 1',
       tenantCode: 'T001',
+      director: 'Directora Test',
       memberLimit: 50,
       currentMembers: 10,
       status: 'ACTIVE'

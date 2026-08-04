@@ -151,7 +151,7 @@ describe('api service', () => {
 
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(() => Promise.resolve(createJsonResponse({ id: 't-1' })) as Promise<Response>);
 
-    await createTenant({ name: 'A', tenantCode: 'AA', memberLimit: 10 });
+    await createTenant({ name: 'A', tenantCode: 'AA', director: 'Directora', memberLimit: 10 });
     await updateTenant('t-1', { name: 'B' });
     await suspendTenant('t-1');
     await reactivateTenant('t-1');
