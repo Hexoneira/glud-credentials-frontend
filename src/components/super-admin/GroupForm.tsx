@@ -11,6 +11,7 @@ interface GroupFormProps {
 interface FormErrors {
   name?: string;
   tenantCode?: string;
+  director?: string;
   memberLimit?: string;
 }
 
@@ -21,6 +22,7 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
   const [formData, setFormData] = useState({
     name: '',
     tenantCode: '',
+    director: '',
     memberLimit: '50',
   });
 
@@ -35,12 +37,14 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
       setFormData({
         name: tenant.name,
         tenantCode: tenant.tenantCode,
+        director: tenant.director,
         memberLimit: String(tenant.memberLimit),
       });
     } else {
       setFormData({
         name: '',
         tenantCode: '',
+        director: '',
         memberLimit: '50',
       });
     }
@@ -78,6 +82,12 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
       newErrors.name = 'Mínimo 3 caracteres';
     }
 
+    if (!formData.director.trim()) {
+      newErrors.director = 'El director es obligatorio';
+    } else if (formData.director.trim().length < 3) {
+      newErrors.director = 'Mínimo 3 caracteres';
+    }
+
     if (mode === 'create') {
       if (!formData.tenantCode.trim()) {
         newErrors.tenantCode = 'El código de tenant es obligatorio';
@@ -109,12 +119,14 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
         await createTenant({
           name: formData.name.trim(),
           tenantCode: formData.tenantCode.trim(),
+          director: formData.director.trim(),
           memberLimit: Number(formData.memberLimit),
         });
         setSubmitSuccess('Grupo creado correctamente');
       } else if (tenant) {
         await updateTenant(tenant.id, {
           name: formData.name.trim(),
+          director: formData.director.trim(),
           memberLimit: Number(formData.memberLimit),
         });
         setSubmitSuccess('Grupo actualizado correctamente');
@@ -142,7 +154,7 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
   const isEdit = mode === 'edit';
   const description = isEdit
     ? 'Modifica la información del grupo de trabajo seleccionado.'
-    : 'Registra un nuevo grupo de trabajo en el sistema. Define nombre, código de tenant y límite de miembros.';
+    : 'Registra un nuevo grupo de trabajo en el sistema. Define nombre, director, código de tenant y límite de miembros.';
   
   let submitButtonLabel = isEdit ? 'Guardar Cambios' : 'Registrar Grupo';
   if (submitting) {
@@ -197,6 +209,24 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 className={`bg-(--bg-black) border ${errors.name ? 'border-(--support-lila)' : 'border-(--support-gunmetal)'} rounded-xl px-4 py-3 text-sm text-(--white) focus:outline-none focus:border-(--cyan) focus:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300`}
+              />
+            </div>
+
+            {/* Director/a del grupo */}
+            <div className="flex flex-col gap-2 group">
+              <div className="flex justify-between items-center">
+                <label htmlFor="group-director" className="text-[10px] uppercase tracking-widest text-(--cyan) font-bold">
+                  Director/a del Grupo
+                </label>
+                {errors.director && <span className="text-[9px] uppercase text-(--support-lila) font-bold tracking-widest">{errors.director}</span>}
+              </div>
+              <input
+                id="group-director"
+                type="text"
+                placeholder="Ej. Nombre Apellido"
+                value={formData.director}
+                onChange={(e) => handleChange('director', e.target.value)}
+                className={`bg-(--bg-black) border ${errors.director ? 'border-(--support-lila)' : 'border-(--support-gunmetal)'} rounded-xl px-4 py-3 text-sm text-(--white) focus:outline-none focus:border-(--cyan) focus:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300`}
               />
             </div>
 

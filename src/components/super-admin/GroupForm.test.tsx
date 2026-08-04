@@ -33,12 +33,13 @@ describe('GroupForm', () => {
   });
 
   it('renderiza correctamente en modo edit con datos', () => {
-    const tenant: Tenant = { id: '1', name: 'Test', tenantCode: 'TST', memberLimit: 20, currentMembers: 0, status: 'ACTIVE' };
+    const tenant: Tenant = { id: '1', name: 'Test', tenantCode: 'TST', director: 'Directora Test', memberLimit: 20, currentMembers: 0, status: 'ACTIVE' };
     render(<GroupForm mode="edit" tenant={tenant} onClose={onCloseMock} />);
     expect(screen.getAllByText('Edición')[0]).toBeInTheDocument();
     expect(screen.getAllByText('Guardar Cambios')[0]).toBeInTheDocument();
     expect(screen.getAllByDisplayValue('Test')[0]).toBeInTheDocument();
     expect(screen.getAllByDisplayValue('TST')[0]).toBeInTheDocument();
+    expect(screen.getAllByDisplayValue('Directora Test')[0]).toBeInTheDocument();
     expect(screen.getAllByDisplayValue('20')[0]).toBeInTheDocument();
   });
 
@@ -51,11 +52,13 @@ describe('GroupForm', () => {
 
     await waitFor(() => {
       expect(screen.getAllByText('El nombre es obligatorio')[0]).toBeInTheDocument();
+      expect(screen.getAllByText('El director es obligatorio')[0]).toBeInTheDocument();
       expect(screen.getAllByText('El código de tenant es obligatorio')[0]).toBeInTheDocument();
     });
 
     // Probar nombres cortos y límites inválidos
     fireEvent.change(screen.getAllByLabelText(/Nombre del Grupo/i)[0], { target: { value: 'ab' } });
+    fireEvent.change(screen.getAllByLabelText(/Director\/a del Grupo/i)[0], { target: { value: 'xy' } });
     fireEvent.change(screen.getAllByLabelText(/Código Tenant/i)[0], { target: { value: 'a' } });
     fireEvent.change(screen.getAllByLabelText(/Límite de Miembros/i)[0], { target: { value: '0' } });
     
@@ -77,11 +80,12 @@ describe('GroupForm', () => {
   });
 
   it('envía datos correctamente en modo create', async () => {
-    vi.mocked(createTenant).mockResolvedValue({ id: '1', name: 'Nuevo', tenantCode: 'NVO', memberLimit: 50, currentMembers: 0, status: 'ACTIVE' });
+    vi.mocked(createTenant).mockResolvedValue({ id: '1', name: 'Nuevo', tenantCode: 'NVO', director: 'Directora', memberLimit: 50, currentMembers: 0, status: 'ACTIVE' });
     
     render(<GroupForm mode="create" onClose={onCloseMock} />);
     
     fireEvent.change(screen.getAllByLabelText(/Nombre del Grupo/i)[0], { target: { value: 'Nuevo Grupo' } });
+    fireEvent.change(screen.getAllByLabelText(/Director\/a del Grupo/i)[0], { target: { value: 'Directora' } });
     fireEvent.change(screen.getAllByLabelText(/Código Tenant/i)[0], { target: { value: 'NUEVO_TENANT' } });
     fireEvent.change(screen.getAllByLabelText(/Límite de Miembros/i)[0], { target: { value: '10' } });
     
@@ -91,6 +95,7 @@ describe('GroupForm', () => {
       expect(createTenant).toHaveBeenCalledWith({
         name: 'Nuevo Grupo',
         tenantCode: 'NUEVO_TENANT',
+        director: 'Directora',
         memberLimit: 10,
       });
       expect(screen.getAllByText('Grupo creado correctamente')[0]).toBeInTheDocument();
@@ -103,18 +108,20 @@ describe('GroupForm', () => {
   });
 
   it('envía datos correctamente en modo edit', async () => {
-    const tenant: Tenant = { id: 't1', name: 'Original', tenantCode: 'ORG', memberLimit: 20, currentMembers: 0, status: 'ACTIVE' };
+    const tenant: Tenant = { id: 't1', name: 'Original', tenantCode: 'ORG', director: 'Directora Original', memberLimit: 20, currentMembers: 0, status: 'ACTIVE' };
     vi.mocked(updateTenant).mockResolvedValue({ ...tenant, name: 'Actualizado' });
     
     render(<GroupForm mode="edit" tenant={tenant} onClose={onCloseMock} />);
     
     fireEvent.change(screen.getAllByLabelText(/Nombre del Grupo/i)[0], { target: { value: 'Actualizado' } });
+    fireEvent.change(screen.getAllByLabelText(/Director\/a del Grupo/i)[0], { target: { value: 'Directora Actualizada' } });
     
     fireEvent.click(screen.getAllByText('Guardar Cambios')[0]);
 
     await waitFor(() => {
       expect(updateTenant).toHaveBeenCalledWith('t1', {
         name: 'Actualizado',
+        director: 'Directora Actualizada',
         memberLimit: 20,
       });
       expect(screen.getAllByText('Grupo actualizado correctamente')[0]).toBeInTheDocument();
@@ -132,11 +139,13 @@ describe('GroupForm', () => {
     const { container } = render(<GroupForm mode="create" onClose={onCloseMock} />);
     
     const nameInput = container.querySelector('#group-name') as HTMLInputElement;
+    const directorInput = container.querySelector('#group-director') as HTMLInputElement;
     const codeInput = container.querySelector('#tenant-code') as HTMLInputElement;
     const limitInput = container.querySelector('#member-limit') as HTMLInputElement;
     const form = container.querySelector('form') as HTMLFormElement;
 
     fireEvent.change(nameInput, { target: { value: 'Valido' } });
+    fireEvent.change(directorInput, { target: { value: 'Directora' } });
     fireEvent.change(codeInput, { target: { value: 'VALIDO' } });
     fireEvent.change(limitInput, { target: { value: '10' } });
     

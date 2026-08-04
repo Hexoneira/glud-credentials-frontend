@@ -16,7 +16,7 @@ export interface Tenant {
   id: string;
   name: string;
   tenantCode: string;
-  director?: string;
+  director: string;
   memberLimit: number;
   currentMembers: number;
   status: 'ACTIVE' | 'SUSPENDED';
@@ -25,11 +25,13 @@ export interface Tenant {
 export interface CreateTenantPayload {
   name: string;
   tenantCode: string;
+  director: string;
   memberLimit: number;
 }
 
 export interface UpdateTenantPayload {
   name?: string;
+  director?: string;
   memberLimit?: number;
 }
 
