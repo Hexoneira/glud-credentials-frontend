@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useAuthStore } from './authStore';
+import { useAuthStore, decodeJwtPayload } from './authStore';
 
 describe('Auth Store', () => {
   beforeEach(() => {
@@ -16,7 +16,7 @@ describe('Auth Store', () => {
   it('should set authentication data correctly', () => {
     const mockUser = {
       id: '123',
-      role: 'miembro',
+      role: 'MIEMBRO',
       nombre: 'Test User'
     };
     const mockToken = 'mock-jwt-token';
@@ -31,7 +31,7 @@ describe('Auth Store', () => {
   it('should update user partial data correctly', () => {
     const initialUser = {
       id: '123',
-      role: 'miembro',
+      role: 'MIEMBRO',
       nombre: 'Test User'
     };
     
@@ -62,12 +62,49 @@ describe('Auth Store', () => {
   });
 
   it('should clear state on logout', () => {
-    useAuthStore.getState().setAuth('mock-token', { id: '1', role: 'admin' });
+    useAuthStore.getState().setAuth('mock-token', { id: '1', role: 'SUPER_ADMIN' });
     
     useAuthStore.getState().logout();
     
     const state = useAuthStore.getState();
     expect(state.token).toBeNull();
     expect(state.user).toBeNull();
+  });
+});
+
+describe('decodeJwtPayload', () => {
+  function createFakeJwt(payload: Record<string, unknown>): string {
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+    const body = btoa(JSON.stringify(payload));
+    return `${header}.${body}.fakesignature`;
+  }
+
+  it('decodes userId, role and tenantId from JWT', () => {
+    const token = createFakeJwt({ sub: '42', roleId: 'SUPER_ADMIN', tenantId: 10 });
+    const user = decodeJwtPayload(token);
+
+    expect(user.id).toBe('42');
+    expect(user.role).toBe('SUPER_ADMIN');
+    expect(user.tenantId).toBe('10');
+  });
+
+  it('defaults role to INVITADO when roleId is missing', () => {
+    const token = createFakeJwt({ sub: '1' });
+    const user = decodeJwtPayload(token);
+
+    expect(user.id).toBe('1');
+    expect(user.role).toBe('INVITADO');
+    expect(user.tenantId).toBeUndefined();
+  });
+
+  it('converts numeric tenantId to string', () => {
+    const token = createFakeJwt({ sub: '5', tenantId: 99 });
+    const user = decodeJwtPayload(token);
+
+    expect(user.tenantId).toBe('99');
+  });
+
+  it('throws on invalid JWT format', () => {
+    expect(() => decodeJwtPayload('not-a-jwt')).toThrow('Token JWT inválido');
   });
 });

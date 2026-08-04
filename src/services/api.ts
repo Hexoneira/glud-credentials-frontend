@@ -1,24 +1,15 @@
 import { API_BASE_URL, API_TIMEOUT } from '../config';
-import { useAuthStore } from '../store/authStore';
-
-export interface AuthUser {
-  id: string | number;
-  role: string;
-  nombre?: string;
-  name?: string;
-  email?: string;
-  codigo?: string;
-  tenantId?: string;
-}
+import { useAuthStore, decodeJwtPayload } from '../store/authStore';
+import type { User } from '../store/authStore';
 
 export interface AuthLoginPayload {
-  id: string;
+  username: string;
   password: string;
 }
 
 export interface AuthLoginResponse {
   token: string;
-  user: AuthUser;
+  user: User;
 }
 
 export interface Tenant {
@@ -89,32 +80,6 @@ async function handleResponse<T>(response: Response): Promise<T> {
   }
 }
 
-function normalizeAuthUser(value: unknown): AuthUser {
-  if (!isRecord(value)) {
-    throw new Error('Formato de usuario inválido en la respuesta del login');
-  }
-
-  const role = readString(value.role);
-  if (!role) {
-    throw new Error('El backend no devolvió el rol del usuario');
-  }
-
-  const rawId = value.id;
-  if (typeof rawId !== 'string' && typeof rawId !== 'number') {
-    throw new TypeError('El backend no devolvió un ID de usuario válido');
-  }
-
-  return {
-    id: rawId,
-    role,
-    nombre: readString(value.nombre),
-    name: readString(value.name),
-    email: readString(value.email),
-    codigo: readString(value.codigo),
-    tenantId: readString(value.tenantId),
-  };
-}
-
 // Login para cualquier rol (incluyendo super_admin)
 export async function login(payload: AuthLoginPayload): Promise<AuthLoginResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -136,7 +101,7 @@ export async function login(payload: AuthLoginPayload): Promise<AuthLoginRespons
     throw new Error('El backend no devolvió un token válido');
   }
 
-  const user = normalizeAuthUser(data.user ?? data);
+  const user = decodeJwtPayload(token);
 
   return { token, user };
 }

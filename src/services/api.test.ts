@@ -25,6 +25,18 @@ vi.mock('../store/authStore', () => ({
   useAuthStore: {
     getState: () => ({ token: authState.token }),
   },
+  decodeJwtPayload: (token: string) => {
+    const parts = token.split('.');
+    if (parts.length !== 3) throw new Error('Token JWT inválido');
+    const payload = parts[1];
+    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const data = JSON.parse(decoded);
+    return {
+      id: data.sub,
+      role: data.roleId ?? 'INVITADO',
+      tenantId: data.tenantId != null ? String(data.tenantId) : undefined,
+    };
+  },
 }));
 
 function createJsonResponse(payload: unknown, status = 200): Response {
@@ -34,31 +46,36 @@ function createJsonResponse(payload: unknown, status = 200): Response {
   });
 }
 
+function createFakeJwt(payload: Record<string, unknown>): string {
+  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+  const body = btoa(JSON.stringify(payload));
+  return `${header}.${body}.fakesignature`;
+}
+
 describe('api service', () => {
   beforeEach(() => {
     authState.token = null;
     vi.restoreAllMocks();
   });
 
-  it('login usa /auth/login y normaliza token + usuario', async () => {
+  it('login usa /auth/login con username y decodifica JWT', async () => {
+    const fakeToken = createFakeJwt({ sub: '00000000000', roleId: 'SUPER_ADMIN', tenantId: '1' });
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      createJsonResponse({
-        token: 'jwt-token',
-        user: { id: '00000000000', role: 'super_admin', nombre: 'Root' },
-      })
+      createJsonResponse({ token: fakeToken })
     );
 
-    const result = await login({ id: '00000000000', password: 'secret' });
+    const result = await login({ username: '00000000000', password: 'secret' });
 
     expect(fetchSpy).toHaveBeenCalledWith(
       `${API_BASE_URL}/auth/login`,
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ id: '00000000000', password: 'secret' }),
+        body: JSON.stringify({ username: '00000000000', password: 'secret' }),
       })
     );
-    expect(result.token).toBe('jwt-token');
-    expect(result.user.role).toBe('super_admin');
+    expect(result.token).toBe(fakeToken);
+    expect(result.user.role).toBe('SUPER_ADMIN');
+    expect(result.user.id).toBe('00000000000');
   });
 
   it('fetchTenants envía Authorization cuando existe token', async () => {
@@ -78,44 +95,37 @@ describe('api service', () => {
     );
   });
 
-  it('login acepta accessToken y usuario en nivel superior', async () => {
+  it('login acepta accessToken y decodifica del JWT', async () => {
+    const fakeToken = createFakeJwt({ sub: '20232020172', roleId: 'SUPER_ADMIN', tenantId: '1' });
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      createJsonResponse({
-        accessToken: 'alt-token',
-        id: '20232020172',
-        role: 'super_admin',
-        nombre: 'Root',
-      })
+      createJsonResponse({ accessToken: fakeToken })
     );
 
-    const result = await login({ id: '20232020172', password: 'secret' });
+    const result = await login({ username: '20232020172', password: 'secret' });
 
-    expect(result.token).toBe('alt-token');
+    expect(result.token).toBe(fakeToken);
     expect(result.user.id).toBe('20232020172');
-    expect(result.user.role).toBe('super_admin');
+    expect(result.user.role).toBe('SUPER_ADMIN');
   });
 
   it('login rechaza respuestas sin token', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      createJsonResponse({ user: { id: '1', role: 'member' } })
+      createJsonResponse({ success: true })
     );
 
-    await expect(login({ id: '1', password: 'secret' })).rejects.toThrow(
+    await expect(login({ username: '1', password: 'secret' })).rejects.toThrow(
       'El backend no devolvió un token válido'
     );
   });
 
-  it('login rechaza usuarios sin rol', async () => {
+  it('login asigna INVITADO cuando JWT no tiene roleId', async () => {
+    const fakeToken = createFakeJwt({ sub: '1' });
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      createJsonResponse({
-        token: 'jwt-token',
-        user: { id: '1' },
-      })
+      createJsonResponse({ token: fakeToken })
     );
 
-    await expect(login({ id: '1', password: 'secret' })).rejects.toThrow(
-      'El backend no devolvió el rol del usuario'
-    );
+    const result = await login({ username: '1', password: 'secret' });
+    expect(result.user.role).toBe('INVITADO');
   });
 
   it('createTenant, updateTenant, suspendTenant y reactivateTenant usan Authorization', async () => {
@@ -173,7 +183,7 @@ describe('api service', () => {
       })
     );
 
-    await expect(login({ id: '00000000000', password: 'secret' })).rejects.toThrow(
+    await expect(login({ username: '00000000000', password: 'secret' })).rejects.toThrow(
       'Respuesta inválida del servidor (JSON parse error)'
     );
   });

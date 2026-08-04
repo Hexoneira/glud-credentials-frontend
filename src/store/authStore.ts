@@ -2,16 +2,40 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export interface User {
-  id: string | number;
-  codigo?: string;
+  id: string;
+  role: string;
+  tenantId?: string;
   nombre?: string;
   name?: string;
   email?: string;
+  codigo?: string;
   groups?: string[];
   icon?: string;
-  role: string;
-  tenantId?: string;
-  totpSecret?: string; // Nuevo campo para el secreto real del backend
+  totpSecret?: string;
+}
+
+interface JwtPayload {
+  sub: string;
+  tenantId?: string | number;
+  roleId?: string;
+  exp?: number;
+  iat?: number;
+}
+
+export function decodeJwtPayload(token: string): User {
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+    throw new Error('Token JWT inválido');
+  }
+  const payload = parts[1];
+  const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+  const data = JSON.parse(decoded) as JwtPayload;
+
+  return {
+    id: data.sub,
+    role: data.roleId ?? 'INVITADO',
+    tenantId: data.tenantId != null ? String(data.tenantId) : undefined,
+  };
 }
 
 interface AuthState {

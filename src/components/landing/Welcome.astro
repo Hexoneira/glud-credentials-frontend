@@ -29,7 +29,7 @@ import '../../styles/global.css'
             <form id="login-form" class="grid gap-5">
                 <!-- Campo Usuario/Codigo -->
                 <div class="grid gap-2"> 
-                    <label for="studentId" class="text-[0.6rem] font-bold uppercase tracking-wide text-slate-400">
+                    <label for="username" class="text-[0.6rem] font-bold uppercase tracking-wide text-slate-400">
                         Código de Acceso (11 dígitos)
                     </label>
                     <input 
@@ -38,8 +38,8 @@ import '../../styles/global.css'
                         pattern="[0-9]{11}"
                         minlength="11"
                         maxlength="11"
-                        id="studentId"
-                        name="studentId"
+                        id="username"
+                        name="username"
                         placeholder="202xxxxxxx"
                         required
                         class="w-full rounded-md border border-white/10 bg-[#0b1220]/90 px-4 py-3 text-white placeholder-slate-500 focus:border-cyan-400/50 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"
@@ -110,7 +110,7 @@ import '../../styles/global.css'
     const passwordInput = document.getElementById('password') as HTMLInputElement;
     const eyeIcon = document.getElementById('eye-icon');
     const eyeSlashIcon = document.getElementById('eye-slash-icon');
-    const studentIdInput = document.getElementById('studentId') as HTMLInputElement;
+    const usernameInput = document.getElementById('username') as HTMLInputElement;
 
     function getErrorMessage(error: unknown): string {
         // Log the raw error to help debugging (network/CORS/timeout etc.)
@@ -131,7 +131,7 @@ import '../../styles/global.css'
         }
     });
 
-    studentIdInput?.addEventListener('input', (e) => {
+    usernameInput?.addEventListener('input', (e) => {
         const target = e.target as HTMLInputElement;
         target.value = target.value.replace(/[^0-9]/g, '');
     });
@@ -139,20 +139,20 @@ import '../../styles/global.css'
     form?.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Sanitización: Solo números para el ID de estudiante
-        const rawId = studentIdInput?.value.trim() || '';
-        const studentId = rawId.replace(/\D/g, ''); 
+        // Sanitización: Solo números para el código de usuario
+        const rawUsername = usernameInput?.value.trim() || '';
+        const username = rawUsername.replace(/\D/g, ''); 
         const password = passwordInput?.value.trim() || '';
 
-        if (!studentId || !password) {
+        if (!username || !password) {
             if (errorMessage) {
-                errorMessage.textContent = !studentId ? 'El código debe ser numérico' : 'Ingresa tu contraseña';
+                errorMessage.textContent = !username ? 'El código debe ser numérico' : 'Ingresa tu contraseña';
                 errorMessage.classList.remove('hidden');
             }
             return;
         }
 
-        if (studentId.length !== 11) {
+        if (username.length !== 11) {
             if (errorMessage) {
                 errorMessage.textContent = 'El código debe tener exactamente 11 dígitos';
                 errorMessage.classList.remove('hidden');
@@ -169,12 +169,12 @@ import '../../styles/global.css'
         }
 
         try {
-            const { token, user } = await login({ id: studentId, password });
+            const { token, user } = await login({ username, password });
             useAuthStore.getState().setAuth(token, user);
 
-            if (user.role === 'super_admin') {
+            if (user.role === 'SUPER_ADMIN') {
                 window.location.href = '/super-admin';
-            } else if (user.role === 'admin') {
+            } else if (user.role === 'TENANT_ADMIN') {
                 window.location.href = '/admin';
             } else {
                 window.location.href = '/carnet';
