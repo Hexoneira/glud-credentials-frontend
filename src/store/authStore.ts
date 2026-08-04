@@ -23,19 +23,35 @@ interface JwtPayload {
 }
 
 export function decodeJwtPayload(token: string): User {
-  const parts = token.split('.');
-  if (parts.length !== 3) {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      throw new Error('Token JWT inválido');
+    }
+    let payload = parts[1];
+    // Add base64url padding if missing
+    payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+    while (payload.length % 4 !== 0) {
+      payload += '=';
+    }
+    const decoded = atob(payload);
+    const data = JSON.parse(decoded) as JwtPayload;
+
+    if (!data.sub || typeof data.sub !== 'string') {
+      throw new Error('Token JWT inválido');
+    }
+
+    return {
+      id: data.sub,
+      role: data.roleId ?? 'INVITADO',
+      tenantId: data.tenantId != null ? String(data.tenantId) : undefined,
+    };
+  } catch (e) {
+    if (e instanceof Error && e.message === 'Token JWT inválido') {
+      throw e;
+    }
     throw new Error('Token JWT inválido');
   }
-  const payload = parts[1];
-  const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-  const data = JSON.parse(decoded) as JwtPayload;
-
-  return {
-    id: data.sub,
-    role: data.roleId ?? 'INVITADO',
-    tenantId: data.tenantId != null ? String(data.tenantId) : undefined,
-  };
 }
 
 interface AuthState {

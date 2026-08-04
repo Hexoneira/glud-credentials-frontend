@@ -21,23 +21,36 @@ import {
 } from './api';
 import { API_BASE_URL } from '../config';
 
-vi.mock('../store/authStore', () => ({
-  useAuthStore: {
-    getState: () => ({ token: authState.token }),
-  },
-  decodeJwtPayload: (token: string) => {
-    const parts = token.split('.');
-    if (parts.length !== 3) throw new Error('Token JWT inválido');
-    const payload = parts[1];
-    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-    const data = JSON.parse(decoded);
-    return {
-      id: data.sub,
-      role: data.roleId ?? 'INVITADO',
-      tenantId: data.tenantId != null ? String(data.tenantId) : undefined,
-    };
-  },
-}));
+vi.mock('../store/authStore', () => {
+  const toBase64Url = (obj: unknown) =>
+    btoa(JSON.stringify(obj))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+
+  return {
+    useAuthStore: {
+      getState: () => ({ token: authState.token }),
+    },
+    decodeJwtPayload: (token: string) => {
+      const parts = token.split('.');
+      if (parts.length !== 3) throw new Error('Token JWT inválido');
+      let payload = parts[1];
+      payload = payload.replace(/-/g, '+').replace(/_/g, '/');
+      while (payload.length % 4 !== 0) payload += '=';
+      const decoded = atob(payload);
+      const data = JSON.parse(decoded);
+      if (!data.sub || typeof data.sub !== 'string') {
+        throw new Error('Token JWT inválido');
+      }
+      return {
+        id: data.sub,
+        role: data.roleId ?? 'INVITADO',
+        tenantId: data.tenantId != null ? String(data.tenantId) : undefined,
+      };
+    },
+  };
+});
 
 function createJsonResponse(payload: unknown, status = 200): Response {
   return new Response(JSON.stringify(payload), {
@@ -47,8 +60,13 @@ function createJsonResponse(payload: unknown, status = 200): Response {
 }
 
 function createFakeJwt(payload: Record<string, unknown>): string {
-  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-  const body = btoa(JSON.stringify(payload));
+  const toBase64Url = (obj: unknown) =>
+    btoa(JSON.stringify(obj))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+  const header = toBase64Url({ alg: 'HS256', typ: 'JWT' });
+  const body = toBase64Url(payload);
   return `${header}.${body}.fakesignature`;
 }
 

@@ -74,8 +74,13 @@ describe('Auth Store', () => {
 
 describe('decodeJwtPayload', () => {
   function createFakeJwt(payload: Record<string, unknown>): string {
-    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-    const body = btoa(JSON.stringify(payload));
+    const toBase64Url = (obj: unknown) =>
+      btoa(JSON.stringify(obj))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+    const header = toBase64Url({ alg: 'HS256', typ: 'JWT' });
+    const body = toBase64Url(payload);
     return `${header}.${body}.fakesignature`;
   }
 
@@ -106,5 +111,10 @@ describe('decodeJwtPayload', () => {
 
   it('throws on invalid JWT format', () => {
     expect(() => decodeJwtPayload('not-a-jwt')).toThrow('Token JWT inválido');
+  });
+
+  it('throws when sub is missing', () => {
+    const token = createFakeJwt({ roleId: 'SUPER_ADMIN' });
+    expect(() => decodeJwtPayload(token)).toThrow('Token JWT inválido');
   });
 });
