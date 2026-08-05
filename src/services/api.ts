@@ -35,6 +35,16 @@ export interface UpdateTenantPayload {
   memberLimit?: number;
 }
 
+export interface MemberCurrent {
+  id: string;
+  name: string;
+  email: string | null;
+  role: string;
+  groups: string[];
+  icon: string | null;
+  totpSecret: string | null;
+}
+
 function getAuthHeaders(): HeadersInit {
   const token = useAuthStore.getState().token;
   return {
@@ -106,6 +116,16 @@ export async function login(payload: AuthLoginPayload): Promise<AuthLoginRespons
   const user = decodeJwtPayload(token);
 
   return { token, user };
+}
+
+// Carnet del miembro autenticado
+export async function fetchMemberCurrent(): Promise<MemberCurrent> {
+  const response = await fetch(`${API_BASE_URL}/member/current`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+  });
+  return handleResponse<MemberCurrent>(response);
 }
 
 // Tenants CRUD

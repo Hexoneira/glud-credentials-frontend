@@ -13,6 +13,7 @@ vi.mock('../config', () => ({
 import {
   createTenant,
   deleteTenant,
+  fetchMemberCurrent,
   fetchTenants,
   login,
   reactivateTenant,
@@ -111,6 +112,34 @@ describe('api service', () => {
         }),
       })
     );
+  });
+
+  it('fetchMemberCurrent consume /member/current y devuelve la credencial con totpSecret', async () => {
+    authState.token = 'my-jwt';
+    const member = {
+      id: '20210000000',
+      name: '20210000000',
+      email: 'miembro@udistrital.edu.co',
+      role: 'MIEMBRO',
+      groups: ['GLUD'],
+      icon: null,
+      totpSecret: '4ljjwnrzlorsnlhdmitrl4rubdftyhc64bt3qqsnhjbdbq2uqyhq',
+    };
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(createJsonResponse(member));
+
+    const result = await fetchMemberCurrent();
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      `${API_BASE_URL}/member/current`,
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          Authorization: 'Bearer my-jwt',
+        }),
+      })
+    );
+    expect(result).toEqual(member);
+    expect(result.totpSecret).toBe(member.totpSecret);
   });
 
   it('login acepta accessToken y decodifica del JWT', async () => {
