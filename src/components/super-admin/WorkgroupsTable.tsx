@@ -205,7 +205,14 @@ export default function WorkgroupsTable({
                     className="border-b border-[var(--support-gunmetal)]/60 hover:bg-[var(--bg-black)]/20"
                   >
                     <td className="px-5 py-4 font-semibold text-[var(--white)]">
-                      {tenant.name}
+                      <span className="inline-flex items-center gap-2">
+                        <span
+                          className="inline-block h-3 w-3 shrink-0 rounded-full border border-white/20"
+                          style={{ backgroundColor: tenant.primaryColor || "#22fefb" }}
+                          title={`Color del grupo: ${tenant.primaryColor || "#22fefb"}`}
+                        />
+                        {tenant.name}
+                      </span>
                     </td>
                     <td className="px-5 py-4 text-[var(--support-grey)]">
                       {tenant.tenantCode}

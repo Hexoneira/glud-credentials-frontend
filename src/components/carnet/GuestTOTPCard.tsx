@@ -1,39 +1,27 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { generateSync } from "otplib";
 import QRGenerator from "./QRGenerator";
-import { useAuthStore } from "../../store/authStore";
 
-type TOTPQRBlockProps = {
+type GuestTOTPCardProps = {
+  secret: string;
   studentId: string;
   qrSize?: number;
   primaryColor?: string;
   qrLightColor?: string;
 };
 
-export default function TOTPQRBlock({
-  studentId: initialStudentId,
+export default function GuestTOTPCard({
+  secret,
+  studentId,
   qrSize = 220,
   primaryColor = "#22fefb",
   qrLightColor = "#071026",
-}: Readonly<TOTPQRBlockProps>) {
+}: Readonly<GuestTOTPCardProps>) {
   const [code, setCode] = useState("000000");
   const [remaining, setRemaining] = useState(30);
 
-  const authUser = useAuthStore((state) => state.user);
-  const studentId = authUser
-    ? String(authUser.codigo || authUser.id)
-    : initialStudentId;
-
-  // El color del tenant (si el servidor lo devuelve) gana sobre la prop estática
-  const themeColor = authUser?.primaryColor || primaryColor;
-
-  // La semilla SIEMPRE viene del servidor: el carnet se sincroniza con
-  // /member/current y guarda totpSecret en el store. Nunca se deriva en el
-  // cliente porque el escáner de la puerta valida contra la semilla del servidor.
-  const secret = useMemo(() => authUser?.totpSecret || "", [authUser?.totpSecret]);
   const hasSecret = secret.length > 0;
 
-  // Track which 30s window the last code was generated for so we skip redundant crypto work
   const lastPeriodRef = useRef<number>(-1);
 
   useEffect(() => {
@@ -49,7 +37,7 @@ export default function TOTPQRBlock({
         });
         setCode(token);
       } catch (error) {
-        console.error("[TOTPQRBlock] Error generating TOTP", error);
+        console.error("[GuestTOTPCard] Error generating TOTP", error);
         setCode("000000");
       }
     };
@@ -58,7 +46,6 @@ export default function TOTPQRBlock({
       const epochSeconds = Math.floor(Date.now() / 1000);
       const currentPeriod = Math.floor(epochSeconds / 30);
 
-      // Only redo TOTP crypto when the 30s window rolls over
       if (currentPeriod !== lastPeriodRef.current) {
         lastPeriodRef.current = currentPeriod;
         generateCode();
@@ -67,7 +54,6 @@ export default function TOTPQRBlock({
       setRemaining(30 - (epochSeconds % 30));
     };
 
-    // Run immediately, then every second for the countdown
     tick();
     const interval = globalThis.setInterval(tick, 1000);
     return () => globalThis.clearInterval(interval);
@@ -110,8 +96,8 @@ export default function TOTPQRBlock({
 
         <div className="mt-8 h-1 w-full bg-white/10 rounded-none overflow-hidden">
           <div
-            className="h-full bg-(--accent) transition-[width] duration-700 ease-out rounded-none"
-            style={{ width: `${cycleProgress}%` }}
+            className="h-full transition-[width] duration-700 ease-out rounded-none"
+            style={{ backgroundColor: primaryColor, width: `${cycleProgress}%` }}
           />
         </div>
 
@@ -128,7 +114,7 @@ export default function TOTPQRBlock({
             value={payload}
             size={qrSize}
             className="w-full max-w-60"
-            darkColor={themeColor}
+            darkColor={primaryColor}
             lightColor={qrLightColor}
             borderColor="transparent"
             shadowColor="rgba(34,254,251,0.2)"

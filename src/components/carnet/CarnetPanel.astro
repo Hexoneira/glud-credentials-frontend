@@ -12,17 +12,17 @@ const gludTheme = {
     <div class="absolute inset-0 z-0">
         <OrbsBackground client:load />
     </div>
-    <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_15%_15%,rgba(34,254,251,0.1),transparent_36%),radial-gradient(circle_at_85%_85%,rgba(129,140,248,0.1),transparent_40%),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[auto,auto,28px_28px,28px_28px] opacity-40 pointer-events-none" aria-hidden="true"></div>
+    <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_15%_15%,rgba(var(--accent-rgb),0.1),transparent_36%),radial-gradient(circle_at_85%_85%,rgba(129,140,248,0.1),transparent_40%),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[auto,auto,28px_28px,28px_28px] opacity-40 pointer-events-none" aria-hidden="true"></div>
 
-    <article class="credential-card relative z-20 col-start-2 row-start-2 w-full justify-self-center overflow-hidden rounded-4xl border border-cyan-400/40 shadow-[0_0_20px_rgba(34,254,251,0.15)] transition-all duration-500 ease-out hover:border-cyan-300/60 hover:shadow-[0_0_30px_rgba(34,254,251,0.3)] bg-[#0b1120]/95 backdrop-blur-2xl grid grid-cols-[0.8rem_minmax(0,1fr)_0.8rem] grid-rows-[0.7rem_minmax(0,1fr)_0.7rem] sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:grid-rows-[0.8rem_minmax(0,1fr)_0.8rem] md:grid-cols-[1.5rem_minmax(0,1fr)_1.5rem] md:grid-rows-[1rem_minmax(0,1fr)_1rem] lg:grid-cols-[2rem_minmax(0,1fr)_2rem] lg:grid-rows-[1.2rem_minmax(0,1fr)_1.2rem]">
+    <article class="credential-card relative z-20 col-start-2 row-start-2 w-full justify-self-center overflow-hidden rounded-4xl border border-(--accent)/40 shadow-[0_0_20px_rgba(var(--accent-rgb),0.15)] transition-all duration-500 ease-out hover:border-(--accent)/60 hover:shadow-[0_0_30px_rgba(var(--accent-rgb),0.3)] bg-[#0b1120]/95 backdrop-blur-2xl grid grid-cols-[0.8rem_minmax(0,1fr)_0.8rem] grid-rows-[0.7rem_minmax(0,1fr)_0.7rem] sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:grid-rows-[0.8rem_minmax(0,1fr)_0.8rem] md:grid-cols-[1.5rem_minmax(0,1fr)_1.5rem] md:grid-rows-[1rem_minmax(0,1fr)_1rem] lg:grid-cols-[2rem_minmax(0,1fr)_2rem] lg:grid-rows-[1.2rem_minmax(0,1fr)_1.2rem]">
         <div class="card-sheen" aria-hidden="true"></div>
-        <div class="absolute inset-x-0 top-0 h-px w-full bg-linear-to-r from-transparent via-cyan-400/50 to-transparent"></div>
+        <div class="absolute inset-x-0 top-0 h-px w-full bg-linear-to-r from-transparent via-(--accent)/50 to-transparent"></div>
 
         <div id="inner-panel" class="relative z-10 col-start-2 row-start-2 w-full grid grid-rows-[0.4rem_auto_1fr_auto_0.4rem] sm:grid-rows-[0.7rem_auto_1fr_auto_0.7rem]">
             <header class="row-start-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-white/15 p-4 sm:gap-5 sm:p-5 md:p-6 lg:p-8 sm:items-end">
                 <div class="min-w-0 text-left">
-                    <h1 class="text-2xl font-black tracking-[0.14em] text-white drop-shadow-[0_0_12px_rgba(34,254,251,0.3)] sm:text-3xl md:text-5xl sm:tracking-[0.15em] md:tracking-[0.17em]">GLUD</h1>
-                    <p class="mt-1 text-[0.58rem] font-bold uppercase tracking-[0.27em] text-cyan-400 sm:text-[0.7rem] md:text-[0.75rem] sm:tracking-[0.25em] md:tracking-[0.3em]">Universidad Distrital</p>
+                    <h1 class="text-2xl font-black tracking-[0.14em] text-white drop-shadow-[0_0_12px_rgba(var(--accent-rgb),0.3)] sm:text-3xl md:text-5xl sm:tracking-[0.15em] md:tracking-[0.17em]">GLUD</h1>
+                    <p class="mt-1 text-[0.58rem] font-bold uppercase tracking-[0.27em] text-(--accent) sm:text-[0.7rem] md:text-[0.75rem] sm:tracking-[0.25em] md:tracking-[0.3em]">Universidad Distrital</p>
                 </div>
                 <div class="self-start whitespace-nowrap pl-2 text-right sm:self-auto sm:pl-0">
                     <p class="mt-1 text-[0.65rem] font-mono tracking-[0.12em] text-slate-300 sm:text-[0.75rem] md:text-[0.85rem] sm:tracking-[0.15em]">
@@ -38,7 +38,7 @@ const gludTheme = {
                             <span id="ui-member-initial" class="text-3xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white"></span>
                         </div>
                         <div class="min-w-0">
-                            <p class="text-[0.6rem] font-bold uppercase tracking-[0.25em] text-cyan-400 sm:text-[0.62rem] md:text-[0.65rem]">Miembro Titular</p>
+                            <p class="text-[0.6rem] font-bold uppercase tracking-[0.25em] text-(--accent) sm:text-[0.62rem] md:text-[0.65rem]">Miembro Titular</p>
                             <h2 id="ui-member-name" class="mt-2 text-[1.7rem] sm:text-xl md:text-2xl lg:text-3xl font-bold leading-tight tracking-wide text-white">Cargando...</h2>
                             <p id="ui-member-email" class="mt-1 break-all text-[0.8rem] sm:text-[0.85rem] md:text-[0.9rem] font-medium tracking-wide text-slate-400">...</p>
                         </div>
@@ -74,7 +74,7 @@ const gludTheme = {
 
             <footer class="row-start-4 grid gap-3 sm:gap-3 md:gap-4 border-t border-white/15 bg-black/50 p-4 sm:p-5 md:p-6 text-[0.55rem] sm:text-[0.58rem] md:text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-slate-400 md:grid-cols-[1fr_auto] md:items-center">
                 <p class="text-center md:text-left">Credencial digital oficial e intransferible.</p>
-                <div class="flex items-center justify-center gap-3 text-cyan-400 md:justify-end">
+                <div class="flex items-center justify-center gap-3 text-(--accent) md:justify-end">
                     <span class="status-dot shrink-0"></span>
                     <span id="ui-status">Estado: Verificando...</span>
                 </div>
@@ -86,6 +86,7 @@ const gludTheme = {
 <script>
     import { useAuthStore } from '../../store/authStore';
     import { fetchMemberCurrent } from '../../services/api';
+    import { applyTenantTheme } from '../../utils/theme';
 
     const nameEl = document.getElementById('ui-member-name');
     const emailEl = document.getElementById('ui-member-email');
@@ -130,6 +131,9 @@ const gludTheme = {
             // Sincronizar con el store global para que otros componentes (como el QR) se actualicen
             useAuthStore.getState().updateUser(data);
 
+            // Tema del tenant (color/logo) para carnet y componentes
+            if (data.primaryColor) applyTenantTheme(data.primaryColor);
+
             if (nameEl && data.name) nameEl.textContent = data.name;
             if (emailEl && data.email) emailEl.textContent = data.email;
             if (roleEl && data.role) roleEl.textContent = data.role;
@@ -169,7 +173,7 @@ const gludTheme = {
 
             if (statusEl) {
                 statusEl.textContent = "● Sincronizado";
-                statusEl.className = "text-[0.65rem] font-bold uppercase tracking-[0.15em] text-cyan-400";
+                statusEl.className = "text-[0.65rem] font-bold uppercase tracking-[0.15em] text-(--accent)";
             }
         } catch (e: any) {
             console.error("No se pudo cargar la data completa del miembro", e);

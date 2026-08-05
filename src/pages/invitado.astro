@@ -1,0 +1,16 @@
+---
+import '../styles/global.css';
+import GuestCarnet from '../components/carnet/GuestCarnet';
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Credencial digital de invitado - Hexoneira Credentials" />
+  <title>Credencial de Invitado | Hexoneira</title>
+</head>
+<body class="bg-[#050916]">
+  <GuestCarnet client:load token={Astro.url.searchParams.get('token') ?? ''} />
+</body>
+</html>

@@ -11,9 +11,13 @@ vi.mock('../config', () => ({
 }));
 
 import {
+  createGuest,
   createTenant,
   deleteTenant,
+  fetchGuestAccess,
   fetchMemberCurrent,
+  fetchMembers,
+  fetchMyGuests,
   fetchTenants,
   login,
   reactivateTenant,
@@ -249,5 +253,85 @@ describe('api service', () => {
     );
 
     await expect(fetchTenants()).rejects.toThrow('Servicio caído');
+  });
+
+  it('createGuest hace POST a /guests con Authorization y body', async () => {
+    authState.token = 'jwt-auth';
+    const guest = {
+      id: '2',
+      codigo: '101011000',
+      name: 'Invitada Uno',
+      status: 'ACTIVE',
+      accessToken: 'tok',
+      expiresAt: '2026-08-05T20:35:27',
+      totpSecret: null,
+    };
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(createJsonResponse(guest, 201));
+
+    const result = await createGuest({ codigo: '101011000', name: 'Invitada Uno', email: 'inv@mail.com' });
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      `${API_BASE_URL}/guests`,
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-auth' }),
+        body: JSON.stringify({ codigo: '101011000', name: 'Invitada Uno', email: 'inv@mail.com' }),
+      })
+    );
+    expect(result.accessToken).toBe('tok');
+  });
+
+  it('fetchMyGuests consume GET /guests con Authorization', async () => {
+    authState.token = 'jwt-auth';
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(createJsonResponse([]));
+
+    await fetchMyGuests();
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      `${API_BASE_URL}/guests`,
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-auth' }),
+      })
+    );
+  });
+
+  it('fetchGuestAccess NO envía Authorization (enlace público)', async () => {
+    authState.token = 'jwt-auth';
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      createJsonResponse({ id: '2', codigo: '101011000', status: 'ACTIVE' })
+    );
+
+    await fetchGuestAccess('tok-123');
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      `${API_BASE_URL}/guests/access/tok-123`,
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.not.objectContaining({ Authorization: expect.any(String) }),
+      })
+    );
+  });
+
+  it('fetchGuestAccess propaga mensaje de enlace expirado', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      createJsonResponse({ message: 'El enlace de acceso del invitado ha expirado' }, 410)
+    );
+
+    await expect(fetchGuestAccess('vencido')).rejects.toThrow('El enlace de acceso del invitado ha expirado');
+  });
+
+  it('fetchMembers consume GET /members con Authorization', async () => {
+    authState.token = 'jwt-auth';
+    const members = [{ id: '1', codigo: '20210000001', username: '20210000001', rol: 'MIEMBRO', status: 'ACTIVE' }];
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(createJsonResponse(members));
+
+    const result = await fetchMembers();
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      `${API_BASE_URL}/members`,
+      expect.objectContaining({ method: 'GET' })
+    );
+    expect(result).toEqual(members);
   });
 });
