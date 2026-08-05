@@ -1,9 +1,6 @@
 ---
 import OrbsBackground from '../OrbsBackground';
 import TOTPQRBlock from '../carnet/TOTPQRBlock';
-import { API_BASE_URL } from '../../config';
-
-const API_MEMBER_ENDPOINT = `${API_BASE_URL}/member/current`;
 
 const gludTheme = {
     primary: '#22fefb',
@@ -11,7 +8,7 @@ const gludTheme = {
 };
 ---
 
-<section id="panel" data-endpoint={API_MEMBER_ENDPOINT} class="relative isolate grid min-h-screen grid-cols-[1.25rem_minmax(0,1fr)_1.25rem] grid-rows-[1fr_auto_1fr] overflow-hidden bg-[#050916] py-6 font-sans selection:bg-cyan-500/30 sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:py-0 md:grid-cols-[1.25rem_minmax(0,67rem)_1.25rem] lg:grid-cols-[2fr_minmax(0,75rem)_2fr]">
+<section id="panel" class="relative isolate grid min-h-screen grid-cols-[1.25rem_minmax(0,1fr)_1.25rem] grid-rows-[1fr_auto_1fr] overflow-hidden bg-[#050916] py-6 font-sans selection:bg-cyan-500/30 sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:py-0 md:grid-cols-[1.25rem_minmax(0,67rem)_1.25rem] lg:grid-cols-[2fr_minmax(0,75rem)_2fr]">
     <div class="absolute inset-0 z-0">
         <OrbsBackground client:load />
     </div>
@@ -88,11 +85,8 @@ const gludTheme = {
 
 <script>
     import { useAuthStore } from '../../store/authStore';
-    import { API_TIMEOUT } from '../../config';
-    
-    const panel = document.getElementById('panel');
-    const endpoint = panel?.dataset.endpoint || '';
-    
+    import { fetchMemberCurrent } from '../../services/api';
+
     const nameEl = document.getElementById('ui-member-name');
     const emailEl = document.getElementById('ui-member-email');
     const roleEl = document.getElementById('ui-member-role');
@@ -129,74 +123,58 @@ const gludTheme = {
         
         if (initialEl) initialEl.textContent = baseName.charAt(0).toUpperCase();
 
-        if (!endpoint) return;
-
         // 2. Traer información completa del endpoint GET /member/current
         try {
-            const response = await fetch(endpoint, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                signal: AbortSignal.timeout(API_TIMEOUT)
-            });
+            const data = await fetchMemberCurrent();
+
+            // Sincronizar con el store global para que otros componentes (como el QR) se actualicen
+            useAuthStore.getState().updateUser(data);
+
+            if (nameEl && data.name) nameEl.textContent = data.name;
+            if (emailEl && data.email) emailEl.textContent = data.email;
+            if (roleEl && data.role) roleEl.textContent = data.role;
             
-            if (response.ok) {
-                const data = await response.json();
-                
-                // Sincronizar con el store global para que otros componentes (como el QR) se actualicen
-                useAuthStore.getState().updateUser(data);
+            if (groupsEl && Array.isArray(data.groups)) {
+                groupsEl.innerHTML = '';
+                data.groups.forEach((group: string) => {
+                    const p = document.createElement('p');
+                    p.className = 'text-[0.85rem] sm:text-sm md:text-base font-bold uppercase tracking-[0.15em] text-slate-200';
+                    p.textContent = group;
+                    groupsEl.appendChild(p);
+                });
+            } else if (groupsEl) {
+                groupsEl.innerHTML = '<p class="text-[0.85rem] sm:text-sm md:text-base font-bold uppercase tracking-[0.15em] text-slate-500">Sin grupo</p>';
+            }
+            
+            if (idEl && data.id) {
+                 const realId = String(data.id);
+                 idEl.textContent = realId.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
+            }
 
-                if (nameEl && data.name) nameEl.textContent = data.name;
-                if (emailEl && data.email) emailEl.textContent = data.email;
-                if (roleEl && data.role) roleEl.textContent = data.role;
+            if (data.icon && avatarFrame) {
+                // Validación de URL segura (solo http, https o rutas relativas)
+                const isSafeUrl = /^https?:\/\//i.test(data.icon) || data.icon.startsWith('/');
                 
-                if (groupsEl && Array.isArray(data.groups)) {
-                    groupsEl.innerHTML = '';
-                    data.groups.forEach((group: string) => {
-                        const p = document.createElement('p');
-                        p.className = 'text-[0.85rem] sm:text-sm md:text-base font-bold uppercase tracking-[0.15em] text-slate-200';
-                        p.textContent = group;
-                        groupsEl.appendChild(p);
-                    });
-                } else if (groupsEl) {
-                    groupsEl.innerHTML = '<p class="text-[0.85rem] sm:text-sm md:text-base font-bold uppercase tracking-[0.15em] text-slate-500">Sin grupo</p>';
-                }
-                
-                if (idEl && data.id) {
-                     const realId = String(data.id);
-                     idEl.textContent = realId.replace(/\B(?=(\d{4})+(?!\d))/g, ' ');
-                }
-
-                if (data.icon && avatarFrame) {
-                    // Validación de URL segura (solo http, https o rutas relativas)
-                    const isSafeUrl = /^https?:\/\//i.test(data.icon) || data.icon.startsWith('/');
+                if (isSafeUrl) {
+                    const img = document.createElement('img');
+                    img.src = data.icon;
+                    img.alt = 'Avatar';
+                    img.className = 'object-cover w-full h-full';
+                    img.onerror = () => { img.style.display = 'none'; };
                     
-                    if (isSafeUrl) {
-                        const img = document.createElement('img');
-                        img.src = data.icon;
-                        img.alt = 'Avatar';
-                        img.className = 'object-cover w-full h-full';
-                        img.onerror = () => { img.style.display = 'none'; };
-                        
-                        avatarFrame.innerHTML = '';
-                        avatarFrame.appendChild(img);
-                    }
+                    avatarFrame.innerHTML = '';
+                    avatarFrame.appendChild(img);
                 }
+            }
 
-                if (statusEl) {
-                    statusEl.textContent = "● Sincronizado";
-                    statusEl.className = "text-[0.65rem] font-bold uppercase tracking-[0.15em] text-cyan-400";
-                }
-            } else {
-                if (statusEl) {
-                    statusEl.textContent = "● Modo Offline (Error " + response.status + ")";
-                    statusEl.className = "text-[0.65rem] font-bold uppercase tracking-[0.15em] text-amber-500";
-                }
+            if (statusEl) {
+                statusEl.textContent = "● Sincronizado";
+                statusEl.className = "text-[0.65rem] font-bold uppercase tracking-[0.15em] text-cyan-400";
             }
         } catch (e: any) {
             console.error("No se pudo cargar la data completa del miembro", e);
             if (statusEl) {
-                const isTimeout = e.name === 'TimeoutError';
+                const isTimeout = e?.name === 'TimeoutError' || e?.name === 'AbortError';
                 statusEl.textContent = isTimeout ? "● Tiempo Agotado" : "● Modo Offline";
                 statusEl.className = "text-[0.65rem] font-bold uppercase tracking-[0.15em] text-amber-500";
             }

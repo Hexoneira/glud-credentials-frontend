@@ -1,4 +1,3 @@
-
 import { render, screen, act, cleanup } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import TOTPQRBlock from './TOTPQRBlock';
@@ -26,15 +25,18 @@ describe('TOTPQRBlock Component', () => {
     cleanup();
   });
 
-  it('should render correctly with a fallback student ID', () => {
+  it('should show unavailable state when there is no server seed', () => {
     render(<TOTPQRBlock studentId="123456789" />);
-    
-    // Verifica que el componente carga visualmente
+
     expect(screen.getByText('Codigo de validacion')).toBeInTheDocument();
-    expect(screen.getByText('Escanea para validar')).toBeInTheDocument();
-    
-    // El mock de otplib devuelve 123456, agrupado debe ser "123 456"
-    expect(screen.getByText('123 456')).toBeInTheDocument();
+    expect(screen.getByText('NO DISPONIBLE')).toBeInTheDocument();
+    expect(screen.getByText('--- ---')).toBeInTheDocument();
+    expect(screen.getByText(/Sincroniza tu carnet para generar el codigo/)).toBeInTheDocument();
+    expect(screen.getByText('QR no disponible')).toBeInTheDocument();
+    expect(screen.getByText('Carnet sin sincronizar')).toBeInTheDocument();
+    expect(screen.queryByTestId('mock-qr-generator')).not.toBeInTheDocument();
+    // Sin seed del servidor nunca debe llamarse otplib ni mostrarse un código inventado
+    expect(otplib.generateSync).not.toHaveBeenCalled();
   });
 
   it('should use totpSecret from Zustand store if available', () => {
@@ -48,20 +50,30 @@ describe('TOTPQRBlock Component', () => {
     });
 
     render(<TOTPQRBlock studentId="fallback-id" />);
-    
-    // Como mockeamos generateSync, sabemos que no fallará por largo del secreto
-    // Y verificamos que renderiza
+
+    // El mock de otplib devuelve 123456, agrupado debe ser "123 456"
     expect(screen.getByText('123 456')).toBeInTheDocument();
+    expect(screen.getByText('Escanea para validar')).toBeInTheDocument();
+    expect(screen.getByTestId('mock-qr-generator')).toBeInTheDocument();
+    expect(otplib.generateSync).toHaveBeenCalled();
   });
 
-  it('should safely render 000000 when crypto fails (or before sync)', () => {
+  it('should safely render 000000 when crypto fails', () => {
     // Hacemos que el mock de otplib tire un error simulando el SecretTooShortError
     vi.mocked(otplib.generateSync).mockImplementationOnce(() => {
       throw new Error('Secret must be at least 16 bytes');
     });
 
+    act(() => {
+      useAuthStore.getState().setAuth('token', {
+        id: '20232020172',
+        role: 'TENANT_ADMIN',
+        totpSecret: 'REALBACKENDSECRET32CHARSMAXIMO'
+      });
+    });
+
     render(<TOTPQRBlock studentId="short" />);
-    
+
     // Si falla el crypto, muestra 000 000 como fallback
     expect(screen.getByText('000 000')).toBeInTheDocument();
   });

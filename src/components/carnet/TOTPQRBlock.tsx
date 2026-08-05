@@ -10,26 +10,6 @@ type TOTPQRBlockProps = {
   qrLightColor?: string;
 };
 
-const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-
-function deriveBase32SecretFromId(studentId: string): string {
-  // Deterministic secret generation from the student id.
-  let hash = 2166136261;
-  for (let i = 0; i < studentId.length; i++) {
-    hash ^= studentId.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-
-  let seed = hash >>> 0;
-  let secret = "";
-  for (let i = 0; i < 32; i++) {
-    seed = (1664525 * seed + 1013904223) >>> 0;
-    secret += BASE32_ALPHABET[seed % BASE32_ALPHABET.length];
-  }
-
-  return secret;
-}
-
 export default function TOTPQRBlock({
   studentId: initialStudentId,
   qrSize = 220,
@@ -44,16 +24,18 @@ export default function TOTPQRBlock({
     ? String(authUser.codigo || authUser.id)
     : initialStudentId;
 
-  // Priorizar el secreto real del backend si existe, sino usar la derivación determinista
-  const secret = useMemo(() => {
-    if (authUser?.totpSecret) return authUser.totpSecret;
-    return deriveBase32SecretFromId(studentId);
-  }, [studentId, authUser?.totpSecret]);
+  // La semilla SIEMPRE viene del servidor: el carnet se sincroniza con
+  // /member/current y guarda totpSecret en el store. Nunca se deriva en el
+  // cliente porque el escáner de la puerta valida contra la semilla del servidor.
+  const secret = useMemo(() => authUser?.totpSecret || "", [authUser?.totpSecret]);
+  const hasSecret = secret.length > 0;
 
   // Track which 30s window the last code was generated for so we skip redundant crypto work
   const lastPeriodRef = useRef<number>(-1);
 
   useEffect(() => {
+    if (!hasSecret) return;
+
     const generateCode = () => {
       try {
         const token = generateSync({
@@ -86,19 +68,19 @@ export default function TOTPQRBlock({
     tick();
     const interval = globalThis.setInterval(tick, 1000);
     return () => globalThis.clearInterval(interval);
-  }, [secret]);
+  }, [secret, hasSecret]);
 
   const payload = useMemo(
     () => `ID:${studentId}|TOTP:${code}`,
     [studentId, code],
   );
   const groupedCode = useMemo(
-    () => `${code.slice(0, 3)} ${code.slice(3)}`,
-    [code],
+    () => (hasSecret ? `${code.slice(0, 3)} ${code.slice(3)}` : "--- ---"),
+    [code, hasSecret],
   );
   const cycleProgress = useMemo(
-    () => Math.max(0, Math.min(100, (remaining / 30) * 100)),
-    [remaining],
+    () => (hasSecret ? Math.max(0, Math.min(100, (remaining / 30) * 100)) : 0),
+    [remaining, hasSecret],
   );
 
   return (
@@ -108,9 +90,15 @@ export default function TOTPQRBlock({
           <p className="text-[0.65rem] font-bold uppercase tracking-[0.25em] text-slate-400">
             Codigo de validacion
           </p>
-          <div className="text-xs font-mono font-bold tracking-wide text-cyan-300">
-            00:{remaining.toString().padStart(2, "0")}
-          </div>
+          {hasSecret ? (
+            <div className="text-xs font-mono font-bold tracking-wide text-cyan-300">
+              00:{remaining.toString().padStart(2, "0")}
+            </div>
+          ) : (
+            <div className="text-xs font-mono font-bold tracking-wide text-amber-400">
+              NO DISPONIBLE
+            </div>
+          )}
         </div>
 
         <p className="mt-2 font-mono text-[2.5rem] leading-none font-black tracking-[0.22em] text-white text-center sm:text-[2.8rem]">
@@ -123,22 +111,40 @@ export default function TOTPQRBlock({
             style={{ width: `${cycleProgress}%` }}
           />
         </div>
+
+        {!hasSecret && (
+          <p className="mt-6 text-center text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-amber-400/90">
+            Sincroniza tu carnet para generar el codigo
+          </p>
+        )}
       </div>
 
-      <div className="flex justify-center border border-white/10 bg-[#070d18] p-6 rounded-md">
-        <QRGenerator
-          value={payload}
-          size={qrSize}
-          className="w-full max-w-60"
-          darkColor={primaryColor}
-          lightColor={qrLightColor}
-          borderColor="transparent"
-          shadowColor="rgba(34,254,251,0.2)"
-        />
-      </div>
+      {hasSecret ? (
+        <div className="flex justify-center border border-white/10 bg-[#070d18] p-6 rounded-md">
+          <QRGenerator
+            value={payload}
+            size={qrSize}
+            className="w-full max-w-60"
+            darkColor={primaryColor}
+            lightColor={qrLightColor}
+            borderColor="transparent"
+            shadowColor="rgba(34,254,251,0.2)"
+          />
+        </div>
+      ) : (
+        <div className="flex h-60 items-center justify-center border border-dashed border-white/10 bg-[#070d18] p-6 rounded-md">
+          <p className="text-center text-[0.7rem] font-bold uppercase tracking-[0.2em] text-slate-500">
+            QR no disponible
+            <br />
+            <span className="mt-2 block font-normal normal-case tracking-normal text-slate-600">
+              Conectate al servidor para obtener tu codigo dinamico
+            </span>
+          </p>
+        </div>
+      )}
 
       <p className="text-center text-[0.65rem] font-bold uppercase tracking-[0.25em] text-slate-500">
-        Escanea para validar
+        {hasSecret ? "Escanea para validar" : "Carnet sin sincronizar"}
       </p>
     </div>
   );
