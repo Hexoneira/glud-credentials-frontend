@@ -4,32 +4,39 @@ import '../../styles/global.css'
 ---
 <!--Tarjeta central y orbes del fondo-->
 
-<section id="panel" class="relative isolate grid min-h-screen grid-cols-[1.25rem_minmax(0,1fr)_1.25rem] grid-rows-[1fr_auto_1fr] overflow-hidden bg-[#050916] py-6 font-sans selection:bg-cyan-500/30 sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:py-0 md:grid-cols-[1.25rem_minmax(0,67rem)_1.25rem] lg:grid-cols-[2fr_minmax(0,75rem)_2fr]">
+    <section id="panel" class="relative isolate grid min-h-screen grid-cols-[1.25rem_minmax(0,1fr)_1.25rem] grid-rows-[1fr_auto_1fr] overflow-hidden bg-(--bg-black-gunmetal) py-6 font-sans selection:bg-cyan-500/30 sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:py-0 md:grid-cols-[1.25rem_minmax(0,67rem)_1.25rem] lg:grid-cols-[2fr_minmax(0,75rem)_2fr]">
     <div class="absolute inset-0 z-0">
-      <OrbsBackground client:load />
+      <OrbsBackground variant="hexoneira" client:load />
     </div>
-    <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_15%_15%,rgba(34,254,251,0.1),transparent_36%),radial-gradient(circle_at_85%_85%,rgba(129,140,248,0.1),transparent_40%),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[auto,auto,28px_28px,28px_28px] opacity-40 pointer-events-none" aria-hidden="true"></div>
+    <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_15%_15%,rgba(0,255,255,0.08),transparent_36%),radial-gradient(circle_at_85%_85%,rgba(255,70,125,0.1),transparent_40%),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[auto,auto,28px_28px,28px_28px] opacity-40 pointer-events-none" aria-hidden="true"></div>
 
-    <article class="credential-card relative z-20 col-start-2 row-start-2 w-full justify-self-center overflow-hidden rounded-4xl border border-cyan-400/40 shadow-[0_0_20px_rgba(34,254,251,0.15)] transition-all duration-500 ease-out hover:border-cyan-300/60 hover:shadow-[0_0_30px_rgba(34,254,251,0.3)] bg-[#0b1120]/95 backdrop-blur-2xl grid grid-cols-[0.8rem_minmax(0,1fr)_0.8rem] grid-rows-[0.7rem_minmax(0,1fr)_0.7rem] sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:grid-rows-[0.8rem_minmax(0,1fr)_0.8rem] md:grid-cols-[1.5rem_minmax(0,1fr)_1.5rem] md:grid-rows-[1rem_minmax(0,1fr)_1rem] lg:grid-cols-[2rem_minmax(0,1fr)_2rem] lg:grid-rows-[1.2rem_minmax(0,1fr)_1.2rem]">
+    <article class="credential-card relative z-20 col-start-2 row-start-2 w-full justify-self-center overflow-hidden rounded-4xl border border-(--support-gunmetal) shadow-[0_0_20px_rgba(0,255,255,0.12)] transition-all duration-500 ease-out hover:border-(--cyan)/40 hover:shadow-[0_0_30px_rgba(0,255,255,0.22)] bg-(--bg-eerie)/95 backdrop-blur-2xl grid grid-cols-[0.8rem_minmax(0,1fr)_0.8rem] grid-rows-[0.7rem_minmax(0,1fr)_0.7rem] sm:grid-cols-[1rem_minmax(0,1fr)_1rem] sm:grid-rows-[0.8rem_minmax(0,1fr)_0.8rem] md:grid-cols-[1.5rem_minmax(0,1fr)_1.5rem] md:grid-rows-[1rem_minmax(0,1fr)_1rem] lg:grid-cols-[2rem_minmax(0,1fr)_2rem] lg:grid-rows-[1.2rem_minmax(0,1fr)_1.2rem]">
         <div class="card-sheen" aria-hidden="true"></div>
-        <div class="absolute inset-x-0 top-0 h-px w-full bg-linear-to-r from-transparent via-cyan-400/50 to-transparent"></div>
+        <div class="absolute inset-x-0 top-0 h-px w-full bg-linear-to-r from-transparent via-(--cyan)/40 to-transparent"></div>
 
         <div id="inner-panel" class="relative z-10 col-start-2 row-start-2 w-full grid grid-rows-[0.4rem_auto_auto_1fr_auto_0.4rem] sm:grid-rows-[0.7rem_auto_auto_1fr_auto_0.7rem]">
-            <header class="row-start-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-white/15 p-4 sm:gap-5 sm:p-5 md:p-6 lg:p-8 sm:items-end">
-                           <div class="min-w-0 text-left">
-                    <h1 class="text-2xl font-black tracking-widest text-white drop-shadow-[0_0_12px_rgba(34,254,251,0.3)] sm:text-3xl md:text-5xl sm:tracking-widest md:tracking-widest">COWORKING</h1>
-                    <p class="mt-1 text-[0.58rem] font-bold uppercase tracking-wide text-cyan-400 sm:text-[0.7rem] md:text-[0.75rem]">Universidad Distrital</p>
+            <header class="row-start-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-(--support-gunmetal) p-4 sm:gap-5 sm:p-5 md:p-6 lg:p-8 sm:items-end">
+                <div class="min-w-0 text-left">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 shrink-0 rounded bg-(--support-gunmetal) flex items-center justify-center">
+                            <span class="text-(--support-beer) font-bold">H</span>
+                        </div>
+                        <div class="min-w-0">
+                            <h1 class="text-2xl font-black tracking-widest text-(--white) drop-shadow-[0_0_12px_rgba(0,255,255,0.3)] sm:text-3xl md:text-4xl sm:tracking-widest md:tracking-widest">COWORKING</h1>
+                            <p class="mt-1 text-[0.58rem] font-bold uppercase tracking-wide text-(--cyan) sm:text-[0.7rem] md:text-[0.75rem]">Universidad Distrital</p>
+                        </div>
+                    </div>
                 </div>
-                <h1 class="text-white font-black tracking-wider md:text-5xl">LOGIN</h1>
+                <h1 class="text-(--white) font-black tracking-wider md:text-5xl">LOGIN</h1>
             </header>
     
-        <div class="row-start-3 h-px w-full bg-linear-to-r from-transparent via-cyan-400/30 to-transparent"></div>
+        <div class="row-start-3 h-px w-full bg-linear-to-r from-transparent via-(--cyan)/30 to-transparent"></div>
         
         <section class="row-start-4 grid content-center gap-6 p-4 sm:p-5 md:p-6 lg:p-8"> 
             <form id="login-form" class="grid gap-5">
                 <!-- Campo Usuario/Codigo -->
                 <div class="grid gap-2"> 
-                    <label for="username" class="text-[0.6rem] font-bold uppercase tracking-wide text-slate-400">
+                    <label for="username" class="text-[0.6rem] font-bold uppercase tracking-wide text-(--support-grey)">
                         Código de Acceso (11 dígitos)
                     </label>
                     <input 
@@ -42,19 +49,16 @@ import '../../styles/global.css'
                         name="username"
                         placeholder="202xxxxxxx"
                         required
-                        class="w-full rounded-md border border-white/10 bg-[#0b1220]/90 px-4 py-3 text-white placeholder-slate-500 focus:border-cyan-400/50 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"
+                        class="w-full rounded-md border border-(--support-gunmetal) bg-[#12161d]/90 px-4 py-3 text-(--white) placeholder-(--support-grey) focus:border-(--cyan) focus:outline-none focus:ring-1 focus:ring-(--cyan)/30 transition-all"
                     />
                 </div>
 
                 <!-- Campo Contraseña -->
                 <div class="grid gap-2">
                     <div class="flex items-center justify-between">
-                        <label for="password" class="text-[0.6rem] font-bold uppercase tracking-wide text-slate-400">
+                        <label for="password" class="text-[0.6rem] font-bold uppercase tracking-wide text-(--support-grey)">
                             Contraseña
                         </label>
-                        <a href="#" class="text-[0.6rem] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
-                            ¿Olvidaste tu contraseña?
-                        </a>
                     </div>
                     <div class="relative">
                         <input
@@ -63,8 +67,8 @@ import '../../styles/global.css'
                             name="password"
                             placeholder="••••••••"
                             required
-                            class="w-full rounded-md border border-white/10 bg-[#0b1220]/90 px-4 py-3 pr-12 text-white placeholder-slate-500 focus:border-cyan-400/50 focus:outline-none focus:ring-1 focus:ring-cyan-400/30 transition-all"/>
-                        <button type="button" id="toggle-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none p-1">
+                            class="w-full rounded-md border border-(--support-gunmetal) bg-[#12161d]/90 px-4 py-3 pr-12 text-(--white) placeholder-(--support-grey) focus:border-(--cyan) focus:outline-none focus:ring-1 focus:ring-(--cyan)/30 transition-all"/>
+                        <button type="button" id="toggle-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-(--support-grey) hover:text-(--support-lila) focus:outline-none p-1">
                             <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -84,13 +88,13 @@ import '../../styles/global.css'
                 <button
                     type="submit"
                     id="submit-btn"
-                    class="mt-4 w-full rounded-md bg-cyan-500 hover:bg-cyan-400 text-[#050916] font-bold uppercase tracking-wide py-3 transition-all duration-300 shadow-[0_0_15px_rgba(34,254,251,0.3)] hover:shadow-[0_0_25px_rgba(34,254,251,0.5)] focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#0b1120]">
+                    class="mt-4 w-full rounded-full bg-(--cyan) hover:bg-[#33ffff] text-(--bg-black-gunmetal) font-bold uppercase tracking-wide py-3 transition-all duration-300 shadow-[0_0_15px_rgba(0,255,255,0.3)] hover:shadow-[0_0_25px_rgba(0,255,255,0.5)] focus:outline-none focus:ring-2 focus:ring-(--cyan) focus:ring-offset-2 focus:ring-offset-(--bg-eerie)">
                     Ingresar
                 </button>
             </form>
         </section>
         
-        <footer class="row-start-5 grid gap-3 border-t border-white/15 bg-black/50 p-4 sm:p-5 md:p-6 text-[0.55rem] font-semibold uppercase tracking-wide text-slate-400 text-center">
+        <footer class="row-start-5 grid gap-3 border-t border-(--support-gunmetal) bg-black/50 p-4 sm:p-5 md:p-6 text-[0.55rem] font-semibold uppercase tracking-wide text-(--support-grey) text-center">
             <p>Acceso exclusivo para miembros activos.</p>
         </footer>
         

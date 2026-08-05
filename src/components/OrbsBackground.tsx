@@ -137,7 +137,12 @@ async function startAnimations({ orbEntriesRef, animationInstancesRef, mouseHand
   }
 }
 
-export default function OrbsBackground() {
+const VARIANTS = {
+  glud: 'bg-linear-to-br from-[#030617] via-[#0f0820] to-[#1a0f2e]',
+  hexoneira: 'bg-linear-to-br from-[#0c0f14] via-[#14181f] to-[#1c2128]',
+};
+
+export default function OrbsBackground({ variant = 'glud' }: { variant?: keyof typeof VARIANTS }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   // Store wrapper (parallax target) and inner orb (anime animation target) separately
   const orbEntriesRef = useRef<OrbEntry[]>([]);
@@ -228,7 +233,7 @@ export default function OrbsBackground() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 z-0 bg-linear-to-br from-[#030617] via-[#0f0820] to-[#1a0f2e] overflow-hidden"
+      className={`absolute inset-0 z-0 ${VARIANTS[variant] ?? VARIANTS.glud} overflow-hidden`}
       aria-hidden="true"
     />
   );
