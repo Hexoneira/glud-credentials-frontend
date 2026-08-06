@@ -5,10 +5,11 @@ export function hexToRgbTriplet(hex: string | null | undefined): string {
   if (!/^[0-9A-Fa-f]{6}$/.test(value)) {
     return '34, 254, 251';
   }
-  const r = parseInt(value.slice(0, 2), 16);
-  const g = parseInt(value.slice(2, 4), 16);
-  const b = parseInt(value.slice(4, 6), 16);
-  return `${r}, ${g}, ${b}`;
+  const channels: number[] = [];
+  for (let i = 0; i < 6; i += 2) {
+    channels.push(parseInt(value.slice(i, i + 2), 16));
+  }
+  return channels.join(', ');
 }
 
 export function normalizeColor(hex: string | null | undefined): string {

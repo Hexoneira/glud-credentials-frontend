@@ -35,15 +35,16 @@ export default function GuestCarnet({ token }: Readonly<GuestCarnetProps>) {
         if (cancelled) return;
         const message = error instanceof Error ? error.message : "";
         const status = (error as { status?: number })?.status;
-        setState({
-          kind: "error",
-          reason:
-            status === 410 || /expirado/i.test(message)
-              ? "expired"
-              : status === 404
-                ? "invalid"
-                : "network",
-        });
+
+        let reason: "expired" | "invalid" | "network";
+        if (status === 410 || /expirado/i.test(message)) {
+          reason = "expired";
+        } else if (status === 404) {
+          reason = "invalid";
+        } else {
+          reason = "network";
+        }
+        setState({ kind: "error", reason });
       }
     })();
 
@@ -60,6 +61,12 @@ export default function GuestCarnet({ token }: Readonly<GuestCarnetProps>) {
     }
   }, []);
 
+  const errorTitle: Record<State["error"]["reason"], string> = {
+    expired: "Enlace expirado",
+    invalid: "Enlace inválido",
+    network: "No se pudo conectar",
+  };
+
   if (state.kind === "loading") {
     return (
       <section className="grid min-h-screen place-items-center bg-[#050916] font-sans">
@@ -75,11 +82,7 @@ export default function GuestCarnet({ token }: Readonly<GuestCarnetProps>) {
       <section className="grid min-h-screen place-items-center bg-[#050916] px-6 font-sans">
         <div className="w-full max-w-md rounded-3xl border border-white/15 bg-[#0b1120]/95 p-10 text-center">
           <h1 className="text-2xl font-black tracking-[0.12em] text-white">
-            {state.reason === "expired"
-              ? "Enlace expirado"
-              : state.reason === "invalid"
-                ? "Enlace inválido"
-                : "No se pudo conectar"}
+            {errorTitle[state.reason]}
           </h1>
           <p className="mt-4 text-sm leading-relaxed text-slate-400">
             {state.reason === "expired" &&
