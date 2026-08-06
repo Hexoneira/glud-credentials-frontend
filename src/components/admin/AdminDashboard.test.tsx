@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AdminDashboard from './AdminDashboard';
 import { fetchMemberCurrent, fetchMembers } from '../../services/api';
@@ -62,5 +62,46 @@ describe('AdminDashboard', () => {
     render(<AdminDashboard />);
 
     expect(await screen.findByText('Sin permisos')).toBeInTheDocument();
+  });
+
+  it('muestra estados de carga y lista vacía', async () => {
+    vi.mocked(fetchMembers).mockResolvedValue([] as never);
+
+    render(<AdminDashboard />);
+
+    expect(screen.getByText('Cargando miembros...')).toBeInTheDocument();
+    expect(await screen.findByText('No hay miembros registrados')).toBeInTheDocument();
+  });
+
+  it('etiqueta roles: Super Admin, Miembro y valor por defecto', async () => {
+    vi.mocked(fetchMembers).mockResolvedValue([
+      { id: '3', codigo: '20210000003', username: 'sadmin', email: null, rol: 'SUPER_ADMIN', status: 'ACTIVE', tenantId: '1', tenantName: 'GLUD' },
+      { id: '4', codigo: '20210000004', username: 'miembro', email: null, rol: 'MIEMBRO', status: 'ACTIVE', tenantId: '1', tenantName: 'GLUD' },
+      { id: '5', codigo: '20210000005', username: 'inv', email: null, rol: 'INVITADO', status: 'ACTIVE', tenantId: '1', tenantName: 'GLUD' },
+    ] as never);
+
+    render(<AdminDashboard />);
+
+    expect(await screen.findByText('Super Admin')).toBeInTheDocument();
+    expect(screen.getByText('Miembro')).toBeInTheDocument();
+    expect(screen.getByText('Invitado')).toBeInTheDocument();
+    expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('cierra sesión al pulsar Cerrar sesión', async () => {
+    const { useAuthStore } = await import('../../store/authStore');
+    useAuthStore.getState().setAuth('tok', { id: '10', role: 'TENANT_ADMIN', name: 'Admin' });
+    const locationSpy = vi.fn();
+    Object.defineProperty(globalThis, 'location', { value: { href: '', assign: locationSpy }, writable: true });
+
+    render(<AdminDashboard />);
+
+    fireEvent.click(await screen.findByText('Cerrar sesión'));
+
+    await waitFor(() => {
+      expect(useAuthStore.getState().token).toBeNull();
+      expect(globalThis.location.href).toBe('/');
+    });
+    useAuthStore.getState().logout();
   });
 });

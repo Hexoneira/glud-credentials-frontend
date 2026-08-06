@@ -3,6 +3,8 @@ import { createGuest, fetchMyGuests } from "../../services/api";
 import type { Guest } from "../../services/api";
 import { useAuthStore } from "../../store/authStore";
 import { applyTenantTheme } from "../../utils/theme";
+import { formatDate } from "../../utils/format";
+import GuestStatusBadge from "../carnet/GuestStatusBadge";
 
 type FormState = {
   codigo: string;
@@ -15,19 +17,6 @@ type InviteError =
   | { kind: "limit"; message: string }
   | { kind: "other"; message: string }
   | null;
-
-function formatDate(value: string | null): string {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleString("es-CO", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 function guestLink(token: string | null): string {
   return `${globalThis.location.origin}/invitado?token=${encodeURIComponent(token ?? "")}`;
@@ -295,18 +284,7 @@ export default function GuestManager() {
                 <td className="px-6 py-4 text-sm font-semibold text-white">{guest.name}</td>
                 <td className="px-6 py-4 font-mono text-sm text-slate-300">{guest.codigo}</td>
                 <td className="px-6 py-4">
-                  <span
-                    className="rounded-full px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.15em]"
-                    style={
-                      guest.status === "ACTIVE"
-                        ? { color: "var(--accent)", backgroundColor: "color-mix(in srgb, var(--accent) 12%, transparent)" }
-                        : guest.status === "EXPIRED"
-                          ? { color: "#fbbf24", backgroundColor: "rgba(251,191,36,0.1)" }
-                          : { color: "#f87171", backgroundColor: "rgba(248,113,113,0.1)" }
-                    }
-                  >
-                    {guest.status === "ACTIVE" ? "Activo" : guest.status === "EXPIRED" ? "Expirado" : "Revocado"}
-                  </span>
+                  <GuestStatusBadge status={guest.status} />
                 </td>
                 <td className="px-6 py-4 text-sm text-slate-400">{formatDate(guest.createdAt)}</td>
                 <td className="px-6 py-4 text-sm text-slate-400">{formatDate(guest.expiresAt)}</td>

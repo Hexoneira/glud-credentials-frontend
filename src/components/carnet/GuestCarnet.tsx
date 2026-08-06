@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { fetchGuestAccess } from "../../services/api";
 import type { Guest } from "../../services/api";
 import { applyTenantTheme } from "../../utils/theme";
+import { formatDate } from "../../utils/format";
 import GuestTOTPCard from "../carnet/GuestTOTPCard";
+import GuestStatusBadge from "../carnet/GuestStatusBadge";
 
 type GuestCarnetProps = {
   token: string;
@@ -12,19 +14,6 @@ type State =
   | { kind: "loading" }
   | { kind: "error"; reason: "expired" | "invalid" | "network" }
   | { kind: "ready"; guest: Guest };
-
-function formatDate(value: string | null): string {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleString("es-CO", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 export default function GuestCarnet({ token }: Readonly<GuestCarnetProps>) {
   const [state, setState] = useState<State>({ kind: "loading" });
@@ -168,14 +157,7 @@ export default function GuestCarnet({ token }: Readonly<GuestCarnetProps>) {
                   <span className="block text-[0.6rem] font-bold uppercase tracking-[0.2em] text-slate-500">
                     Estado
                   </span>
-                  <span className="mt-1 inline-block rounded-full px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.15em]"
-                    style={{
-                      color: primaryColor,
-                      backgroundColor: `color-mix(in srgb, ${primaryColor} 12%, transparent)`,
-                      border: `1px solid color-mix(in srgb, ${primaryColor} 40%, transparent)`,
-                    }}>
-                    {guest.status === "ACTIVE" ? "Activo" : guest.status === "EXPIRED" ? "Expirado" : "Revocado"}
-                  </span>
+                  <GuestStatusBadge status={guest.status} accentColor={primaryColor} />
                 </div>
                 <div>
                   <span className="block text-[0.6rem] font-bold uppercase tracking-[0.2em] text-slate-500">

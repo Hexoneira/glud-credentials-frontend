@@ -90,6 +90,21 @@ describe('GuestCarnet', () => {
     });
   });
 
+  it('copia el enlace actual al portapapeles', async () => {
+    vi.mocked(fetchGuestAccess).mockResolvedValue(activeGuest as never);
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+
+    render(<GuestCarnet token="tok" />);
+
+    const button = await screen.findByText('Copiar enlace');
+    button.click();
+
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith(globalThis.location.href);
+    });
+  });
+
   it('muestra enlace inválido cuando no hay token', async () => {
     render(<GuestCarnet token="" />);
 
