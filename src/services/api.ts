@@ -207,13 +207,69 @@ export async function fetchGuestAccess(token: string): Promise<Guest> {
 }
 
 // Miembros del tenant (dashboard de admin)
-export async function fetchMembers(): Promise<Member[]> {
-  const response = await fetch(`${API_BASE_URL}/members`, {
-    method: 'GET',
+export async function fetchMembers(tenantId?: string): Promise<Member[]> {
+  const query = tenantId ? `?tenantId=${encodeURIComponent(tenantId)}` : "";
+  const response = await fetch(`${API_BASE_URL}/members${query}`, {
+    method: "GET",
     headers: getAuthHeaders(),
     signal: createSignal(),
   });
   return handleResponse<Member[]>(response);
+}
+
+export interface CreateMemberPayload {
+  codigo: string;
+  password: string;
+  email?: string | null;
+  rol: string;
+  tenantId?: string | null;
+}
+
+export async function createMember(payload: CreateMemberPayload): Promise<Member> {
+  const response = await fetch(`${API_BASE_URL}/members`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<Member>(response);
+}
+
+export interface UpdateMemberPayload {
+  email?: string | null;
+  rol?: string | null;
+}
+
+export async function updateMember(id: string, payload: UpdateMemberPayload): Promise<Member> {
+  const response = await fetch(`${API_BASE_URL}/members/${id}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<Member>(response);
+}
+
+export async function updateMemberStatus(id: string, status: string): Promise<Member> {
+  const response = await fetch(`${API_BASE_URL}/members/${id}/status`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+    body: JSON.stringify({ status }),
+  });
+  return handleResponse<Member>(response);
+}
+
+export async function deleteMember(id: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/members/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+  });
+  if (!response.ok) {
+    const errorData = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error(readString(errorData.message) || `Error ${response.status}`);
+  }
 }
 
 // Tenants CRUD

@@ -3,6 +3,7 @@ import { fetchMemberCurrent, fetchMembers } from "../../services/api";
 import type { Member, MemberCurrent } from "../../services/api";
 import { useAuthStore } from "../../store/authStore";
 import { applyTenantTheme } from "../../utils/theme";
+import MemberManager from "./MemberManager";
 
 type Status = "loading" | "error" | "ready";
 
@@ -11,6 +12,7 @@ export default function AdminDashboard() {
   const [members, setMembers] = useState<Member[]>([]);
   const [member, setMember] = useState<MemberCurrent | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [memberManagerOpen, setMemberManagerOpen] = useState(false);
 
   const load = useCallback(async () => {
     setStatus("loading");
@@ -28,6 +30,14 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     void load();
+  }, [load]);
+
+  useEffect(() => {
+    const handleMembersUpdated = () => {
+      void load();
+    };
+    globalThis.addEventListener("membersUpdated", handleMembersUpdated);
+    return () => globalThis.removeEventListener("membersUpdated", handleMembersUpdated);
   }, [load]);
 
   const handleLogout = () => {
@@ -111,9 +121,18 @@ export default function AdminDashboard() {
               </p>
             </div>
             {status === "ready" && (
-              <span className="rounded-full border border-(--accent)/40 bg-(--accent)/10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-(--accent)">
-                {members.length} miembro{members.length === 1 ? "" : "s"}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="rounded-full border border-(--accent)/40 bg-(--accent)/10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-(--accent)">
+                  {members.length} miembro{members.length === 1 ? "" : "s"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMemberManagerOpen(true)}
+                  className="flex items-center gap-2 rounded-full border border-(--accent) bg-(--accent)/10 px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-(--accent) shadow-[0_0_15px_var(--accent)] transition-all duration-300 hover:bg-(--accent) hover:text-(--bg-black) hover:shadow-[0_0_25px_var(--accent)]"
+                >
+                  + Gestionar Miembros
+                </button>
+              </div>
             )}
           </div>
 
@@ -175,6 +194,15 @@ export default function AdminDashboard() {
           )}
         </div>
       </main>
+
+      <MemberManager
+        open={memberManagerOpen}
+        onClose={() => setMemberManagerOpen(false)}
+        tenantId={null}
+        tenantName={member?.tenantName}
+        isSuperAdmin={false}
+        currentUserId={member?.id}
+      />
     </div>
   );
 }
