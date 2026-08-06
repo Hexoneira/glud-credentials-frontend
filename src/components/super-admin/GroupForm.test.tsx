@@ -97,6 +97,8 @@ describe('GroupForm', () => {
         tenantCode: 'NUEVO_TENANT',
         director: 'Directora',
         memberLimit: 10,
+        primaryColor: '#22fefb',
+        logoUrl: undefined,
       });
       expect(screen.getAllByText('Grupo creado correctamente')[0]).toBeInTheDocument();
       expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
@@ -123,6 +125,8 @@ describe('GroupForm', () => {
         name: 'Actualizado',
         director: 'Directora Actualizada',
         memberLimit: 20,
+        primaryColor: '#22fefb',
+        logoUrl: undefined,
       });
       expect(screen.getAllByText('Grupo actualizado correctamente')[0]).toBeInTheDocument();
       expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(CustomEvent));

@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import ProtectedRoute from '../layouts/ProtectedRoute.astro';
 import CarnetPanel from '../components/carnet/CarnetPanel.astro';
+import GuestManager from '../components/carnet/GuestManager';
 import '../styles/global.css';
 
 // Pagina del carnet del estudiante
@@ -9,5 +10,6 @@ import '../styles/global.css';
 <ProtectedRoute>
     <Layout>
         <CarnetPanel />
+        <GuestManager client:load />
     </Layout>
 </ProtectedRoute>

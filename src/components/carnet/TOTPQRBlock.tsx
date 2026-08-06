@@ -8,6 +8,7 @@ type TOTPQRBlockProps = {
   qrSize?: number;
   primaryColor?: string;
   qrLightColor?: string;
+  secret?: string;
 };
 
 export default function TOTPQRBlock({
@@ -15,6 +16,7 @@ export default function TOTPQRBlock({
   qrSize = 220,
   primaryColor = "#22fefb",
   qrLightColor = "#071026",
+  secret: secretOverride,
 }: Readonly<TOTPQRBlockProps>) {
   const [code, setCode] = useState("000000");
   const [remaining, setRemaining] = useState(30);
@@ -24,10 +26,17 @@ export default function TOTPQRBlock({
     ? String(authUser.codigo || authUser.id)
     : initialStudentId;
 
-  // La semilla SIEMPRE viene del servidor: el carnet se sincroniza con
-  // /member/current y guarda totpSecret en el store. Nunca se deriva en el
+  // El color del tenant (si el servidor lo devuelve) gana sobre la prop estática
+  const themeColor = authUser?.primaryColor || primaryColor;
+
+  // Carnet público de invitado (sin sesión): la semilla llega por prop.
+  // Con sesión, la semilla SIEMPRE viene del servidor: el carnet se sincroniza
+  // con /member/current y guarda totpSecret en el store. Nunca se deriva en el
   // cliente porque el escáner de la puerta valida contra la semilla del servidor.
-  const secret = useMemo(() => authUser?.totpSecret || "", [authUser?.totpSecret]);
+  const secret = useMemo(
+    () => secretOverride ?? authUser?.totpSecret ?? "",
+    [secretOverride, authUser?.totpSecret],
+  );
   const hasSecret = secret.length > 0;
 
   // Track which 30s window the last code was generated for so we skip redundant crypto work
@@ -91,7 +100,7 @@ export default function TOTPQRBlock({
             Codigo de validacion
           </p>
           {hasSecret ? (
-            <div className="text-xs font-mono font-bold tracking-wide text-cyan-300">
+            <div className="text-xs font-mono font-bold tracking-wide text-(--accent)">
               00:{remaining.toString().padStart(2, "0")}
             </div>
           ) : (
@@ -107,7 +116,7 @@ export default function TOTPQRBlock({
 
         <div className="mt-8 h-1 w-full bg-white/10 rounded-none overflow-hidden">
           <div
-            className="h-full bg-cyan-400 transition-[width] duration-700 ease-out rounded-none"
+            className="h-full bg-(--accent) transition-[width] duration-700 ease-out rounded-none"
             style={{ width: `${cycleProgress}%` }}
           />
         </div>
@@ -125,7 +134,7 @@ export default function TOTPQRBlock({
             value={payload}
             size={qrSize}
             className="w-full max-w-60"
-            darkColor={primaryColor}
+            darkColor={themeColor}
             lightColor={qrLightColor}
             borderColor="transparent"
             shadowColor="rgba(34,254,251,0.2)"

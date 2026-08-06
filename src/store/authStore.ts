@@ -12,6 +12,10 @@ export interface User {
   groups?: string[];
   icon?: string;
   totpSecret?: string;
+  tenantName?: string;
+  tenantCode?: string;
+  primaryColor?: string;
+  logoUrl?: string;
 }
 
 interface JwtPayload {

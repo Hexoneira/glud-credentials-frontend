@@ -20,6 +20,8 @@ export interface Tenant {
   memberLimit: number;
   currentMembers: number;
   status: 'ACTIVE' | 'SUSPENDED';
+  primaryColor?: string;
+  logoUrl?: string | null;
 }
 
 export interface CreateTenantPayload {
@@ -27,12 +29,16 @@ export interface CreateTenantPayload {
   tenantCode: string;
   director: string;
   memberLimit: number;
+  primaryColor?: string;
+  logoUrl?: string;
 }
 
 export interface UpdateTenantPayload {
   name?: string;
   director?: string;
   memberLimit?: number;
+  primaryColor?: string;
+  logoUrl?: string;
 }
 
 export interface MemberCurrent {
@@ -43,6 +49,48 @@ export interface MemberCurrent {
   groups: string[];
   icon: string | null;
   totpSecret: string | null;
+  tenantName?: string;
+  tenantCode?: string;
+  primaryColor?: string;
+  logoUrl?: string | null;
+}
+
+export type GuestStatus = 'ACTIVE' | 'REVOKED' | 'EXPIRED';
+
+export interface Guest {
+  id: string;
+  codigo: string;
+  name: string;
+  email: string | null;
+  status: GuestStatus;
+  tenantId: string;
+  tenantName: string;
+  tenantCode: string;
+  primaryColor?: string;
+  logoUrl?: string | null;
+  createdById: string;
+  createdByCodigo: string;
+  createdAt: string;
+  expiresAt: string | null;
+  accessToken: string | null;
+  totpSecret: string | null;
+}
+
+export interface CreateGuestPayload {
+  codigo: string;
+  name: string;
+  email?: string;
+}
+
+export interface Member {
+  id: string;
+  codigo: string;
+  username: string;
+  email: string | null;
+  rol: string;
+  status: string;
+  tenantId: string;
+  tenantName: string;
 }
 
 function getAuthHeaders(): HeadersInit {
@@ -126,6 +174,46 @@ export async function fetchMemberCurrent(): Promise<MemberCurrent> {
     signal: createSignal(),
   });
   return handleResponse<MemberCurrent>(response);
+}
+
+// Invitados
+export async function createGuest(payload: CreateGuestPayload): Promise<Guest> {
+  const response = await fetch(`${API_BASE_URL}/guests`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<Guest>(response);
+}
+
+export async function fetchMyGuests(): Promise<Guest[]> {
+  const response = await fetch(`${API_BASE_URL}/guests`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+  });
+  return handleResponse<Guest[]>(response);
+}
+
+// Carnet público del invitado vía enlace temporal (sin token de sesión)
+export async function fetchGuestAccess(token: string): Promise<Guest> {
+  const response = await fetch(`${API_BASE_URL}/guests/access/${encodeURIComponent(token)}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    signal: createSignal(),
+  });
+  return handleResponse<Guest>(response);
+}
+
+// Miembros del tenant (dashboard de admin)
+export async function fetchMembers(): Promise<Member[]> {
+  const response = await fetch(`${API_BASE_URL}/members`, {
+    method: 'GET',
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+  });
+  return handleResponse<Member[]>(response);
 }
 
 // Tenants CRUD

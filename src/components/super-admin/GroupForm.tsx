@@ -13,6 +13,8 @@ interface FormErrors {
   tenantCode?: string;
   director?: string;
   memberLimit?: string;
+  primaryColor?: string;
+  logoUrl?: string;
 }
 
 export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormProps>) {
@@ -24,6 +26,8 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
     tenantCode: '',
     director: '',
     memberLimit: '50',
+    primaryColor: '#22fefb',
+    logoUrl: '',
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -39,6 +43,8 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
         tenantCode: tenant.tenantCode,
         director: tenant.director,
         memberLimit: String(tenant.memberLimit),
+        primaryColor: tenant.primaryColor ?? '#22fefb',
+        logoUrl: tenant.logoUrl ?? '',
       });
     } else {
       setFormData({
@@ -46,6 +52,8 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
         tenantCode: '',
         director: '',
         memberLimit: '50',
+        primaryColor: '#22fefb',
+        logoUrl: '',
       });
     }
     setErrors({});
@@ -103,6 +111,11 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
       newErrors.memberLimit = 'Máximo 1000 miembros';
     }
 
+    const color = formData.primaryColor.trim();
+    if (color && !/^#?[0-9A-Fa-f]{6}$/.test(color)) {
+      newErrors.primaryColor = 'Usa formato hex (#22fefb)';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -121,6 +134,8 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
           tenantCode: formData.tenantCode.trim(),
           director: formData.director.trim(),
           memberLimit: Number(formData.memberLimit),
+          primaryColor: formData.primaryColor.trim(),
+          logoUrl: formData.logoUrl.trim() || undefined,
         });
         setSubmitSuccess('Grupo creado correctamente');
       } else if (tenant) {
@@ -128,6 +143,8 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
           name: formData.name.trim(),
           director: formData.director.trim(),
           memberLimit: Number(formData.memberLimit),
+          primaryColor: formData.primaryColor.trim(),
+          logoUrl: formData.logoUrl.trim() || undefined,
         });
         setSubmitSuccess('Grupo actualizado correctamente');
       }
@@ -269,6 +286,54 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
                 value={formData.memberLimit}
                 onChange={(e) => handleChange('memberLimit', e.target.value)}
                 className={`bg-(--bg-black) border ${errors.memberLimit ? 'border-(--support-lila)' : 'border-(--support-gunmetal)'} rounded-xl px-4 py-3 text-sm text-(--white) focus:outline-none focus:border-(--cyan) focus:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300`}
+              />
+            </div>
+
+            {/* Color del tema (carnet y dashboard del grupo) */}
+            <div className="flex flex-col gap-2 group">
+              <div className="flex justify-between items-center">
+                <label htmlFor="primary-color" className="text-[10px] uppercase tracking-widest text-(--cyan) font-bold">
+                  Color del Grupo
+                </label>
+                {errors.primaryColor && <span className="text-[9px] uppercase text-(--support-lila) font-bold tracking-widest">{errors.primaryColor}</span>}
+              </div>
+              <div className="flex items-center gap-3">
+                <input
+                  id="primary-color"
+                  type="color"
+                  value={formData.primaryColor}
+                  onChange={(e) => handleChange('primaryColor', e.target.value)}
+                  className="h-11 w-14 shrink-0 cursor-pointer rounded-xl border border-(--support-gunmetal) bg-(--bg-black) p-1"
+                />
+                <input
+                  id="primary-color-hex"
+                  type="text"
+                  placeholder="#22fefb"
+                  value={formData.primaryColor}
+                  onChange={(e) => handleChange('primaryColor', e.target.value)}
+                  className={`bg-(--bg-black) border ${errors.primaryColor ? 'border-(--support-lila)' : 'border-(--support-gunmetal)'} rounded-xl px-4 py-3 text-sm font-mono text-(--white) focus:outline-none focus:border-(--cyan) transition-all duration-300`}
+                />
+              </div>
+              <span className="text-[9px] uppercase text-(--support-grey) tracking-widest">
+                Color que se usa en el carnet y dashboard de este grupo
+              </span>
+            </div>
+
+            {/* Logo del grupo (opcional) */}
+            <div className="flex flex-col gap-2 group">
+              <div className="flex justify-between items-center">
+                <label htmlFor="logo-url" className="text-[10px] uppercase tracking-widest text-(--cyan) font-bold">
+                  URL del Logo <span className="text-(--support-grey)">(opcional)</span>
+                </label>
+                {errors.logoUrl && <span className="text-[9px] uppercase text-(--support-lila) font-bold tracking-widest">{errors.logoUrl}</span>}
+              </div>
+              <input
+                id="logo-url"
+                type="url"
+                placeholder="https://grupo.com/logo.png"
+                value={formData.logoUrl}
+                onChange={(e) => handleChange('logoUrl', e.target.value)}
+                className={`bg-(--bg-black) border ${errors.logoUrl ? 'border-(--support-lila)' : 'border-(--support-gunmetal)'} rounded-xl px-4 py-3 text-sm text-(--white) focus:outline-none focus:border-(--cyan) focus:shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300`}
               />
             </div>
 
