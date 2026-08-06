@@ -35,12 +35,12 @@ export default function SuperAdminDashboard() {
   return (
     <>
       {/* Encabezado de la sección */}
-      <div className="flex justify-between items-start mb-10">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4 md:mb-10">
         <div>
-          <h1 className="text-4xl font-bold tracking-tight mb-2">
+          <h1 className="mb-2 text-2xl font-bold tracking-tight md:text-4xl">
             Grupos de Trabajo
           </h1>
-          <p className="text-(--support-grey) max-w-md text-sm leading-relaxed">
+          <p className="max-w-md text-sm leading-relaxed text-(--support-grey)">
             Administra la creación, edición, suspensión y reactivación de
             tenants.
           </p>

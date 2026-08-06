@@ -49,11 +49,11 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-(--bg-black-gunmetal) font-sans text-(--white)">
-      {/* Sidebar */}
-      <aside className="flex w-64 shrink-0 flex-col justify-between border-r border-(--support-gunmetal) bg-(--bg-black-gunmetal) p-6">
+    <div className="flex h-screen flex-col overflow-hidden bg-(--bg-black-gunmetal) font-sans text-(--white) md:flex-row">
+      {/* Sidebar: top bar en móvil, columna en desktop */}
+      <aside className="shrink-0 border-b border-(--support-gunmetal) bg-(--bg-black-gunmetal) p-4 md:flex md:w-64 md:flex-col md:justify-between md:border-b-0 md:border-r md:p-6">
         <div>
-          <div className="mb-12 flex items-center gap-3">
+          <div className="mb-4 flex items-center gap-3 md:mb-12">
             <div
               className="flex h-8 w-8 items-center justify-center rounded"
               style={{ backgroundColor: "color-mix(in srgb, var(--accent) 18%, transparent)", color: "var(--accent)" }}
@@ -66,7 +66,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <nav className="flex flex-col gap-4 text-sm font-semibold">
+          <nav className="flex flex-row gap-4 text-sm font-semibold md:flex-col">
             <a
               href="/admin"
               className="flex items-center gap-3 border-l-2 border-(--accent) pl-3 text-(--accent)"
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
         <button
           type="button"
           onClick={handleLogout}
-          className="text-left text-xs text-(--support-grey) transition-colors hover:text-(--support-lila)"
+          className="mt-4 text-left text-xs text-(--support-grey) transition-colors hover:text-(--support-lila) md:mt-0"
         >
           Cerrar sesión
         </button>
@@ -90,22 +90,22 @@ export default function AdminDashboard() {
 
       {/* Contenido */}
       <main className="flex flex-1 flex-col overflow-y-auto bg-(--bg-eerie)">
-        <header className="flex items-center justify-between border-b border-(--support-gunmetal) px-10 py-6">
+        <header className="flex items-center justify-between border-b border-(--support-gunmetal) px-4 py-4 md:px-10 md:py-6">
           <div className="flex items-center gap-3">
             <div className="h-2 w-2 rounded-full bg-(--accent) shadow-[0_0_6px_var(--accent)]"></div>
             <span className="text-[10px] uppercase tracking-widest text-(--support-grey)">
               Panel de Administración
             </span>
           </div>
-          <span className="text-[10px] uppercase tracking-widest text-(--support-grey)">
+          <span className="hidden text-[10px] uppercase tracking-widest text-(--support-grey) sm:inline">
             {member?.name || member?.codigo || "Admin"} · {member?.tenantName ?? ""}
           </span>
         </header>
 
-        <div className="p-10">
-          <div className="mb-10 flex items-start justify-between">
+        <div className="p-4 md:p-10">
+          <div className="mb-6 flex flex-wrap items-start justify-between gap-4 md:mb-10">
             <div>
-              <h1 className="text-4xl font-bold tracking-tight">Miembros del Grupo</h1>
+              <h1 className="text-2xl font-bold tracking-tight md:text-4xl">Miembros del Grupo</h1>
               <p className="mt-2 max-w-md text-sm leading-relaxed text-(--support-grey)">
                 Miembros registrados en {member?.tenantName ?? "tu grupo de trabajo"}.
               </p>

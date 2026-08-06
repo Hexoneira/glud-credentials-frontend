@@ -191,24 +191,24 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
         ref={modalRef}
         open
         aria-labelledby="group-form-title"
-        className="m-0 p-0 bg-(--bg-black-gunmetal) border border-(--cyan)/30 rounded-3xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden shadow-[0_0_40px_rgba(0,255,255,0.15)] focus:outline-none"
+        className="m-0 max-h-[90dvh] w-full max-w-4xl flex flex-col overflow-y-auto rounded-3xl border border-(--cyan)/30 bg-(--bg-black-gunmetal) p-0 shadow-[0_0_40px_rgba(0,255,255,0.15)] focus:outline-none md:flex-row"
       >
         {/* Panel izquierdo */}
-        <div className="w-full md:w-1/3 bg-(--bg-eerie) p-10 border-b md:border-b-0 md:border-r border-(--support-gunmetal) flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute -top-20 -left-20 w-40 h-40 bg-(--cyan) rounded-full blur-[100px] opacity-20"></div>
+        <div className="relative flex w-full flex-col justify-between overflow-hidden border-b border-(--support-gunmetal) bg-(--bg-eerie) p-5 md:w-1/3 md:border-b-0 md:border-r md:p-10">
+          <div className="absolute -left-20 -top-20 h-40 w-40 rounded-full bg-(--cyan) opacity-20 blur-[100px]"></div>
           <div className="relative z-10">
-            <span className="text-[10px] text-(--cyan) uppercase tracking-widest font-bold">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-(--cyan)">
               {isEdit ? 'Edición' : 'Registro'}
             </span>
-            <h2 id="group-form-title" className="text-4xl font-display font-bold text-(--white) mt-2 leading-tight uppercase tracking-tighter">
+            <h2 id="group-form-title" className="mt-2 text-2xl font-display font-bold uppercase leading-tight tracking-tighter text-(--white) md:text-4xl">
               {isEdit ? (<>Editar<br/>Grupo</>) : (<>Crear<br/>Grupo</>)}
             </h2>
-            <p className="text-(--support-grey) text-xs mt-6 leading-relaxed">{description}</p>
+            <p className="mt-4 text-xs leading-relaxed text-(--support-grey) md:mt-6">{description}</p>
           </div>
         </div>
 
         {/* Panel derecho - Formulario */}
-        <div className="w-full md:w-2/3 p-10 flex flex-col justify-center bg-(--bg-black-gunmetal)">
+        <div className="flex w-full flex-col justify-center bg-(--bg-black-gunmetal) p-5 md:w-2/3 md:p-10">
           <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-5" noValidate>
 
             {/* Nombre del grupo */}
