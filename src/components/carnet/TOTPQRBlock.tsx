@@ -8,6 +8,7 @@ type TOTPQRBlockProps = {
   qrSize?: number;
   primaryColor?: string;
   qrLightColor?: string;
+  secret?: string;
 };
 
 export default function TOTPQRBlock({
@@ -15,6 +16,7 @@ export default function TOTPQRBlock({
   qrSize = 220,
   primaryColor = "#22fefb",
   qrLightColor = "#071026",
+  secret: secretOverride,
 }: Readonly<TOTPQRBlockProps>) {
   const [code, setCode] = useState("000000");
   const [remaining, setRemaining] = useState(30);
@@ -27,10 +29,14 @@ export default function TOTPQRBlock({
   // El color del tenant (si el servidor lo devuelve) gana sobre la prop estática
   const themeColor = authUser?.primaryColor || primaryColor;
 
-  // La semilla SIEMPRE viene del servidor: el carnet se sincroniza con
-  // /member/current y guarda totpSecret en el store. Nunca se deriva en el
+  // Carnet público de invitado (sin sesión): la semilla llega por prop.
+  // Con sesión, la semilla SIEMPRE viene del servidor: el carnet se sincroniza
+  // con /member/current y guarda totpSecret en el store. Nunca se deriva en el
   // cliente porque el escáner de la puerta valida contra la semilla del servidor.
-  const secret = useMemo(() => authUser?.totpSecret || "", [authUser?.totpSecret]);
+  const secret = useMemo(
+    () => secretOverride ?? authUser?.totpSecret ?? "",
+    [secretOverride, authUser?.totpSecret],
+  );
   const hasSecret = secret.length > 0;
 
   // Track which 30s window the last code was generated for so we skip redundant crypto work

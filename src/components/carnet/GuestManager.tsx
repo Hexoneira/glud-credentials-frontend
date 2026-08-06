@@ -52,8 +52,7 @@ export default function GuestManager() {
     void loadGuests();
   }, [loadGuests]);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const submitInvite = async (): Promise<void> => {
     setError(null);
     setCopied(false);
 
@@ -86,6 +85,11 @@ export default function GuestManager() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    void submitInvite();
   };
 
   const copyLink = useCallback(async () => {

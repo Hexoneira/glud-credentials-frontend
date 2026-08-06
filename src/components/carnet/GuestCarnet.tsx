@@ -3,7 +3,7 @@ import { fetchGuestAccess } from "../../services/api";
 import type { Guest } from "../../services/api";
 import { applyTenantTheme } from "../../utils/theme";
 import { formatDate } from "../../utils/format";
-import GuestTOTPCard from "../carnet/GuestTOTPCard";
+import TOTPQRBlock from "../carnet/TOTPQRBlock";
 import GuestStatusBadge from "../carnet/GuestStatusBadge";
 
 type GuestCarnetProps = {
@@ -193,7 +193,7 @@ export default function GuestCarnet({ token }: Readonly<GuestCarnetProps>) {
 
             <section className="grid place-items-center">
               <div className="w-full max-w-sm">
-                <GuestTOTPCard
+                <TOTPQRBlock
                   secret={guest.totpSecret ?? ""}
                   studentId={guest.codigo}
                   qrSize={200}

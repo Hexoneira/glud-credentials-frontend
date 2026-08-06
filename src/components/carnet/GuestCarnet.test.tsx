@@ -11,7 +11,7 @@ vi.mock('../../utils/theme', () => ({
   applyTenantTheme: vi.fn(),
 }));
 
-vi.mock('../carnet/GuestTOTPCard', () => ({
+vi.mock('../carnet/TOTPQRBlock', () => ({
   default: ({ secret, studentId }: { secret: string; studentId: string }) => (
     <div data-testid="mock-totp-card" data-secret={secret} data-student={studentId} />
   ),
