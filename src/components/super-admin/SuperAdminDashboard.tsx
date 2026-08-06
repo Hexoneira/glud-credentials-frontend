@@ -3,10 +3,12 @@ import type { Tenant } from "../../services/api";
 import WorkgroupsTable from "./WorkgroupsTable";
 import CreateGroupForm from "./CreateGroupForm";
 import EditGroupForm from "./EditGroupForm";
+import MemberManager from "../admin/MemberManager";
 
 export default function SuperAdminDashboard() {
   const [createFormOpen, setCreateFormOpen] = useState(false);
   const [editingTenant, setEditingTenant] = useState<Tenant | null>(null);
+  const [membersTenant, setMembersTenant] = useState<Tenant | null>(null);
 
   const handleCreate = () => {
     setCreateFormOpen(true);
@@ -16,12 +18,20 @@ export default function SuperAdminDashboard() {
     setEditingTenant(tenant);
   };
 
+  const handleManageMembers = (tenant: Tenant) => {
+    setMembersTenant(tenant);
+  };
+
   const handleCloseCreateForm = () => {
     setCreateFormOpen(false);
   };
 
   const handleCloseEditForm = () => {
     setEditingTenant(null);
+  };
+
+  const handleCloseMembers = () => {
+    setMembersTenant(null);
   };
 
   // Escuchar evento del sidebar para abrir el modal de crear
@@ -56,7 +66,7 @@ export default function SuperAdminDashboard() {
 
       {/* Tabla de grupos */}
       <div className="mb-10">
-        <WorkgroupsTable onEdit={handleEdit} />
+        <WorkgroupsTable onEdit={handleEdit} onManageMembers={handleManageMembers} />
       </div>
 
       {/* Modal de formulario */}
@@ -65,6 +75,13 @@ export default function SuperAdminDashboard() {
         onClose={handleCloseCreateForm}
       />
       <EditGroupForm tenant={editingTenant} onClose={handleCloseEditForm} />
+      <MemberManager
+        open={membersTenant !== null}
+        onClose={handleCloseMembers}
+        tenantId={membersTenant?.id ?? null}
+        tenantName={membersTenant?.name}
+        isSuperAdmin
+      />
     </>
   );
 }

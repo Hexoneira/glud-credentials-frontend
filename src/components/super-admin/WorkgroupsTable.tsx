@@ -9,6 +9,7 @@ import {
 
 interface WorkgroupsTableProps {
   onEdit?: (tenant: Tenant) => void;
+  onManageMembers?: (tenant: Tenant) => void;
 }
 
 function getErrorMessage(error: unknown, fallback: string): string {
@@ -17,6 +18,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
 
 export default function WorkgroupsTable({
   onEdit,
+  onManageMembers,
 }: Readonly<WorkgroupsTableProps>) {
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -232,6 +234,15 @@ export default function WorkgroupsTable({
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-2">
+                        {onManageMembers && (
+                          <button
+                            onClick={() => onManageMembers(tenant)}
+                            disabled={isActionLoading}
+                            className="text-[10px] font-bold uppercase tracking-widest text-[var(--support-beer)] hover:text-[var(--cyan)] transition-colors disabled:opacity-50"
+                          >
+                            Miembros
+                          </button>
+                        )}
                         <button
                           onClick={() => onEdit?.(tenant)}
                           disabled={isActionLoading}
