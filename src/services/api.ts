@@ -44,6 +44,7 @@ export interface UpdateTenantPayload {
 export interface MemberCurrent {
   id: string;
   name: string;
+  codigo?: string;
   email: string | null;
   role: string;
   groups: string[];
@@ -270,6 +271,37 @@ export async function deleteMember(id: string): Promise<void> {
     const errorData = (await response.json().catch(() => ({}))) as Record<string, unknown>;
     throw new Error(readString(errorData.message) || `Error ${response.status}`);
   }
+}
+
+// Asistencia (toma de asistencia escaneando el QR del carnet)
+export interface AttendanceRecord {
+  attendanceId: string;
+  codigo: string;
+  email: string | null;
+  rol: string;
+  tenantId: string;
+  tenantName: string;
+  checkInAt: string;
+  markedByCodigo: string;
+}
+
+export async function registerAttendance(code: string): Promise<AttendanceRecord> {
+  const response = await fetch(`${API_BASE_URL}/attendance/register`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+    body: JSON.stringify({ code }),
+  });
+  return handleResponse<AttendanceRecord>(response);
+}
+
+export async function fetchTodayAttendance(): Promise<AttendanceRecord[]> {
+  const response = await fetch(`${API_BASE_URL}/attendance/today`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+  });
+  return handleResponse<AttendanceRecord[]>(response);
 }
 
 // Tenants CRUD

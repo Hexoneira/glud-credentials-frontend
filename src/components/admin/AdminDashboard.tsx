@@ -4,8 +4,10 @@ import type { Member, MemberCurrent } from "../../services/api";
 import { useAuthStore } from "../../store/authStore";
 import { applyTenantTheme } from "../../utils/theme";
 import MemberManager from "./MemberManager";
+import AttendanceScanner from "./AttendanceScanner";
 
 type Status = "loading" | "error" | "ready";
+type View = "members" | "attendance";
 
 export default function AdminDashboard() {
   const [status, setStatus] = useState<Status>("loading");
@@ -13,6 +15,7 @@ export default function AdminDashboard() {
   const [member, setMember] = useState<MemberCurrent | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [memberManagerOpen, setMemberManagerOpen] = useState(false);
+  const [view, setView] = useState<View>("members");
 
   const load = useCallback(async () => {
     setStatus("loading");
@@ -77,12 +80,24 @@ export default function AdminDashboard() {
           </div>
 
           <nav className="flex flex-row gap-4 text-sm font-semibold md:flex-col">
-            <a
-              href="/admin"
-              className="flex items-center gap-3 border-l-2 border-(--accent) pl-3 text-(--accent)"
+            <button
+              type="button"
+              onClick={() => setView("members")}
+              className={`flex items-center gap-3 border-l-2 pl-3 text-left transition-colors ${
+                view === "members" ? "border-(--accent) text-(--accent)" : "border-transparent text-(--support-grey) hover:text-(--accent)"
+              }`}
             >
               <span>Miembros</span>
-            </a>
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("attendance")}
+              className={`flex items-center gap-3 border-l-2 pl-3 text-left transition-colors ${
+                view === "attendance" ? "border-(--accent) text-(--accent)" : "border-transparent text-(--support-grey) hover:text-(--accent)"
+              }`}
+            >
+              <span>Asistencia</span>
+            </button>
             <a href="/carnet" className="flex items-center gap-3 border-l-2 border-transparent pl-3 text-(--support-grey) hover:text-(--accent)">
               <span>Mi carnet</span>
             </a>
@@ -115,12 +130,16 @@ export default function AdminDashboard() {
         <div className="p-4 md:p-10">
           <div className="mb-6 flex flex-wrap items-start justify-between gap-4 md:mb-10">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight md:text-4xl">Miembros del Grupo</h1>
+              <h1 className="text-2xl font-bold tracking-tight md:text-4xl">
+                {view === "members" ? "Miembros del Grupo" : "Toma de Asistencia"}
+              </h1>
               <p className="mt-2 max-w-md text-sm leading-relaxed text-(--support-grey)">
-                Miembros registrados en {member?.tenantName ?? "tu grupo de trabajo"}.
+                {view === "members"
+                  ? `Miembros registrados en ${member?.tenantName ?? "tu grupo de trabajo"}.`
+                  : "Escanea el QR del carnet de cada miembro para registrar su asistencia del día."}
               </p>
             </div>
-            {status === "ready" && (
+            {status === "ready" && view === "members" && (
               <div className="flex items-center gap-3">
                 <span className="rounded-full border border-(--accent)/40 bg-(--accent)/10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-(--accent)">
                   {members.length} miembro{members.length === 1 ? "" : "s"}
@@ -136,19 +155,21 @@ export default function AdminDashboard() {
             )}
           </div>
 
-          {status === "loading" && (
+          {view === "attendance" && <AttendanceScanner />}
+
+          {view === "members" && status === "loading" && (
             <div className="rounded-3xl border border-(--support-gunmetal) p-10 text-center text-[10px] uppercase tracking-widest text-(--support-grey)">
               Cargando miembros...
             </div>
           )}
 
-          {status === "error" && (
+          {view === "members" && status === "error" && (
             <div className="rounded-3xl border border-(--support-lila)/40 bg-(--support-lila)/10 p-10 text-center text-[10px] font-bold uppercase tracking-widest text-(--support-lila)">
               {errorMessage}
             </div>
           )}
 
-          {status === "ready" && (
+          {view === "members" && status === "ready" && (
             <div className="overflow-x-auto rounded-3xl border border-(--support-gunmetal)">
               <table className="w-full min-w-[42rem] text-left">
                 <thead>
