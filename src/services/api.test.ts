@@ -19,8 +19,10 @@ import {
   fetchMembers,
   fetchMyGuests,
   fetchTenants,
+  fetchTodayAttendance,
   login,
   reactivateTenant,
+  registerAttendance,
   suspendTenant,
   updateTenant,
 } from './api';
@@ -333,5 +335,69 @@ describe('api service', () => {
       expect.objectContaining({ method: 'GET' })
     );
     expect(result).toEqual(members);
+  });
+
+  it('fetchMembers envía tenantId cuando se filtra por grupo', async () => {
+    authState.token = 'jwt-auth';
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(createJsonResponse([]));
+
+    await fetchMembers('5');
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `${API_BASE_URL}/members?tenantId=5`,
+      expect.objectContaining({ method: 'GET' })
+    );
+  });
+
+  it('registerAttendance consume POST /attendance/register', async () => {
+    authState.token = 'jwt-auth';
+    const record = {
+      attendanceId: '1',
+      codigo: '20210000002',
+      email: null,
+      rol: 'MIEMBRO',
+      tenantId: '1',
+      tenantName: 'GLUD',
+      checkInAt: '2026-08-05T09:30:00',
+      markedByCodigo: '20210001001',
+    };
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(createJsonResponse(record));
+
+    const result = await registerAttendance('ID:20210000002|TOTP:123456');
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      `${API_BASE_URL}/attendance/register`,
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ code: 'ID:20210000002|TOTP:123456' }),
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-auth' }),
+      })
+    );
+    expect(result).toEqual(record);
+  });
+
+  it('registerAttendance propaga el error del servidor', async () => {
+    authState.token = 'jwt-auth';
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      createJsonResponse({ message: 'El miembro 20210000002 ya registró su asistencia hoy' }, 409)
+    );
+
+    await expect(registerAttendance('20210000002')).rejects.toThrow(
+      'El miembro 20210000002 ya registró su asistencia hoy'
+    );
+  });
+
+  it('fetchTodayAttendance consume GET /attendance/today', async () => {
+    authState.token = 'jwt-auth';
+    const records = [{ attendanceId: '1', codigo: '20210000002', tenantName: 'GLUD' }];
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(createJsonResponse(records));
+
+    const result = await fetchTodayAttendance();
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      `${API_BASE_URL}/attendance/today`,
+      expect.objectContaining({ method: 'GET' })
+    );
+    expect(result).toEqual(records);
   });
 });

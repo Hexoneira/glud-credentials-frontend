@@ -1,9 +1,11 @@
 ---
+import AdminLayout from "../layouts/AdminLayout.astro";
 import ProtectedRoute from "../layouts/ProtectedRoute.astro";
 import AdminDashboard from "../components/admin/AdminDashboard";
-import "../styles/global.css";
 ---
 
-<ProtectedRoute allowedRoles={["TENANT_ADMIN"]}>
-  <AdminDashboard client:load />
-</ProtectedRoute>
+<AdminLayout>
+  <ProtectedRoute allowedRoles={["TENANT_ADMIN"]}>
+    <AdminDashboard client:load />
+  </ProtectedRoute>
+</AdminLayout>
