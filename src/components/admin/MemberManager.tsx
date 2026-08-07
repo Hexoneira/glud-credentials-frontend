@@ -234,7 +234,7 @@ export default function MemberManager({
         ref={modalRef}
         open
         aria-label="Gestión de miembros"
-        className="m-0 flex max-h-[90dvh] w-full max-w-5xl flex-col overflow-y-auto rounded-3xl border border-(--cyan)/30 bg-(--bg-black-gunmetal) p-0 shadow-[0_0_40px_rgba(0,255,255,0.15)] focus:outline-none"
+        className="relative m-auto flex max-h-[90dvh] w-full max-w-5xl flex-col overflow-y-auto rounded-3xl border border-(--cyan)/30 bg-(--bg-black-gunmetal) p-0 shadow-[0_0_40px_rgba(0,255,255,0.15)] focus:outline-none"
       >
         <div className="flex items-center justify-between border-b border-(--support-gunmetal) px-6 py-5">
           <div>

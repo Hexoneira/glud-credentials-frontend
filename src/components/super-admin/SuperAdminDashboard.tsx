@@ -43,16 +43,18 @@ export default function SuperAdminDashboard() {
   }, []);
 
   return (
-    <>
+    <div className="mx-auto w-full max-w-6xl px-4 pb-14 pt-6 sm:px-6">
       {/* Encabezado de la sección */}
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4 md:mb-10">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="mb-2 text-2xl font-bold tracking-tight md:text-4xl">
+          <p className="text-[0.6rem] font-bold uppercase tracking-[0.25em] text-(--accent)">
+            Panel general
+          </p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-(--white) md:text-3xl">
             Grupos de Trabajo
           </h1>
-          <p className="max-w-md text-sm leading-relaxed text-(--support-grey)">
-            Administra la creación, edición, suspensión y reactivación de
-            tenants.
+          <p className="mt-1.5 max-w-md text-xs leading-relaxed text-(--support-grey)">
+            Crea, edita, suspende y reactiva los grupos y sus miembros.
           </p>
         </div>
 
@@ -65,9 +67,7 @@ export default function SuperAdminDashboard() {
       </div>
 
       {/* Tabla de grupos */}
-      <div className="mb-10">
-        <WorkgroupsTable onEdit={handleEdit} onManageMembers={handleManageMembers} />
-      </div>
+      <WorkgroupsTable onEdit={handleEdit} onManageMembers={handleManageMembers} />
 
       {/* Modal de formulario */}
       <CreateGroupForm
@@ -82,6 +82,6 @@ export default function SuperAdminDashboard() {
         tenantName={membersTenant?.name}
         isSuperAdmin
       />
-    </>
+    </div>
   );
 }
