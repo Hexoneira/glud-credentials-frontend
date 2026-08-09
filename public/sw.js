@@ -1,21 +1,18 @@
-const CACHE_NAME = "glud-credentials-v1";
-const APP_SHELL = [
-  "/",
-  "/carnet",
-  "/admin",
-  "/super-admin",
-  "/invitado",
-  "/manifest.webmanifest",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
-  "/icons/apple-touch-icon.png",
-];
+const CACHE_NAME = "glud-credentials-v2";
+// Rutas relativas al propio service worker (funciona en raíz y con base path de GitHub Pages)
+const STATIC_ASSETS = [
+  "manifest.webmanifest",
+  "favicon.svg",
+  "icons/icon-192.png",
+  "icons/icon-512.png",
+  "icons/apple-touch-icon.png",
+].map((path) => new URL(path, self.location).href);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_SHELL))
+      .then((cache) => cache.addAll(STATIC_ASSETS))
       .then(() => self.skipWaiting()),
   );
 });
@@ -40,22 +37,9 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith("/api/")) return;
-
-  // Navegaciones: red primero, si falla, shell offline
-  if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          return response;
-        })
-        .catch(() =>
-          caches.match(request).then((cached) => cached || caches.match("/")),
-        ),
-    );
-    return;
-  }
+  // El HTML de las páginas SIEMPRE se sirve de red: cachear navegaciones provoca
+  // "shell viejo + bundles nuevos" y pantallas en negro al navegar.
+  if (request.mode === "navigate") return;
 
   // Estáticos: caché primero, actualiza en segundo plano
   event.respondWith(

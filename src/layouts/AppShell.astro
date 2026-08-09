@@ -28,9 +28,9 @@ const { title = 'GLUD Credenciales | Hexoneira' } = Astro.props;
 	<body class="min-h-screen bg-[#0b0f16] font-sans text-(--white)">
 		<AppNav client:load />
 		<slot />
-		<script is:inline>
+		<script is:inline define:vars={{ baseUrl: import.meta.env.BASE_URL }}>
 			if ("serviceWorker" in navigator) {
-				navigator.serviceWorker.register("/sw.js").catch(() => {});
+				navigator.serviceWorker.register(baseUrl + "sw.js").catch(() => {});
 			}
 		</script>
 	</body>
