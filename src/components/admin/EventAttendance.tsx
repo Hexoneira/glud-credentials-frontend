@@ -384,18 +384,14 @@ export default function EventAttendance() {
               {events.map((event) => (
                 <div
                   key={event.eventId}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`Seleccionar evento ${event.title}`}
-                  className={`cursor-pointer rounded-xl border p-4 transition-all focus-visible:outline-2 focus-visible:outline-(--accent) ${selectedClass(event)}`}
-                  onClick={() => selectEvent(event)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      selectEvent(event);
-                    }
-                  }}
+                  className={`relative rounded-xl border p-4 transition-all ${selectedClass(event)}`}
                 >
+                  <button
+                    type="button"
+                    aria-label={`Seleccionar evento ${event.title}`}
+                    onClick={() => selectEvent(event)}
+                    className="absolute inset-0 cursor-pointer rounded-xl focus-visible:outline-2 focus-visible:outline-(--accent)"
+                  />
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-(--white)">{event.title}</p>
@@ -419,7 +415,7 @@ export default function EventAttendance() {
                           setConfirmDeleteId(event.eventId);
                         }
                       }}
-                      className="text-[9px] font-bold uppercase tracking-widest text-(--support-grey) transition-colors hover:text-(--support-lila)"
+                      className="relative z-10 text-[9px] font-bold uppercase tracking-widest text-(--support-grey) transition-colors hover:text-(--support-lila)"
                     >
                       {deleteLabel(event.eventId, confirmDeleteId, deletingId)}
                     </button>
