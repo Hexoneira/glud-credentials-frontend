@@ -1,5 +1,5 @@
 const CODIGO_PATTERN = /^[A-Za-z0-9_-]{3,30}$/;
-const QR_ID_PATTERN = /^ID:([A-Za-z0-9_-]{3,30})\|TOTP:/;
+const QR_PAYLOAD_PATTERN = /^ID:([A-Za-z0-9_-]{3,30})\|TOTP:(\d{6})$/;
 
 /**
  * Extrae el código de miembro desde el contenido escaneado.
@@ -11,6 +11,16 @@ export function extractCodigoFromScan(scanned: string): string | null {
   if (CODIGO_PATTERN.test(value)) {
     return value;
   }
-  const match = QR_ID_PATTERN.exec(value);
+  const match = QR_PAYLOAD_PATTERN.exec(value);
   return match ? match[1] : null;
+}
+
+/**
+ * Extrae el código TOTP de 6 dígitos del payload QR del carnet.
+ * Devuelve null si el contenido es un código plano o no reconocido.
+ */
+export function extractTotpFromScan(scanned: string): string | null {
+  const value = scanned?.trim() ?? "";
+  const match = QR_PAYLOAD_PATTERN.exec(value);
+  return match ? match[2] : null;
 }

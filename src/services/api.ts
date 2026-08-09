@@ -87,7 +87,7 @@ export interface Member {
   id: string;
   codigo: string;
   username: string;
-  email: string | null;
+  name: string;
   rol: string;
   status: string;
   tenantId: string;
@@ -221,7 +221,7 @@ export async function fetchMembers(tenantId?: string): Promise<Member[]> {
 export interface CreateMemberPayload {
   codigo: string;
   password: string;
-  email?: string | null;
+  name?: string | null;
   rol: string;
   tenantId?: string | null;
 }
@@ -237,7 +237,7 @@ export async function createMember(payload: CreateMemberPayload): Promise<Member
 }
 
 export interface UpdateMemberPayload {
-  email?: string | null;
+  name?: string | null;
   rol?: string | null;
 }
 
@@ -277,6 +277,7 @@ export async function deleteMember(id: string): Promise<void> {
 export interface AttendanceRecord {
   attendanceId: string;
   codigo: string;
+  name: string;
   email: string | null;
   rol: string;
   tenantId: string;
@@ -285,12 +286,45 @@ export interface AttendanceRecord {
   markedByCodigo: string;
 }
 
-export async function registerAttendance(code: string): Promise<AttendanceRecord> {
+export interface EventAttendance {
+  attendanceId: string;
+  userId: string;
+  codigo: string;
+  name: string;
+  checkInAt: string;
+  markedByCodigo: string;
+}
+
+export type EventStatus = "SCHEDULED" | "IN_PROGRESS" | "FINISHED";
+
+export interface EventSummary {
+  eventId: string;
+  title: string;
+  startsAt: string;
+  status: EventStatus;
+  attendeesCount: number;
+  tenantId: string;
+  tenantName: string;
+  createdByCodigo: string;
+}
+
+export interface CreateEventPayload {
+  title: string;
+  startsAt: string;
+  tenantId?: string | null;
+}
+
+// Envía el contenido escaneado crudo (código plano o payload ID:...|TOTP:...).
+// Si el carnet trae TOTP, el backend lo valida contra la semilla del servidor.
+export async function registerAttendance(
+  code: string,
+  eventId?: string,
+): Promise<AttendanceRecord> {
   const response = await fetch(`${API_BASE_URL}/attendance/register`, {
     method: "POST",
     headers: getAuthHeaders(),
     signal: createSignal(),
-    body: JSON.stringify({ code }),
+    body: JSON.stringify({ code, eventId: eventId ?? null }),
   });
   return handleResponse<AttendanceRecord>(response);
 }
@@ -302,6 +336,69 @@ export async function fetchTodayAttendance(): Promise<AttendanceRecord[]> {
     signal: createSignal(),
   });
   return handleResponse<AttendanceRecord[]>(response);
+}
+
+// Eventos y asistencia por evento
+export async function fetchEvents(): Promise<EventSummary[]> {
+  const response = await fetch(`${API_BASE_URL}/events`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+  });
+  return handleResponse<EventSummary[]>(response);
+}
+
+export async function createEvent(payload: CreateEventPayload): Promise<EventSummary> {
+  const response = await fetch(`${API_BASE_URL}/events`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<EventSummary>(response);
+}
+
+export async function fetchEventAttendance(eventId: string): Promise<EventAttendance[]> {
+  const response = await fetch(`${API_BASE_URL}/events/${encodeURIComponent(eventId)}/attendance`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+  });
+  return handleResponse<EventAttendance[]>(response);
+}
+
+export async function deleteEvent(eventId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/events/${encodeURIComponent(eventId)}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+  });
+  if (!response.ok) {
+    const errorData = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error(readString(errorData.message) || `Error ${response.status}`);
+  }
+}
+
+// Descarga el CSV del backend con el token de sesión y dispara la descarga
+export async function downloadAttendanceCsv(url: string, filename: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}${url}`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+    signal: createSignal(),
+  });
+  if (!response.ok) {
+    const errorData = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error(readString(errorData.message) || `Error ${response.status}`);
+  }
+  const blob = await response.blob();
+  const objectUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = objectUrl;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(objectUrl);
 }
 
 // Tenants CRUD

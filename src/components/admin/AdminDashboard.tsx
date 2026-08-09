@@ -6,10 +6,11 @@ import { applyTenantTheme } from "../../utils/theme";
 import { roleLabel } from "../layout/AppNav";
 import MemberManager from "./MemberManager";
 import AttendanceScanner from "./AttendanceScanner";
+import EventAttendance from "./EventAttendance";
 import EmptyState from "../ui/EmptyState";
 
 type Status = "loading" | "error" | "ready";
-type View = "members" | "attendance";
+type View = "members" | "attendance" | "events";
 
 function StatusBadge({ status }: Readonly<{ status: string }>) {
   const active = status === "ACTIVE";
@@ -177,10 +178,20 @@ export default function AdminDashboard() {
         >
           Asistencia
         </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === "events"}
+          onClick={() => setView("events")}
+          className={tabClass(view === "events")}
+        >
+          Eventos
+        </button>
       </div>
 
       <div className="mt-5">
         {view === "attendance" && <AttendanceScanner />}
+        {view === "events" && <EventAttendance />}
 
         {view === "members" && status === "loading" && (
           <div className="rounded-xl border border-(--support-gunmetal) p-10 text-center text-[0.6rem] uppercase tracking-widest text-(--support-grey)">
@@ -222,7 +233,7 @@ export default function AdminDashboard() {
                   <tr className="border-b border-(--support-gunmetal) text-[0.6rem] uppercase tracking-widest text-(--support-grey)">
                     <th className="px-4 py-3.5">Código</th>
                     <th className="px-4 py-3.5">Usuario</th>
-                    <th className="px-4 py-3.5">Email</th>
+                    <th className="px-4 py-3.5">Nombre</th>
                     <th className="px-4 py-3.5">Rol</th>
                     <th className="px-4 py-3.5">Estado</th>
                   </tr>
@@ -232,7 +243,7 @@ export default function AdminDashboard() {
                     <tr key={m.id} className="border-b border-(--support-gunmetal)/60 transition-colors last:border-b-0 hover:bg-(--bg-black)/40">
                       <td className="px-4 py-3.5 font-mono text-sm text-(--accent)">{m.codigo}</td>
                       <td className="px-4 py-3.5 text-sm font-semibold text-(--white)">{m.username}</td>
-                      <td className="px-4 py-3.5 text-sm text-(--support-grey)">{m.email ?? "—"}</td>
+                      <td className="px-4 py-3.5 text-sm text-(--support-grey)">{m.name || "—"}</td>
                       <td className="px-4 py-3.5 text-sm text-(--white)">{roleLabel(m.rol)}</td>
                       <td className="px-4 py-3.5">
                         <StatusBadge status={m.status} />
@@ -254,7 +265,7 @@ export default function AdminDashboard() {
                     <div className="min-w-0">
                       <p className="font-mono text-sm font-semibold text-(--accent)">{m.codigo}</p>
                       <p className="mt-1 truncate text-sm font-semibold text-(--white)">{m.username}</p>
-                      <p className="mt-0.5 truncate text-xs text-(--support-grey)">{m.email ?? "—"}</p>
+                      <p className="mt-0.5 truncate text-xs text-(--support-grey)">{m.name || "—"}</p>
                     </div>
                     <StatusBadge status={m.status} />
                   </div>

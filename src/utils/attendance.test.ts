@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractCodigoFromScan } from "./attendance";
+import { extractCodigoFromScan, extractTotpFromScan } from "./attendance";
 
 describe("extractCodigoFromScan", () => {
   it("acepta un código plano", () => {
@@ -32,5 +32,26 @@ describe("extractCodigoFromScan", () => {
     expect(extractCodigoFromScan("ID:20210000001")).toBeNull();
     expect(extractCodigoFromScan("ab")).toBeNull();
     expect(extractCodigoFromScan("código con acentos")).toBeNull();
+  });
+});
+
+describe("extractTotpFromScan", () => {
+  it("extrae el TOTP del payload QR del carnet", () => {
+    expect(extractTotpFromScan("ID:20210000001|TOTP:123456")).toBe("123456");
+  });
+
+  it("devuelve null para un código plano", () => {
+    expect(extractTotpFromScan("20210000001")).toBeNull();
+  });
+
+  it("devuelve null si el TOTP no tiene 6 dígitos", () => {
+    expect(extractTotpFromScan("ID:20210000001|TOTP:12")).toBeNull();
+    expect(extractTotpFromScan("ID:20210000001|TOTP:1234567")).toBeNull();
+  });
+
+  it("devuelve null para contenido vacío o desconocido", () => {
+    expect(extractTotpFromScan("")).toBeNull();
+    expect(extractTotpFromScan("https://example.com/qr")).toBeNull();
+    expect(extractTotpFromScan(null as unknown as string)).toBeNull();
   });
 });

@@ -22,7 +22,7 @@ const member = (overrides: Partial<Member> = {}): Member => ({
   id: "2",
   codigo: "20210000002",
   username: "20210000002",
-  email: "m2@glud.org",
+  name: "María Gómez",
   rol: "MIEMBRO",
   status: "ACTIVE",
   tenantId: "1",
@@ -31,9 +31,9 @@ const member = (overrides: Partial<Member> = {}): Member => ({
 });
 
 const members: Member[] = [
-  member({ id: "1", codigo: "20210000001", email: "admin@glud.org", rol: "TENANT_ADMIN", username: "20210000001" }),
+  member({ id: "1", codigo: "20210000001", name: "Ana Admin", rol: "TENANT_ADMIN", username: "20210000001" }),
   member({ id: "2" }),
-  member({ id: "3", codigo: "20210000003", email: null, rol: "MIEMBRO", status: "SUSPENDED" }),
+  member({ id: "3", codigo: "20210000003", name: "", rol: "MIEMBRO", status: "SUSPENDED" }),
 ];
 
 describe("MemberManager", () => {
@@ -57,7 +57,7 @@ describe("MemberManager", () => {
     });
 
     expect(screen.getByText("Miembros de GLUD")).toBeInTheDocument();
-    expect(screen.getByText("m2@glud.org")).toBeInTheDocument();
+    expect(screen.getByText("María Gómez")).toBeInTheDocument();
     expect(screen.getByText("Suspendido")).toBeInTheDocument();
     expect(screen.getByText(`Admins: 1/${MAX_ADMINS_PER_GROUP}`)).toBeInTheDocument();
     expect(vi.mocked(fetchMembers)).toHaveBeenCalledWith(undefined);
@@ -121,8 +121,8 @@ describe("MemberManager", () => {
     fireEvent.change(screen.getByLabelText("Contraseña"), {
       target: { value: "clave123" },
     });
-    fireEvent.change(screen.getByLabelText("Email (opcional)"), {
-      target: { value: "nuevo@glud.org" },
+    fireEvent.change(screen.getByLabelText("Nombre (opcional)"), {
+      target: { value: "Nuevo Miembro" },
     });
     fireEvent.click(screen.getByText("Crear Miembro"));
 
@@ -130,7 +130,7 @@ describe("MemberManager", () => {
       expect(createMember).toHaveBeenCalledWith({
         codigo: "20210000009",
         password: "clave123",
-        email: "nuevo@glud.org",
+        name: "Nuevo Miembro",
         rol: "MIEMBRO",
         tenantId: null,
       });
@@ -191,9 +191,9 @@ describe("MemberManager", () => {
     expect(createMember).not.toHaveBeenCalled();
   });
 
-  it("edita email y rol de un miembro", async () => {
+  it("edita nombre y rol de un miembro", async () => {
     vi.mocked(fetchMembers).mockResolvedValue(members);
-    vi.mocked(updateMember).mockResolvedValue(member({ email: "x@glud.org", rol: "MIEMBRO" }));
+    vi.mocked(updateMember).mockResolvedValue(member({ name: "Nombre Nuevo", rol: "MIEMBRO" }));
     render(<MemberManager open onClose={() => {}} isSuperAdmin={false} />);
 
     await waitFor(() => {
@@ -201,14 +201,14 @@ describe("MemberManager", () => {
     });
 
     fireEvent.click(screen.getAllByText("Editar")[0]);
-    fireEvent.change(screen.getByLabelText("Email (opcional)"), {
-      target: { value: "x@glud.org" },
+    fireEvent.change(screen.getByLabelText("Nombre (opcional)"), {
+      target: { value: "Nombre Nuevo" },
     });
     fireEvent.click(screen.getByText("Guardar Cambios"));
 
     await waitFor(() => {
       expect(updateMember).toHaveBeenCalledWith("1", {
-        email: "x@glud.org",
+        name: "Nombre Nuevo",
         rol: null,
       });
     });
