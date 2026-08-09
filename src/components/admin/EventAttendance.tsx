@@ -30,6 +30,11 @@ function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
 }
 
+function deleteLabel(eventId: string, confirmDeleteId: string | null, deletingId: string | null): string {
+  if (confirmDeleteId !== eventId) return "Eliminar";
+  return deletingId === eventId ? "..." : "¿Eliminar? Sí";
+}
+
 function formatDateTime(iso: string): string {
   try {
     return new Date(iso).toLocaleString("es-CO", {
@@ -157,7 +162,7 @@ export default function EventAttendance() {
     [selected, loadAttendees, loadEvents],
   );
 
-  const handleManualSubmit = async (e: React.FormEvent) => {
+  const handleManualSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!selected || !manualCodigo.trim()) return;
     setManualBusy(true);
@@ -178,7 +183,7 @@ export default function EventAttendance() {
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleCreate = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setCreateError("");
     if (!newTitle.trim()) {
@@ -379,8 +384,17 @@ export default function EventAttendance() {
               {events.map((event) => (
                 <div
                   key={event.eventId}
-                  className={`cursor-pointer rounded-xl border p-4 transition-all ${selectedClass(event)}`}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Seleccionar evento ${event.title}`}
+                  className={`cursor-pointer rounded-xl border p-4 transition-all focus-visible:outline-2 focus-visible:outline-(--accent) ${selectedClass(event)}`}
                   onClick={() => selectEvent(event)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      selectEvent(event);
+                    }
+                  }}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -407,11 +421,7 @@ export default function EventAttendance() {
                       }}
                       className="text-[9px] font-bold uppercase tracking-widest text-(--support-grey) transition-colors hover:text-(--support-lila)"
                     >
-                      {confirmDeleteId === event.eventId
-                        ? deletingId === event.eventId
-                          ? "..."
-                          : "¿Eliminar? Sí"
-                        : "Eliminar"}
+                      {deleteLabel(event.eventId, confirmDeleteId, deletingId)}
                     </button>
                   </div>
                 </div>
