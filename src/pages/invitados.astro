@@ -1,0 +1,12 @@
+---
+import AppShell from '../layouts/AppShell.astro';
+import ProtectedRoute from '../layouts/ProtectedRoute.astro';
+import GuestManager from '../components/carnet/GuestManager';
+
+// Pagina de gestion de invitados del miembro
+---
+<ProtectedRoute>
+  <AppShell title="Invitados | GLUD Credenciales">
+    <GuestManager client:load />
+  </AppShell>
+</ProtectedRoute>

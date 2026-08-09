@@ -191,7 +191,7 @@ export default function GroupForm({ mode, tenant, onClose }: Readonly<GroupFormP
         ref={modalRef}
         open
         aria-labelledby="group-form-title"
-        className="m-0 max-h-[90dvh] w-full max-w-4xl flex flex-col overflow-y-auto rounded-3xl border border-(--cyan)/30 bg-(--bg-black-gunmetal) p-0 shadow-[0_0_40px_rgba(0,255,255,0.15)] focus:outline-none md:flex-row"
+        className="relative m-auto max-h-[90dvh] w-full max-w-4xl flex flex-col overflow-y-auto rounded-3xl border border-(--cyan)/30 bg-(--bg-black-gunmetal) p-0 shadow-[0_0_40px_rgba(0,255,255,0.15)] focus:outline-none md:flex-row"
       >
         {/* Panel izquierdo */}
         <div className="relative flex w-full flex-col justify-between overflow-hidden border-b border-(--support-gunmetal) bg-(--bg-eerie) p-5 md:w-1/3 md:border-b-0 md:border-r md:p-10">

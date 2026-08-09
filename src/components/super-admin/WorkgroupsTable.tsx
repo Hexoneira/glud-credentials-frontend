@@ -93,6 +93,16 @@ export default function WorkgroupsTable({
       ),
     [tenants],
   );
+  const totalLimit = useMemo(
+    () =>
+      tenants.reduce(
+        (acc, tenant) => acc + (Number(tenant.memberLimit) || 0),
+        0,
+      ),
+    [tenants],
+  );
+  const occupancy =
+    totalLimit > 0 ? Math.round((totalMembers / totalLimit) * 100) : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -111,53 +121,58 @@ export default function WorkgroupsTable({
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-[var(--bg-black-gunmetal)] p-5 rounded-2xl border border-[var(--support-gunmetal)]">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="bg-[var(--bg-black-gunmetal)] p-4 rounded-xl border border-[var(--support-gunmetal)]">
           <span className="text-[10px] uppercase tracking-widest text-[var(--support-grey)] mb-1 block">
             Total Grupos
           </span>
-          <span className="text-3xl font-bold text-[var(--white)]">
+          <span className="text-2xl font-bold text-[var(--white)]">
             {totalGroups}
           </span>
         </div>
-        <div className="bg-[var(--bg-black-gunmetal)] p-5 rounded-2xl border border-[var(--cyan)]/30">
+        <div className="bg-[var(--bg-black-gunmetal)] p-4 rounded-xl border border-[var(--cyan)]/30">
           <span className="text-[10px] uppercase tracking-widest text-[var(--support-grey)] mb-1 block">
             Activos
           </span>
-          <span className="text-3xl font-bold text-[var(--cyan)]">
+          <span className="text-2xl font-bold text-[var(--cyan)]">
             {activeGroups}
           </span>
         </div>
-        <div className="bg-[var(--bg-black-gunmetal)] p-5 rounded-2xl border border-[var(--support-beer)]/30">
+        <div className="bg-[var(--bg-black-gunmetal)] p-4 rounded-xl border border-[var(--support-beer)]/30">
           <span className="text-[10px] uppercase tracking-widest text-[var(--support-grey)] mb-1 block">
             Miembros Totales
           </span>
-          <span className="text-3xl font-bold text-[var(--support-beer)]">
+          <span className="text-2xl font-bold text-[var(--support-beer)]">
             {totalMembers}
+          </span>
+        </div>
+        <div className="bg-[var(--bg-black-gunmetal)] p-4 rounded-xl border border-[var(--support-gunmetal)]">
+          <span className="text-[10px] uppercase tracking-widest text-[var(--support-grey)] mb-1 block">
+            Ocupación
+          </span>
+          <span className="text-2xl font-bold text-[var(--white)]">
+            {occupancy === null ? "—" : `${occupancy}%`}
           </span>
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-[var(--support-gunmetal)] bg-[var(--bg-black-gunmetal)]">
+      <div className="overflow-x-auto rounded-xl border border-[var(--support-gunmetal)] bg-[var(--bg-black-gunmetal)]">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-[var(--bg-black)] border-b border-[var(--support-gunmetal)]">
             <tr>
-              <th className="px-5 py-4 text-[10px] uppercase tracking-widest text-[var(--support-grey)]">
+              <th className="px-4 py-3.5 text-[10px] uppercase tracking-widest text-[var(--support-grey)]">
                 Grupo
               </th>
-              <th className="px-5 py-4 text-[10px] uppercase tracking-widest text-[var(--support-grey)]">
-                Tenant Code
-              </th>
-              <th className="px-5 py-4 text-[10px] uppercase tracking-widest text-[var(--support-grey)]">
+              <th className="px-4 py-3.5 text-[10px] uppercase tracking-widest text-[var(--support-grey)]">
                 Director
               </th>
-              <th className="px-5 py-4 text-[10px] uppercase tracking-widest text-[var(--support-grey)]">
+              <th className="px-4 py-3.5 text-[10px] uppercase tracking-widest text-[var(--support-grey)]">
                 Miembros
               </th>
-              <th className="px-5 py-4 text-[10px] uppercase tracking-widest text-[var(--support-grey)]">
+              <th className="px-4 py-3.5 text-[10px] uppercase tracking-widest text-[var(--support-grey)]">
                 Estado
               </th>
-              <th className="px-5 py-4 text-[10px] uppercase tracking-widest text-[var(--support-grey)] text-right">
+              <th className="px-4 py-3.5 text-[10px] uppercase tracking-widest text-[var(--support-grey)] text-right">
                 Acciones
               </th>
             </tr>
@@ -166,8 +181,8 @@ export default function WorkgroupsTable({
             {loading && (
               <tr>
                 <td
-                  colSpan={6}
-                  className="px-5 py-6 text-center text-[var(--support-grey)]"
+                  colSpan={5}
+                  className="px-4 py-6 text-center text-[var(--support-grey)]"
                 >
                   Cargando grupos de trabajo...
                 </td>
@@ -177,8 +192,8 @@ export default function WorkgroupsTable({
             {!loading && tenants.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
-                  className="px-5 py-6 text-center text-[var(--support-grey)]"
+                  colSpan={5}
+                  className="px-4 py-6 text-center text-[var(--support-grey)]"
                 >
                   No hay grupos de trabajo registrados.
                 </td>
@@ -206,34 +221,50 @@ export default function WorkgroupsTable({
                     key={tenant.id}
                     className="border-b border-[var(--support-gunmetal)]/60 hover:bg-[var(--bg-black)]/20"
                   >
-                    <td className="px-5 py-4 font-semibold text-[var(--white)]">
-                      <span className="inline-flex items-center gap-2">
+                    <td className="px-4 py-3.5">
+                      <span className="inline-flex items-center gap-2 font-semibold text-[var(--white)]">
                         <span
-                          className="inline-block h-3 w-3 shrink-0 rounded-full border border-white/20"
+                          className="inline-block h-2.5 w-2.5 shrink-0 rounded-full border border-white/20"
                           style={{ backgroundColor: tenant.primaryColor || "#22fefb" }}
                           title={`Color del grupo: ${tenant.primaryColor || "#22fefb"}`}
                         />
                         {tenant.name}
                       </span>
+                      <span className="ml-4 font-mono text-[10px] tracking-wider text-[var(--support-grey)]">
+                        {tenant.tenantCode}
+                      </span>
                     </td>
-                    <td className="px-5 py-4 text-[var(--support-grey)]">
-                      {tenant.tenantCode}
-                    </td>
-                    <td className="px-5 py-4 text-[var(--white)]">
+                    <td className="px-4 py-3.5 text-[var(--white)]">
                       {tenant.director || "Sin asignar"}
                     </td>
-                    <td className="px-5 py-4 text-[var(--white)]">
-                      {currentMembers} / {memberLimit}
+                    <td className="px-4 py-3.5">
+                      <span className="font-semibold text-[var(--white)]">
+                        {currentMembers} / {memberLimit}
+                      </span>
+                      {memberLimit > 0 && (
+                        <div className="mt-1.5 h-1 w-full max-w-28 overflow-hidden rounded-none bg-[var(--bg-black)]">
+                          <div
+                            className={`h-full ${
+                              currentMembers / memberLimit >= 0.9
+                                ? "bg-[var(--support-lila)]"
+                                : "bg-[var(--cyan)]"
+                            }`}
+                            style={{
+                              width: `${Math.min(100, (currentMembers / memberLimit) * 100)}%`,
+                            }}
+                          />
+                        </div>
+                      )}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-4 py-3.5">
                       <span
                         className={`px-3 py-1 rounded-full text-[10px] uppercase tracking-widest border font-bold ${statusClass}`}
                       >
                         {tenant.status === "ACTIVE" ? "Activo" : "Suspendido"}
                       </span>
                     </td>
-                    <td className="px-5 py-4">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-4 py-3.5">
+                      <div className="flex items-center justify-end gap-2.5">
                         {onManageMembers && (
                           <button
                             onClick={() => onManageMembers(tenant)}

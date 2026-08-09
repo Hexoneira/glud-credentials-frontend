@@ -1,0 +1,37 @@
+---
+import '../styles/global.css';
+import AppNav from '../components/layout/AppNav';
+
+interface Props {
+  title?: string;
+}
+
+const { title = 'GLUD Credenciales | Hexoneira' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content="Sistema de gestión de credenciales y grupos de trabajo para GLUD - Hexoneira." />
+		<meta name="theme-color" content="#1c2128" />
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<title>{title}</title>
+	</head>
+	<body class="min-h-screen bg-[#0b0f16] font-sans text-(--white)">
+		<AppNav client:load />
+		<slot />
+		<script is:inline>
+			if ("serviceWorker" in navigator) {
+				navigator.serviceWorker.register("/sw.js").catch(() => {});
+			}
+		</script>
+	</body>
+</html>
