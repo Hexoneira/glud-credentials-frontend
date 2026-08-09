@@ -22,11 +22,11 @@ interface MemberManagerProps {
 interface MemberForm {
   codigo: string;
   password: string;
-  email: string;
+  name: string;
   rol: string;
 }
 
-const EMPTY_FORM: MemberForm = { codigo: "", password: "", email: "", rol: "MIEMBRO" };
+const EMPTY_FORM: MemberForm = { codigo: "", password: "", name: "", rol: "MIEMBRO" };
 
 const ROLE_LABELS: Record<string, string> = {
   SUPER_ADMIN: "Super Admin",
@@ -125,7 +125,7 @@ export default function MemberManager({
     setForm({
       codigo: member.codigo,
       password: "",
-      email: member.email ?? "",
+      name: member.name ?? "",
       rol: member.rol,
     });
     setFormError("");
@@ -153,8 +153,8 @@ export default function MemberManager({
       setFormError("La contraseña debe tener al menos 6 caracteres");
       return;
     }
-    if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
-      setFormError("El email no es válido");
+    if (form.name.trim().length > 120) {
+      setFormError("El nombre no puede superar 120 caracteres");
       return;
     }
 
@@ -164,13 +164,13 @@ export default function MemberManager({
         await createMember({
           codigo: form.codigo.trim(),
           password: form.password,
-          email: form.email.trim() || null,
+          name: form.name.trim() || null,
           rol: form.rol,
           tenantId: isSuperAdmin ? tenantId : null,
         });
       } else if (editing) {
-        const payload: { email?: string | null; rol?: string | null } = {
-          email: form.email.trim() || null,
+        const payload: { name?: string | null; rol?: string | null } = {
+          name: form.name.trim() || null,
           rol: form.rol !== editing.rol ? form.rol : null,
         };
         await updateMember(editing.id, payload);
@@ -303,7 +303,7 @@ export default function MemberManager({
                   <thead>
                     <tr className="border-b border-(--support-gunmetal) text-[10px] uppercase tracking-widest text-(--support-grey)">
                       <th className="px-5 py-4">Código</th>
-                      <th className="px-5 py-4">Email</th>
+                      <th className="px-5 py-4">Nombre</th>
                       <th className="px-5 py-4">Rol</th>
                       <th className="px-5 py-4">Estado</th>
                       <th className="px-5 py-4 text-right">Acciones</th>
@@ -338,7 +338,7 @@ export default function MemberManager({
                                 </span>
                               )}
                             </td>
-                            <td className="px-5 py-4 text-(--support-grey)">{member.email ?? "—"}</td>
+                            <td className="px-5 py-4 text-(--support-grey)">{member.name || "—"}</td>
                             <td className="px-5 py-4 font-semibold text-(--white)">{ROLE_LABELS[member.rol] ?? member.rol}</td>
                             <td className="px-5 py-4">
                               <span
@@ -455,15 +455,15 @@ export default function MemberManager({
               )}
 
               <div className="flex flex-col gap-2">
-                <label htmlFor="member-email" className="text-[10px] font-bold uppercase tracking-widest text-(--cyan)">
-                  Email <span className="text-(--support-grey)">(opcional)</span>
+                <label htmlFor="member-name" className="text-[10px] font-bold uppercase tracking-widest text-(--cyan)">
+                  Nombre <span className="text-(--support-grey)">(opcional)</span>
                 </label>
                 <input
-                  id="member-email"
-                  type="email"
-                  placeholder="ejemplo@glud.org"
-                  value={form.email}
-                  onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+                  id="member-name"
+                  type="text"
+                  placeholder="Nombre del miembro"
+                  value={form.name}
+                  onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
                   className="rounded-xl border border-(--support-gunmetal) bg-(--bg-black) px-4 py-3 text-sm text-(--white) transition-all duration-300 focus:border-(--cyan) focus:shadow-[0_0_15px_rgba(0,255,255,0.2)] focus:outline-none"
                 />
               </div>

@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import jsQR from "jsqr";
-import { fetchTodayAttendance, registerAttendance } from "../../services/api";
+import { useCallback, useEffect, useState } from "react";
+import { downloadAttendanceCsv, fetchTodayAttendance, registerAttendance } from "../../services/api";
 import type { AttendanceRecord } from "../../services/api";
 import { extractCodigoFromScan } from "../../utils/attendance";
+import QrScannerPanel from "./QrScannerPanel";
 
-type ScanStatus = "idle" | "scanning" | "success" | "error";
+type ScanStatus = "idle" | "success" | "error";
 
 function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
@@ -21,15 +21,17 @@ function formatTime(iso: string): string {
   }
 }
 
-export default function AttendanceScanner() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const scanningRef = useRef(false);
-  const cameraActiveRef = useRef(false);
+function vibrate() {
+  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+    try {
+      navigator.vibrate?.(60);
+    } catch {
+      // sin soporte de vibración: se ignora
+    }
+  }
+}
 
-  const [cameraActive, setCameraActive] = useState(false);
-  const [cameraError, setCameraError] = useState("");
+export default function AttendanceScanner() {
   const [scanStatus, setScanStatus] = useState<ScanStatus>("idle");
   const [lastResult, setLastResult] = useState<AttendanceRecord | null>(null);
   const [resultMessage, setResultMessage] = useState("");
@@ -37,6 +39,7 @@ export default function AttendanceScanner() {
   const [manualBusy, setManualBusy] = useState(false);
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [recordsError, setRecordsError] = useState("");
+  const [exporting, setExporting] = useState(false);
 
   const loadToday = useCallback(async () => {
     setRecordsError("");
@@ -52,93 +55,31 @@ export default function AttendanceScanner() {
     void loadToday();
   }, [loadToday]);
 
-  const stopCamera = useCallback(() => {
-    scanningRef.current = false;
-    cameraActiveRef.current = false;
-    streamRef.current?.getTracks().forEach((track) => track.stop());
-    streamRef.current = null;
-    setCameraActive(false);
-  }, []);
-
-  useEffect(() => {
-    return () => stopCamera();
-  }, [stopCamera]);
-
-  const handleDecoded = useCallback(
-    async (raw: string) => {
-      if (!scanningRef.current) return;
-      scanningRef.current = false;
-      stopCamera();
-
+  // Devuelve true si el escaneo se consumió (cámara se detiene)
+  const handleScanned = useCallback(
+    async (raw: string): Promise<boolean> => {
       const codigo = extractCodigoFromScan(raw);
       if (!codigo) {
         setScanStatus("error");
         setResultMessage("El código escaneado no es válido");
-        return;
+        return true;
       }
       try {
-        const record = await registerAttendance(codigo);
+        // Se envía el payload crudo: si el carnet trae TOTP, el backend lo valida
+        const record = await registerAttendance(raw);
         setLastResult(record);
         setScanStatus("success");
         setResultMessage(`${record.codigo} · ${record.tenantName}`);
+        vibrate();
         await loadToday();
       } catch (error: unknown) {
         setScanStatus("error");
         setResultMessage(getErrorMessage(error, "No se pudo registrar la asistencia"));
       }
+      return true;
     },
-    [loadToday, stopCamera],
+    [loadToday],
   );
-
-  const startCamera = useCallback(async () => {
-    setCameraError("");
-    setScanStatus("idle");
-    setResultMessage("");
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-        audio: false,
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-      setCameraActive(true);
-      cameraActiveRef.current = true;
-      scanningRef.current = true;
-      requestAnimationFrame(tick);
-    } catch {
-      setCameraError("No se pudo acceder a la cámara. Usa la entrada manual.");
-    }
-  }, []);
-
-  const tick = () => {
-    if (!cameraActiveRef.current || !scanningRef.current) return;
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (video && canvas && video.readyState === video.HAVE_ENOUGH_DATA) {
-      const width = video.videoWidth;
-      const height = video.videoHeight;
-      if (width > 0 && height > 0) {
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d", { willReadFrequently: true });
-        if (ctx) {
-          ctx.drawImage(video, 0, 0, width, height);
-          const imageData = ctx.getImageData(0, 0, width, height);
-          const code = jsQR(imageData.data, width, height, {
-            inversionAttempts: "dontInvert",
-          });
-          if (code?.data) {
-            void handleDecoded(code.data);
-            return;
-          }
-        }
-      }
-    }
-    requestAnimationFrame(tick);
-  };
 
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,12 +93,25 @@ export default function AttendanceScanner() {
       setScanStatus("success");
       setResultMessage(`${record.codigo} · ${record.tenantName}`);
       setManualCodigo("");
+      vibrate();
       await loadToday();
     } catch (error: unknown) {
       setScanStatus("error");
       setResultMessage(getErrorMessage(error, "No se pudo registrar la asistencia"));
     } finally {
       setManualBusy(false);
+    }
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      await downloadAttendanceCsv("/attendance/today/export", `asistencia-${today}.csv`);
+    } catch (error: unknown) {
+      setRecordsError(getErrorMessage(error, "Error al exportar la asistencia"));
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -169,35 +123,8 @@ export default function AttendanceScanner() {
           <h3 className="text-[10px] font-bold uppercase tracking-widest text-(--accent)">
             Escanear QR del carnet
           </h3>
-          <p className="mt-1 text-xs leading-relaxed text-(--support-grey)">
-            Apunta a la cámara al QR del carnet. También acepta el código del miembro.
-          </p>
 
-          <div className="relative mt-4 overflow-hidden rounded-xl border border-(--support-gunmetal) bg-[#050916]">
-            <video
-              ref={videoRef}
-              playsInline
-              muted
-              className={`aspect-video w-full object-cover ${cameraActive ? "" : "hidden"}`}
-            />
-            <canvas ref={canvasRef} className="hidden" />
-            {!cameraActive && !cameraError && (
-              <div className="flex aspect-video items-center justify-center">
-                <button
-                  type="button"
-                  onClick={() => void startCamera()}
-                  className="rounded-full border border-(--cyan) bg-(--cyan)/10 px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-(--cyan) shadow-[0_0_15px_rgba(0,255,255,0.2)] transition-all duration-300 hover:bg-(--cyan) hover:text-(--bg-black)"
-                >
-                  Activar cámara
-                </button>
-              </div>
-            )}
-            {!cameraActive && cameraError && (
-              <div className="flex aspect-video items-center justify-center p-6 text-center text-[10px] font-bold uppercase tracking-widest text-(--support-lila)">
-                {cameraError}
-              </div>
-            )}
-          </div>
+          <QrScannerPanel onDecoded={handleScanned} />
 
           {scanStatus === "success" && lastResult && (
             <div className="mt-4 rounded-xl border border-(--cyan)/40 bg-(--cyan)/10 px-4 py-3 text-sm font-semibold text-(--cyan)">
@@ -207,11 +134,6 @@ export default function AttendanceScanner() {
           {scanStatus === "error" && (
             <div className="mt-4 rounded-xl border border-(--support-lila)/40 bg-(--support-lila)/10 px-4 py-3 text-sm font-semibold text-(--support-lila)">
               ✕ {resultMessage}
-            </div>
-          )}
-          {scanStatus === "idle" && !cameraActive && (
-            <div className="mt-4 rounded-xl border border-(--support-gunmetal) px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-(--support-grey)">
-              Esperando escaneo...
             </div>
           )}
 
@@ -236,13 +158,23 @@ export default function AttendanceScanner() {
 
         {/* Registros de hoy */}
         <div className="rounded-2xl border border-(--support-gunmetal) bg-(--bg-black) p-5">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="text-[10px] font-bold uppercase tracking-widest text-(--accent)">
               Asistencia de hoy
             </h3>
-            <span className="rounded-full border border-(--cyan)/40 bg-(--cyan)/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-(--cyan)">
-              {records.length} registro{records.length === 1 ? "" : "s"}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="rounded-full border border-(--cyan)/40 bg-(--cyan)/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-(--cyan)">
+                {records.length} registro{records.length === 1 ? "" : "s"}
+              </span>
+              <button
+                type="button"
+                onClick={() => void handleExport()}
+                disabled={exporting || records.length === 0}
+                className="rounded-full border border-(--support-beer)/50 bg-(--support-beer)/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-(--support-beer) transition-all duration-300 hover:bg-(--support-beer) hover:text-(--bg-black) disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {exporting ? "..." : "Exportar CSV"}
+              </button>
+            </div>
           </div>
 
           {recordsError && (
@@ -253,11 +185,11 @@ export default function AttendanceScanner() {
 
           <div className="mt-4 max-h-96 overflow-y-auto rounded-xl border border-(--support-gunmetal)">
             <table className="w-full min-w-[22rem] text-left text-sm">
-              <thead>
+              <thead className="sticky top-0 bg-(--bg-black)">
                 <tr className="border-b border-(--support-gunmetal) text-[10px] uppercase tracking-widest text-(--support-grey)">
                   <th className="px-4 py-3">Código</th>
+                  <th className="px-4 py-3">Nombre</th>
                   <th className="px-4 py-3">Hora</th>
-                  <th className="px-4 py-3">Grupo</th>
                 </tr>
               </thead>
               <tbody>
@@ -271,8 +203,8 @@ export default function AttendanceScanner() {
                 {records.map((record) => (
                   <tr key={record.attendanceId} className="border-b border-(--support-gunmetal)/60 last:border-b-0">
                     <td className="px-4 py-3 font-mono text-(--accent)">{record.codigo}</td>
-                    <td className="px-4 py-3 text-(--white)">{formatTime(record.checkInAt)}</td>
-                    <td className="px-4 py-3 text-(--support-grey)">{record.tenantName}</td>
+                    <td className="px-4 py-3 text-(--white)">{record.name}</td>
+                    <td className="px-4 py-3 text-(--support-grey)">{formatTime(record.checkInAt)}</td>
                   </tr>
                 ))}
               </tbody>

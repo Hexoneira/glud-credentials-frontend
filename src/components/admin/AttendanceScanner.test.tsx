@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import AttendanceScanner from "./AttendanceScanner";
-import { registerAttendance, fetchTodayAttendance } from "../../services/api";
+import { registerAttendance, fetchTodayAttendance, downloadAttendanceCsv } from "../../services/api";
 import type { AttendanceRecord } from "../../services/api";
 
 vi.mock("jsqr", () => ({
@@ -11,6 +11,7 @@ vi.mock("jsqr", () => ({
 vi.mock("../../services/api", () => ({
   registerAttendance: vi.fn(),
   fetchTodayAttendance: vi.fn(),
+  downloadAttendanceCsv: vi.fn(),
 }));
 
 import jsQR from "jsqr";
@@ -18,6 +19,7 @@ import jsQR from "jsqr";
 const record = (overrides: Partial<AttendanceRecord> = {}): AttendanceRecord => ({
   attendanceId: "1",
   codigo: "20210000002",
+  name: "María Gómez",
   email: "m2@glud.org",
   rol: "MIEMBRO",
   tenantId: "1",
@@ -46,8 +48,7 @@ describe("AttendanceScanner", () => {
     });
     expect(screen.getByText("20210000002")).toBeInTheDocument();
     expect(screen.getByText("20210000003")).toBeInTheDocument();
-    expect(screen.getByText("GLUD")).toBeInTheDocument();
-    expect(screen.getByText("GLUD 2")).toBeInTheDocument();
+    expect(screen.getAllByText("María Gómez").length).toBeGreaterThanOrEqual(1);
   });
 
   it("muestra estado vacío cuando no hay registros", async () => {
@@ -123,6 +124,34 @@ describe("AttendanceScanner", () => {
     expect(registerAttendance).not.toHaveBeenCalled();
   });
 
+  it("exporta el CSV de la asistencia de hoy", async () => {
+    vi.mocked(fetchTodayAttendance).mockResolvedValue([record()]);
+    vi.mocked(downloadAttendanceCsv).mockResolvedValue(undefined);
+
+    render(<AttendanceScanner />);
+
+    const exportButton = await screen.findByText("Exportar CSV");
+    fireEvent.click(exportButton);
+
+    await waitFor(() => {
+      expect(downloadAttendanceCsv).toHaveBeenCalledWith(
+        "/attendance/today/export",
+        expect.stringMatching(/^asistencia-\d{4}-\d{2}-\d{2}\.csv$/),
+      );
+    });
+  });
+
+  it("muestra error al exportar", async () => {
+    vi.mocked(fetchTodayAttendance).mockResolvedValue([record()]);
+    vi.mocked(downloadAttendanceCsv).mockRejectedValue(new Error("Error al exportar"));
+
+    render(<AttendanceScanner />);
+
+    fireEvent.click(await screen.findByText("Exportar CSV"));
+
+    expect(await screen.findByText("Error al exportar")).toBeInTheDocument();
+  });
+
   it("registra asistencia al escanear un QR con la cámara", async () => {
     Object.defineProperty(HTMLVideoElement.prototype, "readyState", {
       configurable: true,
@@ -170,7 +199,7 @@ describe("AttendanceScanner", () => {
     fireEvent.click(await screen.findByText("Activar cámara"));
 
     await waitFor(() => {
-      expect(registerAttendance).toHaveBeenCalledWith("20210000002");
+      expect(registerAttendance).toHaveBeenCalledWith("ID:20210000002|TOTP:123456");
     });
     expect(await screen.findByText(/Asistencia registrada: 20210000002 · GLUD/)).toBeInTheDocument();
   });

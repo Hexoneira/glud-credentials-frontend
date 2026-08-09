@@ -29,8 +29,8 @@ const member = {
 };
 
 const members = [
-  { id: '1', codigo: '20210000001', username: '20210000001', email: 'a@mail.com', rol: 'MIEMBRO', status: 'ACTIVE', tenantId: '1', tenantName: 'GLUD' },
-  { id: '2', codigo: '20210000002', username: '20210000002', email: 'b@mail.com', rol: 'TENANT_ADMIN', status: 'SUSPENDED', tenantId: '1', tenantName: 'GLUD' },
+  { id: '1', codigo: '20210000001', username: '20210000001', name: 'Ana Admin', rol: 'MIEMBRO', status: 'ACTIVE', tenantId: '1', tenantName: 'GLUD' },
+  { id: '2', codigo: '20210000002', username: '20210000002', name: 'Beto Admin', rol: 'TENANT_ADMIN', status: 'SUSPENDED', tenantId: '1', tenantName: 'GLUD' },
 ];
 
 describe('AdminDashboard', () => {
@@ -48,7 +48,7 @@ describe('AdminDashboard', () => {
       { id: '2', codigo: '10102', name: 'Guest 2', email: null, status: 'REVOKED', tenantId: '1', tenantName: 'GLUD', tenantCode: 'GLUD', createdById: '10', createdByCodigo: '20210000001', createdAt: '2026-08-07T10:00:00', expiresAt: null, accessToken: 't', totpSecret: 's' },
     ] as never);
     vi.mocked(fetchTodayAttendance).mockResolvedValue([
-      { attendanceId: 'a1', codigo: '20210000001', email: null, rol: 'MIEMBRO', tenantId: '1', tenantName: 'GLUD', checkInAt: '2026-08-07T09:00:00', markedByCodigo: '20210000002' },
+      { attendanceId: 'a1', codigo: '20210000001', name: 'Ana Admin', email: null, rol: 'MIEMBRO', tenantId: '1', tenantName: 'GLUD', checkInAt: '2026-08-07T09:00:00', markedByCodigo: '20210000002' },
     ] as never);
 
     render(<AdminDashboard />);
@@ -66,7 +66,7 @@ describe('AdminDashboard', () => {
 
     expect(await screen.findByText('GLUD')).toBeInTheDocument();
     expect(screen.getAllByText('20210000001').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('a@mail.com').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Ana Admin').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Miembro').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Suspendido').length).toBeGreaterThanOrEqual(1);
   });
@@ -98,9 +98,9 @@ describe('AdminDashboard', () => {
 
   it('etiqueta roles: Super Admin, Miembro y valor por defecto', async () => {
     vi.mocked(fetchMembers).mockResolvedValue([
-      { id: '3', codigo: '20210000003', username: 'sadmin', email: null, rol: 'SUPER_ADMIN', status: 'ACTIVE', tenantId: '1', tenantName: 'GLUD' },
-      { id: '4', codigo: '20210000004', username: 'miembro', email: null, rol: 'MIEMBRO', status: 'ACTIVE', tenantId: '1', tenantName: 'GLUD' },
-      { id: '5', codigo: '20210000005', username: 'inv', email: null, rol: 'INVITADO', status: 'ACTIVE', tenantId: '1', tenantName: 'GLUD' },
+      { id: '3', codigo: '20210000003', username: 'sadmin', name: '', rol: 'SUPER_ADMIN', status: 'ACTIVE', tenantId: '1', tenantName: 'GLUD' },
+      { id: '4', codigo: '20210000004', username: 'miembro', name: '', rol: 'MIEMBRO', status: 'ACTIVE', tenantId: '1', tenantName: 'GLUD' },
+      { id: '5', codigo: '20210000005', username: 'inv', name: '', rol: 'INVITADO', status: 'ACTIVE', tenantId: '1', tenantName: 'GLUD' },
     ] as never);
 
     render(<AdminDashboard />);

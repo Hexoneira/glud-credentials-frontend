@@ -25,6 +25,11 @@ import {
   registerAttendance,
   suspendTenant,
   updateTenant,
+  createEvent,
+  deleteEvent,
+  downloadAttendanceCsv,
+  fetchEventAttendance,
+  fetchEvents,
 } from './api';
 import { API_BASE_URL } from '../config';
 
@@ -354,6 +359,7 @@ describe('api service', () => {
     const record = {
       attendanceId: '1',
       codigo: '20210000002',
+      name: 'María Gómez',
       email: null,
       rol: 'MIEMBRO',
       tenantId: '1',
@@ -369,11 +375,27 @@ describe('api service', () => {
       `${API_BASE_URL}/attendance/register`,
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ code: 'ID:20210000002|TOTP:123456' }),
+        body: JSON.stringify({ code: 'ID:20210000002|TOTP:123456', eventId: null }),
         headers: expect.objectContaining({ Authorization: 'Bearer jwt-auth' }),
       })
     );
     expect(result).toEqual(record);
+  });
+
+  it('registerAttendance envía eventId cuando se registra a un evento', async () => {
+    authState.token = 'jwt-auth';
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      createJsonResponse({ attendanceId: '1', codigo: '20210000002', name: 'María Gómez' })
+    );
+
+    await registerAttendance('20210000002', '50');
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `${API_BASE_URL}/attendance/register`,
+      expect.objectContaining({
+        body: JSON.stringify({ code: '20210000002', eventId: '50' }),
+      })
+    );
   });
 
   it('registerAttendance propaga el error del servidor', async () => {
@@ -399,5 +421,94 @@ describe('api service', () => {
       expect.objectContaining({ method: 'GET' })
     );
     expect(result).toEqual(records);
+  });
+
+  it('fetchEvents consume GET /events', async () => {
+    authState.token = 'jwt-auth';
+    const events = [{ eventId: '50', title: 'Asamblea GLUD', status: 'SCHEDULED', attendeesCount: 0 }];
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(createJsonResponse(events));
+
+    const result = await fetchEvents();
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      `${API_BASE_URL}/events`,
+      expect.objectContaining({ method: 'GET', headers: expect.objectContaining({ Authorization: 'Bearer jwt-auth' }) })
+    );
+    expect(result).toEqual(events);
+  });
+
+  it('createEvent consume POST /events con título e inicio', async () => {
+    authState.token = 'jwt-auth';
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      createJsonResponse({ eventId: '51', title: 'Asamblea GLUD', status: 'SCHEDULED', attendeesCount: 0 })
+    );
+
+    await createEvent({ title: 'Asamblea GLUD', startsAt: '2026-08-08T18:00' });
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `${API_BASE_URL}/events`,
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ title: 'Asamblea GLUD', startsAt: '2026-08-08T18:00' }),
+      })
+    );
+  });
+
+  it('fetchEventAttendance consume GET /events/{id}/attendance', async () => {
+    authState.token = 'jwt-auth';
+    const attendees = [{ attendanceId: '1', codigo: '20210000002', name: 'María Gómez' }];
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(createJsonResponse(attendees));
+
+    const result = await fetchEventAttendance('50');
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      `${API_BASE_URL}/events/50/attendance`,
+      expect.objectContaining({ method: 'GET' })
+    );
+    expect(result).toEqual(attendees);
+  });
+
+  it('deleteEvent consume DELETE /events/{id}', async () => {
+    authState.token = 'jwt-auth';
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 204 }));
+
+    await deleteEvent('50');
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `${API_BASE_URL}/events/50`,
+      expect.objectContaining({ method: 'DELETE' })
+    );
+  });
+
+  it('downloadAttendanceCsv descarga el blob y dispara el enlace', async () => {
+    authState.token = 'jwt-auth';
+    const blob = new Blob(['csv-content'], { type: 'text/csv' });
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(blob, { status: 200 }));
+    const createObjectUrl = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:fake');
+    const revokeObjectUrl = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+    const clickSpy = vi.fn();
+    const anchorPrototype = HTMLElement.prototype as { click: () => void };
+    vi.spyOn(anchorPrototype, 'click').mockImplementation(clickSpy);
+
+    await downloadAttendanceCsv('/events/50/attendance/export', 'asistentes-evento-50.csv');
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `${API_BASE_URL}/events/50/attendance/export`,
+      expect.objectContaining({ method: 'GET', headers: expect.objectContaining({ Authorization: 'Bearer jwt-auth' }) })
+    );
+    expect(createObjectUrl).toHaveBeenCalled();
+    expect(clickSpy).toHaveBeenCalled();
+    expect(revokeObjectUrl).toHaveBeenCalledWith('blob:fake');
+  });
+
+  it('downloadAttendanceCsv propaga el error del servidor', async () => {
+    authState.token = 'jwt-auth';
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      createJsonResponse({ message: 'Evento no encontrado' }, 404)
+    );
+
+    await expect(downloadAttendanceCsv('/events/99/attendance/export', 'x.csv')).rejects.toThrow(
+      'Evento no encontrado'
+    );
   });
 });
