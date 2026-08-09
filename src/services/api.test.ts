@@ -483,7 +483,9 @@ describe('api service', () => {
   it('downloadAttendanceCsv descarga el blob y dispara el enlace', async () => {
     authState.token = 'jwt-auth';
     const blob = new Blob(['csv-content'], { type: 'text/csv' });
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(blob, { status: 200 }));
+    const response = new Response('csv-content', { status: 200 });
+    vi.spyOn(response, 'blob').mockResolvedValue(blob);
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(response);
     const createObjectUrl = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:fake');
     const revokeObjectUrl = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
     const clickSpy = vi.fn();
