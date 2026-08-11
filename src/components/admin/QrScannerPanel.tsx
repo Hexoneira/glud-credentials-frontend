@@ -65,7 +65,7 @@ export default function QrScannerPanel({
           ctx.drawImage(video, 0, 0, width, height);
           const imageData = ctx.getImageData(0, 0, width, height);
           const code = jsQR(imageData.data, width, height, {
-            inversionAttempts: "dontInvert",
+            inversionAttempts: "attemptBoth",
           });
           if (code?.data) {
             void handleDecoded(code.data);
